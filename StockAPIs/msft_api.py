@@ -11,15 +11,15 @@ def buy_share():
 
 @microsoft_api.route('/msft/sell',methods=['POST'])
 def sell_share():
-    return '/msft/buy'
+    return '/msft/sell'
 
 @microsoft_api.route('/msft/share_price',methods=['GET'])
 def get_price():
-    return '/msft/buy'
+    return '/msft/share_price'
 
 @microsoft_api.route('/msft/shares',methods=['GET'])
 def get_shares():
-    return '/msft/buy'
+    return '/msft/shares'
 
 if __name__ == "__main__":
     app = Flask(__name__)
