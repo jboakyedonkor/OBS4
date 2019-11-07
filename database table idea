@@ -8,8 +8,8 @@ the respective table will be updated (update NUM_SHARES),
 NUM_SHARES would decrease.
 SYMBOL|NUM_SHARES
 
-Banking:
-SYMBOL|ASK_PRICE|NUM_SHARES|TOT_VALUE|
+Banking Table:
+SYMBOL|ASK_PRICE|NUM_SHARES|TOT_VALUE|KEY_USED
 
 Idea is that each bank will have five rows, so each bank account will have 5 rows
 The bank starts with 0 for NUM_SHARES and 0 TOT_VALUE,
@@ -17,14 +17,17 @@ If values are 0, the user cannot sell
 If values are > 0, the user can buy and their NUM_SHARES will increase, ASK_PRICE will change accordingly,
 and TOT_VALUE would give the ASK_PRICE * NUM_SHARES - mainly for finding networth easier.
 
-Transaction:
+Transaction Table:
 TRAN_DATE|SYMBOL|ASK_PRICE|NUM_SHARES|TOT_VALUE|BUYORSELL|KEY_USED
+
+KEY_USED is some token, maybe from the user's username and password
 
 Idea is that every buy/sell transaction will include-
 these fields, and a new row with the current timestamp
 will be included.
 
-
+User Table:
+USERNAME|PASSWORD|ACCOUNT|KEY_USED|
 
 
 
