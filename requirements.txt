@@ -1,0 +1,5 @@
+# dependencies
+pyjwt
+Flask
+virtualenv
+requests
