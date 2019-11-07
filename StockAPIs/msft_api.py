@@ -1,25 +1,27 @@
 import requests, json
 from flask import Flask, Blueprint
-from flask_sqlalchemy import SQLAlchemy
+#from flask_sqlalchemy import SQLAlchemy
 
-#api = Blueprint()
-app = Flask(__name__)
+microsoft_api= Blueprint('microsoft_api',__name__)
 
-@app.route('/msft/buy',methods=['POST'])
+
+@microsoft_api.route('/msft/buy',methods=['POST'])
 def buy_share():
-    return True
+    return '/msft/buy'
 
-@app.route('/msft/sell',methods=['POST'])
+@microsoft_api.route('/msft/sell',methods=['POST'])
 def sell_share():
-    return True
+    return '/msft/buy'
 
-@app.route('/msft/share_price',methods=['GET'])
+@microsoft_api.route('/msft/share_price',methods=['GET'])
 def get_price():
-    return True
+    return '/msft/buy'
 
-@app.route('/msft/shares',methods=['GET'])
+@microsoft_api.route('/msft/shares',methods=['GET'])
 def get_shares():
-    return True
+    return '/msft/buy'
 
 if __name__ == "__main__":
-    app.run() 
+    app = Flask(__name__)
+    app.register_blueprint(microsoft_api)
+    app.run()
