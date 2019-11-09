@@ -103,8 +103,12 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+<<<<<<< HEAD
 # auth keys
 /routes/api/keys.py
 /config/keys.py
 
 .vscode/
+=======
+stockAPIs/config.json
+>>>>>>> 8fa973a9534ebf34a2c59151b3c32b39b3cf77ae
