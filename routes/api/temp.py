@@ -4,8 +4,13 @@ from datetime import datetime
 import requests
 import jwt
 import keys
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
 
 
+@app.route('/api/quotes/FB')
 def get_price():
     """This function fetches the price of a Facebook stock."""
     response = requests.get('https://sandbox.tradier.com/v1/markets/quotes',
@@ -14,14 +19,18 @@ def get_price():
                                      'Accept': 'application/json'})
 
     response_json = response.json()
-    return response_json['quotes']['quote']['last']
+    return str(response_json['quotes']['quote']['last'])
 
 
-def verify(token=keys.get_jwt_key()):
+@app.route('/stocks/FB/verify')
+def verify():
     """This function verifies the authentication token."""
     # The token will need a user account unique identifier and current login credentials
     # The payload for the jwt will be { 'user_id', 'password' }
     # with headers { 'login_time', 'token_expire' }
+    
+    token = request.headers.get('token')
+    
     if token is None:
         raise Exception('Authentication token does not exist.')
 
@@ -30,6 +39,8 @@ def verify(token=keys.get_jwt_key()):
     if datetime.strptime(decoded['token_expire'], "%Y-%m-%d %H:%M:%S.%f") < datetime.now():
         raise Exception('Authentication token has expired.')
 
-    return bool(decoded['password'] == keys.get_password())
+    return str(bool(decoded['password'] == keys.get_password()))
 
-print(verify())
+
+if __name__ == '__main__':
+    app.run('localhost', 5000)
