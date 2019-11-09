@@ -8,13 +8,13 @@ from datetime import datetime, timedelta
 # from flask_sqlalchemy import SQLAlchemy
 
 # TODO Change path to ../config/.env when not debugging
-dotenv.load_dotenv(dotenv_path="./config/.env")
+dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 
 
 microsoft_api = Blueprint('microsoft_api', __name__)
 
 
-def generate_token(username, password, key, seconds=0, minutes=30, hours=0):
+def generate_token(username, key, seconds=0, minutes=30, hours=0):
     """
     generates JWT token
     """
@@ -62,6 +62,9 @@ def get_token(headers):
 
 
 def get_quote():
+    """
+    get market quotes for Micrsoft using the Tradier API
+    """
     api_url = "https://sandbox.tradier.com/v1/market/quotes"
     api_key = os.getenv("API_KEY")
 
@@ -78,20 +81,21 @@ def get_quote():
 
 @microsoft_api.route('/msfts/gen_token', methods=['POST'])
 def gen_token():
-    if request.method == 'POST':
-        user_info = request.get_json()
-        if not user_info:
+    """
+    Route for gnera
+    """
+    user_info = request.get_json()
+    if not user_info:
 
-            return Flask.make_response(
-                jsonify({'error': 'wrong  format'}), 400)
+        return Flask.make_response(
+            jsonify({'error': 'wrong  format'}), 400)
 
-        username = user_info['username']
-        password = user_info['password']
+    username = user_info['username']
 
-        # TODO: store actually key in a config file
-        token = generate_token(username, password, 'secret_key')
+    secret_key = os.getenv('SECRET_KEY')
+    token = generate_token(username, secret_key)
 
-        return jsonify({'token': token})
+    return jsonify({'token': token})
 
 
 @microsoft_api.route('/msft/buy', methods=['POST'])
@@ -121,8 +125,8 @@ def get_price():
     if not token:
         return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
 
-    # TODO: store actually key in a config file
-    valid, msg = verify_token(token, 'secret_key')
+    secret_key = os.getenv('SECRET_KEY')
+    valid, msg = verify_token(token, secret_key)
 
     if not valid:
         return Flask.make_response(jsonify({'error': msg}), 400)
@@ -143,7 +147,26 @@ def get_shares():
     """
     Route for get the amount of share
     """
-    return '/msft/shares'
+    token = get_token(request.headers)
+    if not token:
+        return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
+
+    secret_key = os.getenv('SECRET_KEY')
+    valid, msg = verify_token(token, secret_key)
+
+    if not valid:
+        return Flask.make_response(jsonify({'error': msg}), 400)
+    else:
+        #TODO implement logging
+        username = msg
+        api_response = get_quote()
+        response = {
+            'symbol': api_response['symbol'],
+            'name': api_response['description'],
+            'shares': 5000,
+        }
+
+    return jsonify(response)
 
 
 if __name__ == "__main__":
