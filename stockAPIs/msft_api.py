@@ -157,7 +157,7 @@ def get_shares():
     if not valid:
         return Flask.make_response(jsonify({'error': msg}), 400)
     else:
-        #TODO implement logging
+        #       TODO implement logging
         username = msg
         api_response = get_quote()
         response = {
