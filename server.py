@@ -24,14 +24,16 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100))
     password = db.Column(db.String(100))
+    token = db.Column(db.String)
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, token):
         self.email = email
         self.password = password
+        self.token = token
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ('user_id', 'email', 'password')
+        fields = ('user_id', 'email', 'password', 'token')
 
 class Asset(db.Model):
     asset_id = db.Column(db.Integer, primary_key=True)
@@ -82,20 +84,56 @@ transactions_FB_schema = FBTransactionSchema(many=True)
 # Routes Declaration
 @app.route('/api/user/register', methods=['POST'])
 def register_user():
+    if (db.session.query(User.user_id).filter_by(email=request.json['email']).scalar() is not None):
+        return jsonify(status=400, description='User already exists.')
+
     email = request.json['email']
     password = request.json['password']
-
-    new_user = User(email, password)
-
-    db.session.add(new_user)
-    db.session.commit()
 
     secret = keys['server_key']
     payload = {'email': email, 'password': password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
     encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
 
-    print(type(user_schema.jsonify(new_user)))
+    new_user = User(email, password, encoded_jwt)
+
+    db.session.add(new_user)
+    db.session.commit()
+
     return user_schema.jsonify(new_user)
+
+@app.route('/api/user/login', methods=['POST'])
+def login_user():
+    if (db.session.query(User.user_id).filter_by(email=request.json['email']).scalar() is None):
+        return jsonify(status=400, description='User does not exist.')
+
+    user_cred_check = User.query.filter_by(email=request.json['email']).first()
+
+    if user_cred_check.password == request.json['password']:
+        secret = keys['server_key']
+        payload = {'email': user_cred_check.email, 'password': user_cred_check.password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
+        encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
+
+        user_cred_check.token = encoded_jwt
+
+        db.session.commit()
+
+        return user_schema.jsonify(user_cred_check)
+    else:
+        return jsonify(status=400, description='Incorrect password.')
+
+@app.route('/api/user/verify', methods=['GET'])
+def verify_user():
+    token = request.headers.get('token')
+    
+    if token is None:
+        return jsonify(status=400, description='Authentication token not sent.', authenticated=False)
+
+    decoded = jwt.decode(token, keys['server_key'], algorithm='HS256')
+
+    if datetime.strptime(decoded['token_expire'], "%Y-%m-%d %H:%M:%S.%f") < datetime.now():
+        return jsonify(status=400, description='Authentication token has expired.', authenticated=False)
+
+    return jsonify(status=200, description='User is authenticated.', authenticated=True)
 
 @app.route('/api/quotes/FB', methods=['GET'])
 def get_price():
@@ -108,18 +146,30 @@ def get_price():
 
 @app.route('/api/transactions/FB', methods=['POST'])
 def create_transaction():
+    verify = requests.get('http://localhost:5000/api/user/verify', 
+                          headers={'token': request.headers.get('token')}).json()
+
+    if verify['authenticated'] == False:
+        return jsonify(status=400, description='User not authenticated.')
+
     timestamp = datetime.now()
     trans_type = request.json['trans_type']
     amount = request.json['amount']
     price = requests.get('http://localhost:5000/api/quotes/FB').json()['quote']
     user_id = request.json['user_id']
 
-    new_transaction = TransactionFB(timestamp, amount, trans_type, price, user_id)
+    new_transaction = FBTransaction(timestamp, amount, trans_type, price, user_id)
 
     db.session.add(new_transaction)
     db.session.commit()
 
     return transaction_FB_schema.jsonify(new_transaction)
+
+@app.route('/api/transactions/admin/FB', methods=['GET', 'POST'])
+def get_FB_transactions():
+    all_transactions = FBTransaction.query.all()
+    result = transactions_FB_schema.dump(all_transactions)
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run('localhost', 5000, debug=True)
