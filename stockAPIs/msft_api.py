@@ -14,6 +14,14 @@ dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 microsoft_api = Blueprint('microsoft_api', __name__)
 
 
+def get_token(headers):
+    if 'Authorization' not in headers or not headers['Authorization']:
+        return None
+
+    token = headers['Authorization']
+    return token
+
+
 def generate_token(username, key, seconds=0, minutes=30, hours=0):
     """
     generates JWT token
@@ -52,22 +60,11 @@ def verify_token(token, key):
         return False, 'invalid signature'
 
 
-def get_token(headers):
-    if 'Authorization' not in headers or not headers['Authorization']:
-        return None
-
-    token = headers['Authorization'].split(' ')
-    if len(token) == 2:
-        return token[1].strip()
-    else:
-        return None
-
-
 def get_quote():
     """
     get market quotes for Micrsoft using the Tradier API
     """
-    api_url = "https://sandbox.tradier.com/v1/market/quotes"
+    api_url = "https://sandbox.tradier.com/v1/markets/quotes"
     api_key = os.getenv("API_KEY")
 
     params = {'symbols': 'MSFT'}
@@ -77,11 +74,12 @@ def get_quote():
                }
 
     response = requests.get(api_url, params=params, headers=headers)
-    response = response['quotes']
+    response = response.json()
+    response = response['quotes']['quote']
     return response
 
 
-@microsoft_api.route('/msfts/gen_token', methods=['POST'])
+@microsoft_api.route('/msft/gen_token', methods=['POST'])
 def gen_token():
     """
     Route for gnera
@@ -96,8 +94,9 @@ def gen_token():
 
     secret_key = os.getenv('SECRET_KEY')
     token = generate_token(username, secret_key)
+    token.decode()
 
-    return jsonify({'token': token})
+    return jsonify({'token': token.decode()})
 
 
 @microsoft_api.route('/msft/buy', methods=['POST'])
@@ -128,7 +127,7 @@ def get_price():
         return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
 
     secret_key = os.getenv('SECRET_KEY')
-    valid, msg = verify_token(token, secret_key)
+    valid, msg = verify_token(token.encode(), secret_key)
 
     if not valid:
         return Flask.make_response(jsonify({'error': msg}), 400)
@@ -154,7 +153,7 @@ def get_shares():
         return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
 
     secret_key = os.getenv('SECRET_KEY')
-    valid, msg = verify_token(token, secret_key)
+    valid, msg = verify_token(token.encode(), secret_key)
 
     if not valid:
         return Flask.make_response(jsonify({'error': msg}), 400)
@@ -174,4 +173,4 @@ def get_shares():
 if __name__ == "__main__":
     app = Flask(__name__)
     app.register_blueprint(microsoft_api)
-    # app.run()
+    app.run()
