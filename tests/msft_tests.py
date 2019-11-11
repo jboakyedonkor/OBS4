@@ -10,7 +10,6 @@ import dotenv
 import jwt
 from flask import Flask
 sys.path.append(os.getcwd())
-
 from stockAPIs.msft_api import generate_token, verify_token, get_quote, get_token
 
 class MsftHelperTestCase (unittest.TestCase):
@@ -20,23 +19,25 @@ class MsftHelperTestCase (unittest.TestCase):
                 os.sep, os.sep))
         self.secret_key = os.getenv('SECRET_KEY')
         self.api_key = os.getenv('API_KEY')
-        
+
     def test_get_quote(self):
-        api_url ="https://sandbox.tradier.com/v1/markets/quotes"
+        api_url = "https://sandbox.tradier.com/v1/markets/quotes"
 
         params = {'symbols': 'MSFT'}
 
         headers = {'Accept': 'application/json',
-               'Authorization': 'Bearer ' +self.api_key
-               }
+                   'Authorization': 'Bearer ' + self.api_key
+                   }
 
-        api_response =get_quote()
+        api_response = get_quote()
 
-        test_response = requests.get(api_url,params=params, headers=headers)
+        test_response = requests.get(api_url, params=params, headers=headers)
         test_json = test_response.json()
 
-        self.assertEqual(api_response,test_json['quotes']['quote'],"the Tradier API do not get the same response")
-
+        self.assertEqual(
+            api_response,
+            test_json['quotes']['quote'],
+            "the Tradier API do not get the same response")
 
     def test_get_token(self):
         test_header = {'Authorization': 'check'}
