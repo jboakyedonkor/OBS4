@@ -1,9 +1,12 @@
 import requests
 import os
+import sys
 import jwt
 import dotenv
 from flask import Flask, Blueprint, jsonify, request
 from datetime import datetime, timedelta
+sys.path.append(os.getcwd())
+from db.models import Stock
 
 # from flask_sqlalchemy import SQLAlchemy
 
