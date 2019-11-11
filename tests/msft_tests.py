@@ -1,14 +1,16 @@
+
+import datetime
 from subprocess import Popen
 import requests
 import os
+import sys
 import time
 import unittest
 import dotenv
 import jwt
 from flask import Flask
+sys.path.append(os.getcwd())
 from stockAPIs.msft_api import generate_token, verify_token
-import datetime
-
 
 class MsftTestCase (unittest.TestCase):
     def setUp(self):
@@ -47,8 +49,9 @@ class MsftTestCase (unittest.TestCase):
             self.secret_key,
             algorithm='HS256')
 
-        decoded_token = jwt.decode(token, self.secret_key)
-        decoded_test_token = jwt.decode(test_token, self.secret_key)
+        decoded_token = jwt.decode(token, self.secret_key, algorithms='HS256')
+        decoded_test_token = jwt.decode(
+            test_token, self.secret_key, algorithms='HS256')
 
         self.assertEqual(
             decoded_test_token['username'],
@@ -60,17 +63,71 @@ class MsftTestCase (unittest.TestCase):
             decoded_token['iss'],
             "invalid issuer")
 
-        self.assertAlmostEqual(
+        self.assertEqual(
             decoded_test_token['exp'],
             decoded_token['exp'],
             "Not a close enough expiration time")
 
     def test_verify_token(self):
-        pass
+
+        exp_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=10)
+        test_payload = {
+
+            'username': "test",
+            'iss': 'Microsoft_API',
+            'exp': exp_time
+        }
+
+        token = jwt.encode(
+            test_payload,
+            self.secret_key,
+            algorithm='HS256')
+
+        output = verify_token(token, self.secret_key)
+
+        time.sleep(11)
+
+        output2 = verify_token(token, self.secret_key)
+
+        exp_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=30)
+        test_payload2 = {
+
+            'username': "test",
+            'iss': 'Micrsosoft_API',
+            'exp': exp_time
+        }
+
+        token2 = jwt.encode(
+            test_payload2,
+            self.secret_key,
+            algorithm='HS256')
+
+        token3 = jwt.encode(
+            test_payload,
+            'invalid_key',
+            algorithm='HS256'
+        )
+        output3 = verify_token(token2, self.secret_key)
+        output4 = verify_token(token3, self.secret_key)
+
+        # checks for valid signature
+        self.assertEqual(output, (True, "test"),
+                         "output show be a True \"test\" ")
+
+        # checks for token expiration
+        self.assertEqual(output2, (False, "token expired"),
+                         " token show have expired")
+
+        # checks invalid issuer
+        self.assertEqual(output3, (False, 'invalid iss'),
+                         "token should have been rejected as invalid issuer")
+        # checks for invalid signature
+        self.assertEqual(output4, (False, "invalid signature"),
+                         "should have been rejected as an invalid signature")
 
 
 if __name__ == "__main__":
-    
+
     cmd = ['python3', '..' + os.sep + 'StockAPIs' + os.sep + 'msft_api.py']
     api_proc = Popen(cmd)
     time.sleep(0.2)
