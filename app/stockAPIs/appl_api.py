@@ -7,19 +7,14 @@ import os
 import json
 import datetime
 import pyrebase
-from app import firebase
+from app import firebase,app,db,dbfire
 from functools import wraps
-basedir = os.path.abspath(os.path.dirname(__file__))
-app = Flask(__name__)
 
-dbfire = firebase.database()
-db = SQLAlchemy(app)
-app.config['SECRET_KEY'] = 'welp'
-app.config['SQLALCHEMY_DATABASE_URI'] =  'sqlite:///' + os.path.join(basedir, 'app.db') or \
-    'sqlite:///' + os.path.join(basedir, 'app.db')
-SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-# db.init_app(app)
+
+
+
+
 
 aapl_api = Blueprint('aapl_api', __name__)
 
@@ -37,6 +32,7 @@ def generate_token( seconds=0, minutes=30, hours=0):
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return jsonify({'token':token.decode('UTF-8')})
+
 # Makes decorater to confirm token was put in for api use
 def token_required(f):
     @wraps(f)
@@ -48,7 +44,7 @@ def token_required(f):
         if not token:
             return jsonify({'message': 'Token Missing'}),401
         try:
-            data = jwt.decode(token,app.config['SECRET_KEY'])
+            data = jwt.decode(token, os.environ.get("SECRET_KEY"))
             # current_user = Share.query.filter_by(username = data['username'])  
             current_user = data['username']
         # except:
@@ -59,32 +55,41 @@ def token_required(f):
             return 'Invalid token. Please log in again.'
         return f(current_user,*args,**kwargs)
     return decorated
+
 @aapl_api.route('/aapl/share_price')
 def get_price():
-    response = requests.get('https://sandbox.tradier.com/v1/markets/quotes', 
-                    params={'symbols': 'AAPL'}, 
-                    headers={'Accept': 'application/json','Authorization': 'Bearer q7HoHM5iKOZ1WGou3gguoTqle4VF'})
-    json_response = response.json()
-    print(response.status_code)
-    print(json_response)
-    return jsonify({"Share Price: " : json_response['quotes']['quote']['last']})
-    #return json_response
+    price = aapl_price()
+    return jsonify({"Price" : price['quotes']['quote']['last']})
 
-@aapl_api.route('/aapl/buy/<num>')
+@aapl_api.route('/aapl/buy/')
 @token_required
 def buy_shares(current_user):
+    amount = request.args.get('amount')
+    price = aapl_price()['quotes']['quote']['last']
+    buy = round(float(amount) * price,2)
     data = {
-    "transaction": "yee"
+    'symbol': 'AAPL',
+    "Bought": buy,
+    "Amount": amount,
+    "Purchase Price": price,
+    "time":  str(datetime.datetime.now())
     }
     dbfire.child("Bought").child(current_user).push(data)
     # print(current_user)
     return 'Bought'
 
-@aapl_api.route('/aapl/sell/<num>')
+@aapl_api.route('/aapl/sell/')
 @token_required
 def sell_shares(current_user):
+    amount = request.args.get('amount')
+    price = aapl_price()['quotes']['quote']['last']
+    sell = round(float(amount) * price,2)
     data = {
-    "transaction": "yeet"
+    'symbol': 'AAPL',
+    "Sold": sell,
+    "Amount": amount,
+    "Purchase Price": price,
+    "time":  str(datetime.datetime.now())
     }
     dbfire.child("Sell").child(current_user).push(data)
     return 'Sold'
@@ -105,11 +110,23 @@ def total_shares(current_user):
     # return jsonify({'shares':output})
     all_users = dbfire.child("Bought").child(current_user).get()
     output = []
+    #Checks if any purchases in database
+    if(all_users.each() is None):
+            return jsonify({"Total Shares":" No apple stock purchased"})
     for user in all_users.each():
+        
+        
         #print(user.val()) # {name": "Mortimer 'Morty' Smith"}
         output.append(user.val())
     # print(all_users)
     return jsonify({"Total Shares":output})
+
+def aapl_price():
+    response = requests.get('https://sandbox.tradier.com/v1/markets/quotes', 
+                    params={'symbols': 'AAPL'}, 
+                    headers={'Accept': 'application/json','Authorization': 'Bearer q7HoHM5iKOZ1WGou3gguoTqle4VF'})
+    json_response = response.json()
+    return json_response
 
 if __name__ == "__main__":
     app.register_blueprint(aapl_api)
