@@ -109,3 +109,6 @@ venv.bak/
 
 .vscode/
 stockAPIs/config.json
+
+Pipfile
+Pipfile.lock
