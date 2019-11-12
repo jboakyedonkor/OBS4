@@ -1,12 +1,18 @@
 """Modules include sql ORM, time formatting, http requests, and secret key storage."""
 from datetime import datetime, timedelta
 import os
+import sys
 import jwt
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import requests
 from config.keys import keys
+from models.Users import User, UserSchema
+from models.FBTransactions import FBTransaction, FBTransactionSchema
+from models.Assets import Asset, AssetSchema
+
+sys.path.append(os.getcwd())
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -18,60 +24,6 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 # TODO: Modularize code
-
-# Models and Schemas Declaration
-class User(db.Model):
-    user_id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100))
-    password = db.Column(db.String(100))
-    token = db.Column(db.String)
-
-    def __init__(self, email, password, token):
-        self.email = email
-        self.password = password
-        self.token = token
-
-class UserSchema(ma.Schema):
-    class Meta:
-        fields = ('user_id', 'email', 'password', 'token')
-
-class Asset(db.Model):
-    asset_id = db.Column(db.Integer, primary_key=True)
-    symbol = db.Column(db.String(4))
-    pl = db.Column(db.Float)
-    num_owned = db.Column(db.Integer)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    user = db.relationship('User', backref='assets')
-
-    def __init__(self, symbol, pl, num_owned, user_id):
-        self.symbol = symbol
-        self.pl = pl
-        self.num_owned = num_owned
-        self.user_id = user_id
-
-class AssetSchema(ma.Schema):
-    class Meta:
-        fields = ('asset_id', 'symbol', 'pl', 'num_owned', 'user_id')
-
-class FBTransaction(db.Model):
-    trans_id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.Integer)
-    amount = db.Column(db.Integer)
-    trans_type = db.Column(db.String(4))
-    price = db.Column(db.Float)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
-    user = db.relationship('User', backref='fbtransactions')
-
-    def __init__(self, timestamp, amount, trans_type, price, user_id):
-        self.timestamp = timestamp
-        self.amount = amount
-        self.trans_type = trans_type
-        self.price = price
-        self.user_id = user_id
-
-class FBTransactionSchema(ma.Schema):
-    class Meta:
-        fields = ('trans_id', 'timestamp', 'amount', 'trans_type', 'price', 'user_id')
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
