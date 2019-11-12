@@ -104,3 +104,6 @@ venv.bak/
 .mypy_cache/
 
 stockAPIs/config.json
+
+#vscode env
+.vscode
