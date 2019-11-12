@@ -5,5 +5,5 @@ Do
 virtualenv env <br/>
 source env/bin/activate <br/> 
 pip3 install -r requirements <br/> 
-export(Mac) or set(Windows) SECRET_KEY= <Choose a Key here>
+export(Mac) or set(Windows) SECRET_KEY= <Choose a Key here> <br/>
 Either set FLASK_APP or python3 run.py
