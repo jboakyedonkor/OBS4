@@ -1,6 +1,10 @@
 import unittest
-from routes import generate_token
+import os
+
+from app import app
+from app.routes import generate_token
 import jwt
+
 class TestUserModel(unittest.TestCase):
     def test_split(self):
         username ='test'
