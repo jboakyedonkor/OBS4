@@ -10,12 +10,6 @@ import pyrebase
 from app import firebase,app,db,dbfire
 from functools import wraps
 
-
-
-
-
-
-
 aapl_api = Blueprint('aapl_api', __name__)
 
     # Generates Token

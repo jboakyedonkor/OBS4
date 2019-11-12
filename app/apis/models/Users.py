@@ -1,4 +1,4 @@
-from server import db, ma
+from fb_api import db, ma
 
 class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)

@@ -1,4 +1,4 @@
-from server import db, ma
+from fb_api import db, ma
 
 class FBTransaction(db.Model):
     trans_id = db.Column(db.Integer, primary_key=True)

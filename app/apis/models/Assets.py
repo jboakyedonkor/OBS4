@@ -1,4 +1,4 @@
-from server import ma, db
+from fb_api import db, ma
 
 class Asset(db.Model):
     asset_id = db.Column(db.Integer, primary_key=True)
