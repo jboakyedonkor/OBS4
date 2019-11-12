@@ -121,6 +121,19 @@ def login_user():
     else:
         return jsonify(status=400, description='Incorrect password.')
 
+@app.route('/api/user/logout', methods=['POST'])
+def logout_user():
+    if (db.session.query(User.user_id).filter_by(email=request.json['email']).scalar() is None):
+        return jsonify(status=400, description='User does not exist.')
+
+    user_logout = User.query.filter_by(email=request.json['email']).first()
+
+    user_logout.token = None
+
+    db.session.commit()
+
+    return user_schema.jsonify(user_logout)
+
 @app.route('/api/user/verify', methods=['GET'])
 def verify_user():
     token = request.headers.get('token')
@@ -146,16 +159,10 @@ def get_price():
 
 @app.route('/api/transactions/FB', methods=['POST'])
 def create_transaction():
-    verify = requests.get('http://localhost:5000/api/user/verify', 
-                          headers={'token': request.headers.get('token')}).json()
-
-    if verify['authenticated'] == False:
-        return jsonify(status=400, description='User not authenticated.')
-
     timestamp = datetime.now()
     trans_type = request.json['trans_type']
     amount = request.json['amount']
-    price = requests.get('http://localhost:5000/api/quotes/FB').json()['quote']
+    price = request.json['price']
     user_id = request.json['user_id']
 
     new_transaction = FBTransaction(timestamp, amount, trans_type, price, user_id)
@@ -170,6 +177,68 @@ def get_FB_transactions():
     all_transactions = FBTransaction.query.all()
     result = transactions_FB_schema.dump(all_transactions)
     return jsonify(result)
+
+@app.route('/api/assets/FB', methods=['POST'])
+def fb_assets():
+    verify = requests.get('http://localhost:5000/api/user/verify', 
+                          headers={'token': request.headers.get('token')}).json()
+
+    if verify['authenticated'] == False:
+        return jsonify(status=400, description='User not authenticated.')
+
+    symbol = 'FB'
+    num_owned = request.json['amount']
+    user_id = request.json['user_id']
+    price = requests.get('http://localhost:5000/api/quotes/FB').json()['quote']
+    trans_type = request.json['type']
+    pl = 0
+    pl_added = num_owned * price
+    user_asset = Asset.query.filter_by(user_id=request.json['user_id'], symbol=symbol).first()
+
+    bank_asset = Asset.query.filter_by(user_id=0, symbol=symbol).first()
+    if bank_asset is None:
+        bank_pl = 5000 * price * -1
+        new_bank = Asset('FB', bank_pl, 5000, 0)
+        db.session.add(new_bank)
+        db.session.commit()
+        requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'BUY', 'amount': num_owned, 'user_id': 0, 'price': price})
+        bank_asset = Asset.query.filter_by(user_id=0, symbol=symbol).first()
+
+    if trans_type == 'BUY':
+        if bank_asset.num_owned < num_owned:
+            asset_diff = num_owned - bank_asset.num_owned
+            bank_asset.num_owned += asset_diff + 5000
+            bank_asset.pl += (asset_diff + 5000) * price * -1
+            db.session.commit()
+            requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'BUY', 'amount': asset_diff + 5000, 'user_id': 0, 'price': price})
+
+        bank_asset.num_owned -= num_owned
+        bank_asset.pl += num_owned * price
+
+        if user_asset is not None:
+            user_asset.num_owned += num_owned
+            user_asset.pl -= num_owned * price
+            db.session.commit()
+            requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'BUY', 'amount': num_owned, 'user_id': user_id, 'price': price})
+        else:
+            new_user = Asset(symbol, num_owned*price*-1, num_owned, request.json['user_id'])
+            db.session.add(new_user)
+            db.session.commit()
+            requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'BUY', 'amount': num_owned, 'user_id': user_id, 'price': price})
+    else:
+        bank_asset.num_owned += num_owned
+        bank_asset.pl -= num_owned * price
+
+        if user_asset is not None:
+            if user_asset.num_owned < num_owned:
+                return jsonify(status = 400, description = 'User does not have enough assets to sell.')
+            user_asset.num_owned -= num_owned
+            user_asset.pl += num_owned * price
+            db.session.commit()
+            requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'SELL', 'amount': num_owned, 'user_id': user_id, 'price': price})
+        else:
+            return jsonify(status=400, description='User does not have any assets to sell.')
+
 
 if __name__ == "__main__":
     app.run('localhost', 5000, debug=True)
