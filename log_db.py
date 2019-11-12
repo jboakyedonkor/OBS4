@@ -11,8 +11,8 @@ def execute_sql(command):
 
 
 def getTimeStamp():
-    return "String"
-
+    dateTimeObj = datetime.now()
+    return dateTimeObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
 
 def create_transaction_table():
     command = """
