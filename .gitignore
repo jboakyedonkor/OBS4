@@ -105,5 +105,9 @@ venv.bak/
 
 stockAPIs/config.json
 
+
 #vscode env
-.vscode
+
+.vscode/
+bin/
+include/
