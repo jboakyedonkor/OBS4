@@ -22,7 +22,7 @@ def generate_token( seconds=0, minutes=30, hours=0):
     payload = {'username': request.args.get('username'),
                'iss': 'appl_api',
                'exp': exp_time,
-               'troll': 'troll_by_santiago'
+               'troll': 'it_was_me_dio'
                }
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
