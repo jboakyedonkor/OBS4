@@ -26,7 +26,7 @@ ma.init_app(app)
 def register_user():
     register_user_request = request.get_json()
     
-    if register_user_request is None:
+    if register_user_request:
         return jsonify(status=400, description='You must enter an email and password to register.')
     
     if (db.session.query(User.user_id).filter_by(email=register_user_request['email']).scalar() is not None):
