@@ -113,6 +113,6 @@ stockAPIs/config.json
 
 #vscode env
 
-.vscode/
 bin/
 include/
+.vscode/settings.json
