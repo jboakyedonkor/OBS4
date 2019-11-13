@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 import dotenv
 from models.fb_models import db, ma, User, user_schema, users_schema, FBTransaction, transaction_FB_schema, transactions_FB_schema, Asset, asset_schema, assets_schema
 
-dotenv.load_dotenv(dotenv_path='../config/.env')
+dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -36,8 +36,6 @@ def register_user():
     password = register_user_request['password']
 
     secret = os.getenv('SERVER_KEY')
-
-    return str(type(secret))
 
     payload = {'email': email, 'password': password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
     encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
