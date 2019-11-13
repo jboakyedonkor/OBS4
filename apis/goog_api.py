@@ -139,6 +139,4 @@ def sell_shares(current_user):
     
 
 if __name__ == "__main__":
-    
-    app.register_blueprint(goog_api)
     app.run()
