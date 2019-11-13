@@ -131,15 +131,12 @@ def sell_shares(current_user):
         return jsonify('Error - user not found')
 
 
-@goog_api.route('/goog/shares/', methods=['GET'])
-@token_check
-def total_shares(current_user):
-    if checkMethods.checkUsername(current_user) == True:
-        googNetWorth = get_quote()['last'] * checkMethods.getUserNetworth(current_user)
-        return jsonify(googNetWorth)
-    else:
-        return jsonify('Error - user not found')
-
+#@goog_api.route('/goog/shares/', methods=['GET'])
+#@token_check
+#def total_shares(current_user):
+   #     googNetWorth = get_quote()['last'] * Stock.query.with_entites(func.sum(Transaction.share_price))filter_by(user=current_user).first()
+    #    return jsonify(googNetWorth)
+    
 
 if __name__ == "__main__":
     app = Flask(__name__)
