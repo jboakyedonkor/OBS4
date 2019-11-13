@@ -3,17 +3,15 @@ from datetime import datetime, timedelta
 import os
 import sys
 import jwt
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import requests
-from models.Users import User, UserSchema
-from models.FBTransactions import FBTransaction, FBTransactionSchema
-from models.Assets import Asset, AssetSchema
-import dotenv
 sys.path.append(os.getcwd())
+import dotenv
+from models.fb_models import db, ma, User, user_schema, users_schema, FBTransaction, transaction_FB_schema, transactions_FB_schema, Asset, asset_schema, assets_schema
 
-dotenv.load_dotenv(dotenv_path='./config/.env')
+dotenv.load_dotenv(dotenv_path='../config/.env')
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -21,25 +19,26 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db_temp.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
-
-user_schema = UserSchema()
-users_schema = UserSchema(many=True)
-asset_schema = AssetSchema()
-assets_schema = AssetSchema(many=True)
-transaction_FB_schema = FBTransactionSchema()
-transactions_FB_schema = FBTransactionSchema(many=True)
+db.init_app(app)
+ma.init_app(app)
 
 @app.route('/api/user/register', methods=['POST'])
 def register_user():
-    if (db.session.query(User.user_id).filter_by(email=request.json['email']).scalar() is not None):
+    register_user_request = request.get_json()
+    
+    if register_user_request is None:
+        return jsonify(status=400, description='You must enter an email and password to register.')
+    
+    if (db.session.query(User.user_id).filter_by(email=register_user_request['email']).scalar() is not None):
         return jsonify(status=400, description='User already exists.')
 
-    email = request.json['email']
-    password = request.json['password']
+    email = register_user_request['email']
+    password = register_user_request['password']
 
     secret = os.getenv('SERVER_KEY')
+
+    return str(type(secret))
+
     payload = {'email': email, 'password': password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
     encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
 
@@ -58,7 +57,7 @@ def login_user():
     user_cred_check = User.query.filter_by(email=request.json['email']).first()
 
     if user_cred_check.password == request.json['password']:
-        secret = os.getenv('SERVER_KEY')
+        secret = 'secret_key'
         payload = {'email': user_cred_check.email, 'password': user_cred_check.password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
         encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
 
