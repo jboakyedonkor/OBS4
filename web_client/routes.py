@@ -1,7 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request,session,jsonify
-from app import app, db, bcrypt
-from app.forms import RegistrationForm, LoginForm
-from app.models import User
+from web_client import app, db, bcrypt
+from web_client.forms import RegistrationForm, LoginForm
+from web_client.models import User
 import json
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
@@ -43,8 +43,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
           
-            payload = {'username': form.email.data}
-            r = requests.get('http://localhost:5000/gen', params=payload)
+           
             
             token = generate_token(user.username)
             return  redirect(url_for('home', token=json.dumps({'token':token.decode('UTF-8')})))
