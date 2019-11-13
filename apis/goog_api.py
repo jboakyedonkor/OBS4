@@ -32,7 +32,7 @@ def generate_token(username):
                'iss': 'goog_API',
                'exp': exp_time
                }
-    SECRET_KEY = os.getenv('SECRET_KEY')
+    SECRET_KEY = os.getenv('welp')
     token = jwt.encode(payload, key=str(SECRET_KEY), algorithm='HS256')
     return jsonify({'token': token.decode('UTF-8')})
 
@@ -52,7 +52,7 @@ def token_check(f):
         if not token:
             return Flask.make_response(jsonify({'error': 'Missing token'}), 401)
         try:
-            SECRET_KEY = os.getenv('SECRET_KEY')
+            SECRET_KEY = os.getenv('welp')
             data = jwt.decode(token, str(SECRET_KEY))
             current_user = data['username']
         except jwt.ExpiredSignatureError:
