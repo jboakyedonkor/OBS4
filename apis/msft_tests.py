@@ -10,7 +10,7 @@ import dotenv
 import jwt
 from flask import Flask
 sys.path.append(os.getcwd())
-from stockAPIs.msft_api import generate_token, verify_token, get_quote, get_token
+from app.apis.msft_api import generate_token, verify_token, get_quote, get_token
 
 class MsftHelperTestCase (unittest.TestCase):
     def setUp(self):
@@ -34,10 +34,16 @@ class MsftHelperTestCase (unittest.TestCase):
         test_response = requests.get(api_url, params=params, headers=headers)
         test_json = test_response.json()
 
+        # self.assertEqual(
+        #     api_response['symbol'],
+        #     test_json['quotes']['quote']['symbol'],
+        #     "not the same company")
+        
         self.assertEqual(
-            api_response,
-            test_json['quotes']['quote'],
-            "the Tradier API do not get the same response")
+            api_response['description'],
+            test_json['quotes']['quote']['description'],
+            "not the same company")
+
 
     def test_get_token(self):
         test_header = {'Authorization': 'check'}
