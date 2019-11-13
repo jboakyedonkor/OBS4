@@ -3,14 +3,12 @@ import datetime
 from subprocess import Popen
 import requests
 import os
-import sys
 import time
 import unittest
 import dotenv
 import jwt
 from flask import Flask
-sys.path.append(os.getcwd())
-from app.apis.msft_api import generate_token, verify_token, get_quote, get_token
+from msft_api import generate_token, verify_token, get_quote, get_token
 
 class MsftHelperTestCase (unittest.TestCase):
     def setUp(self):
