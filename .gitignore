@@ -110,5 +110,14 @@ venv.bak/
 .vscode/
 stockAPIs/config.json
 
+<<<<<<< HEAD
 Pipfile
 Pipfile.lock
+=======
+
+#vscode env
+
+bin/
+include/
+.vscode/settings.json
+>>>>>>> master
