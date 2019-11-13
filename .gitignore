@@ -117,4 +117,4 @@ bin/
 include/
 .vscode/settings.json
 
-apis/db_temp.sqlite
+db_temp.sqlite
