@@ -5,7 +5,7 @@ import jwt
 import dotenv
 from flask import Flask, Blueprint, jsonify, request
 from datetime import datetime, timedelta
-from app.apis.models.msft_models import db, Stock, Transaction
+from models.msft_models import db, Stock, Transaction
 
 # from flask_sqlalchemy import SQLAlchemy
 
