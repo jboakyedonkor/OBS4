@@ -24,6 +24,7 @@ ma.init_app(app)
 
 @app.route('/api/user/register', methods=['POST'])
 def register_user():
+    db.create_all()
     register_user_request = request.get_json()
     
     if not register_user_request:
@@ -55,7 +56,7 @@ def login_user():
     user_cred_check = User.query.filter_by(email=request.json['email']).first()
 
     if user_cred_check.password == request.json['password']:
-        secret = 'secret_key'
+        secret = os.getenv('SERVER_KEY')
         payload = {'email': user_cred_check.email, 'password': user_cred_check.password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
         encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
 
@@ -127,14 +128,14 @@ def get_FB_transactions():
 @app.route('/api/assets/FB', methods=['POST'])
 def fb_assets():
     verify = requests.get('http://localhost:5000/api/user/verify', 
-                          headers={'token': request.headers.get('token')}).json()
+                          headers={'token': request.headers.get('token')})
 
-    if verify['authenticated'] == False:
+    if verify.json()['authenticated'] == False:
         return jsonify(status=400, description='User not authenticated.')
 
-    symbol = 'FB'
-    num_owned = request.json['amount']
-    user_id = request.json['user_id']
+    symbol = "FB"
+    num_owned = request.json["amount"]    
+    user_id = request.json["user_id"]
     price = requests.get('http://localhost:5000/api/quotes/FB').json()['quote']
     trans_type = request.json['type']
     pl = 0
@@ -166,11 +167,13 @@ def fb_assets():
             user_asset.pl -= num_owned * price
             db.session.commit()
             requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'BUY', 'amount': num_owned, 'user_id': user_id, 'price': price})
+            return asset_schema.jsonify(user_asset)
         else:
             new_user = Asset(symbol, num_owned*price*-1, num_owned, request.json['user_id'])
             db.session.add(new_user)
             db.session.commit()
             requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'BUY', 'amount': num_owned, 'user_id': user_id, 'price': price})
+            return asset_schema.jsonify(new_user)
     else:
         bank_asset.num_owned += num_owned
         bank_asset.pl -= num_owned * price
@@ -182,6 +185,7 @@ def fb_assets():
             user_asset.pl += num_owned * price
             db.session.commit()
             requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'SELL', 'amount': num_owned, 'user_id': user_id, 'price': price})
+            return asset_schema.jsonify(user_asset)
         else:
             return jsonify(status=400, description='User does not have any assets to sell.')
 
