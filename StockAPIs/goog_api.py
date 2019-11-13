@@ -1,11 +1,11 @@
 from flask import Flask, Blueprint, jsonify, request
 from datetime import datetime, timedelta
 from functools import wraps
-from testPostgres import updateMethods, checkMethods, insertMethods
 import requests
 import os
 import sys
 import jwt
+from models.goog_models import db, Stock, Transaction
 
 goog_api = Blueprint('goog_api', __name__)
 
@@ -24,6 +24,7 @@ def get_quote():
 
 @goog_api.route('/gen_token/<username>', methods=['GET'])
 def generate_token(username):
+    db.create_all()
     current_time = datetime.utcnow()
     exp_time = current_time + \
                timedelta(seconds=0, minutes=30, hours=0)
@@ -61,6 +62,7 @@ def token_check(f):
         except jwt.InvalidTokenError:
             return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
         return f(current_user, *args, **kwargs)
+
     return decorated
 
 
@@ -70,10 +72,29 @@ def buy_shares(current_user):
     if checkMethods.checkUsername(current_user) == True:
         symbol = 'GOOG'
         amount = request.args.get('amount')
-        updateMethods.update_bank_table(symbol, amount, True)
-        updateMethods.update_stock_table(symbol, amount, True)
-        insertMethods.insert_transaction_logs_table(symbol, get_quote()['last'], amount, current_user, 'Buy')
+        share_price = get_quote()['last']
+        payment = share_price * amount
+        goog_stock = Stock.query.filter_by(symbol=symbol).first()
+
+        if not goog_stock:
+            goog_stock = Stock(
+                symbol=symbol,
+                price=share_price)
+            db.session.add(goog_stock)
+
+        else:
+            goog_stock.price = api_response['last']
+
+        transaction = Transaction(
+            user=current_user,
+            symbol=symbol,
+            payment=payment,
+            share_price=share_price,
+            shares_bought=amount,
+            shares_sold=None)
+        db.session.add(transaction)
         return jsonify('Bought')
+        db.session.commit()
     else:
         return jsonify('Error - user not found')
 
@@ -84,21 +105,41 @@ def sell_shares(current_user):
     if checkMethods.checkUsername(current_user) == True:
         symbol = 'GOOG'
         amount = request.args.get('amount')
-        updateMethods.update_bank_table(symbol, amount, False)
-        updateMethods.update_stock_table(symbol, amount, False)
-        insertMethods.insert_transaction_logs_table(symbol, get_quote()['last'], amount, current_user, 'Sell')
+        share_price = get_quote()['last']
+        payment = share_price * amount
+        goog_stock = Stock.query.filter_by(symbol=symbol).first()
+        if not goog_stock:
+            goog_stock = Stock(
+                symbol=symbol,
+                price=share_price)
+            db.session.add(goog_stock)
+        else:
+            goog_stock.price = api_response['last']
+
+        transaction = Transaction(
+            user=current_user,
+            symbol=symbol,
+            payment=payment,
+            share_price=share_price,
+            shares_bought=None,
+            shares_sold=amount)
+        db.session.add(transaction)
+        db.session.commit()
+
         return jsonify('Sold')
     else:
         return jsonify('Error - user not found')
 
-@goog_api.route('/goog/shares/')
+
+@goog_api.route('/goog/shares/', methods=['GET'])
 @token_check
 def total_shares(current_user):
     if checkMethods.checkUsername(current_user) == True:
-        googNetWorth = get_quote()['last']*checkMethods.getUserNetworth(current_user)
+        googNetWorth = get_quote()['last'] * checkMethods.getUserNetworth(current_user)
         return jsonify(googNetWorth)
     else:
         return jsonify('Error - user not found')
+
 
 if __name__ == "__main__":
     app = Flask(__name__)
