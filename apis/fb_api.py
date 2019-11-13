@@ -7,15 +7,11 @@ from flask import Flask, request, jsonify, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 import requests
-from models.Users import User, UserSchema
-from models.FBTransactions import FBTransaction, FBTransactionSchema
-from models.Assets import Asset, AssetSchema
-import dotenv
 sys.path.append(os.getcwd())
+import dotenv
+from models.fb_models import db, ma, User, user_schema, users_schema, FBTransaction, transaction_FB_schema, transactions_FB_schema, Asset, asset_schema, assets_schema
 
-dotenv.load_dotenv(dotenv_path='./config/.env')
-
-facebook_api = Blueprint('facebook_api', __name__)
+dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 
 app = Flask(__name__)
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -23,25 +19,24 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db_temp.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
+db.init_app(app)
+ma.init_app(app)
 
-user_schema = UserSchema()
-users_schema = UserSchema(many=True)
-asset_schema = AssetSchema()
-assets_schema = AssetSchema(many=True)
-transaction_FB_schema = FBTransactionSchema()
-transactions_FB_schema = FBTransactionSchema(many=True)
-
-@facebook_api.route('/api/user/register', methods=['POST'])
+@app.route('/api/user/register', methods=['POST'])
 def register_user():
-    if (db.session.query(User.user_id).filter_by(email=request.json['email']).scalar() is not None):
+    register_user_request = request.get_json()
+    
+    if register_user_request is None:
+        return jsonify(status=400, description='You must enter an email and password to register.')
+    
+    if (db.session.query(User.user_id).filter_by(email=register_user_request['email']).scalar() is not None):
         return jsonify(status=400, description='User already exists.')
 
-    email = request.json['email']
-    password = request.json['password']
+    email = register_user_request['email']
+    password = register_user_request['password']
 
     secret = os.getenv('SERVER_KEY')
+
     payload = {'email': email, 'password': password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
     encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
 
@@ -52,7 +47,7 @@ def register_user():
 
     return user_schema.jsonify(new_user)
 
-@facebook_api.route('/api/user/login', methods=['POST'])
+@app.route('/api/user/login', methods=['POST'])
 def login_user():
     if (db.session.query(User.user_id).filter_by(email=request.json['email']).scalar() is None):
         return jsonify(status=400, description='User does not exist.')
@@ -60,7 +55,7 @@ def login_user():
     user_cred_check = User.query.filter_by(email=request.json['email']).first()
 
     if user_cred_check.password == request.json['password']:
-        secret = os.getenv('SERVER_KEY')
+        secret = 'secret_key'
         payload = {'email': user_cred_check.email, 'password': user_cred_check.password, 'login_time': str(datetime.now()), 'token_expire': str(datetime.now() + timedelta(hours=1))}
         encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
 
@@ -72,7 +67,7 @@ def login_user():
     else:
         return jsonify(status=400, description='Incorrect password.')
 
-@facebook_api.route('/api/user/logout', methods=['POST'])
+@app.route('/api/user/logout', methods=['POST'])
 def logout_user():
     if (db.session.query(User.user_id).filter_by(email=request.json['email']).scalar() is None):
         return jsonify(status=400, description='User does not exist.')
@@ -85,7 +80,7 @@ def logout_user():
 
     return user_schema.jsonify(user_logout)
 
-@facebook_api.route('/api/user/verify', methods=['GET'])
+@app.route('/api/user/verify', methods=['GET'])
 def verify_user():
     token = request.headers.get('token')
     
@@ -99,7 +94,7 @@ def verify_user():
 
     return jsonify(status=200, description='User is authenticated.', authenticated=True)
 
-@facebook_api.route('/api/quotes/FB', methods=['GET'])
+@app.route('/api/quotes/FB', methods=['GET'])
 def get_price():
     response = requests.get('https://sandbox.tradier.com/v1/markets/quotes',
                             params={'symbols': 'FB', 'greeks': 'false'},
@@ -108,7 +103,7 @@ def get_price():
     fb_quote = response.json()['quotes']['quote']
     return jsonify(symbol=fb_quote['symbol'], description=fb_quote['description'], quote=fb_quote['last'])
 
-@facebook_api.route('/api/transactions/FB', methods=['POST'])
+@app.route('/api/transactions/FB', methods=['POST'])
 def create_transaction():
     timestamp = datetime.now()
     trans_type = request.json['trans_type']
@@ -123,13 +118,13 @@ def create_transaction():
 
     return transaction_FB_schema.jsonify(new_transaction)
 
-@facebook_api.route('/api/transactions/admin/FB', methods=['GET', 'POST'])
+@app.route('/api/transactions/admin/FB', methods=['GET', 'POST'])
 def get_FB_transactions():
     all_transactions = FBTransaction.query.all()
     result = transactions_FB_schema.dump(all_transactions)
     return jsonify(result)
 
-@facebook_api.route('/api/assets/FB', methods=['POST'])
+@app.route('/api/assets/FB', methods=['POST'])
 def fb_assets():
     verify = requests.get('http://localhost:5000/api/user/verify', 
                           headers={'token': request.headers.get('token')}).json()
@@ -192,5 +187,4 @@ def fb_assets():
 
 
 if __name__ == "__main__":
-    app.register_blueprint(facebook_api)
     app.run('localhost', 5000, debug=True)
