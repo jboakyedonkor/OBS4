@@ -119,3 +119,4 @@ include/
 
 db_temp.sqlite
 config.json
+config/
