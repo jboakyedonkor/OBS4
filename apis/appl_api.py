@@ -7,10 +7,24 @@ import os
 import json
 import datetime
 import pyrebase
-from app import firebase,app,db,dbfire
 from functools import wraps
+import dotenv
+ 
+dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 
-aapl_api = Blueprint('aapl_api', __name__)
+aapl_api = Flask( __name__)
+config = {
+     "apiKey": os.getenv("FIRE_API_KEY"),
+    "authDomain": os.getenv("AUTH_DOMAIN"),
+    "databaseURL": os.getenv("DATABASE_URL"),
+    "projectId": os.getenv("PROJECT_ID"),
+    "storageBucket": os.getenv("STORAGE_BUCKET"),
+    "messagingSenderId": os.getenv("MESS_SENDER_ID"),
+    "appId": os.getenv("APP_ID")
+}
+
+firebase = pyrebase.initialize_app(config)
+dbfire = firebase.database()
 
     # Generates Token
 @aapl_api.route('/gen/<username>')
@@ -20,9 +34,7 @@ def generate_token( seconds=0, minutes=30, hours=0):
         timedelta(seconds=seconds, minutes=minutes, hours=hours)
 
     payload = {'username': request.args.get('username'),
-               'iss': 'appl_api',
-               'exp': exp_time,
-               'troll': 'troll_by_santiago'
+               'exp': exp_time
                }
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
@@ -54,6 +66,7 @@ def token_required(f):
 @aapl_api.route('/aapl/share_price')
 def get_price():
     price = aapl_price()
+    print(os.getenv("DATABASE_URL"))
     return jsonify({"Price" : price['quotes']['quote']['last']})
 
 @aapl_api.route('/aapl/buy/')
@@ -63,14 +76,15 @@ def buy_shares(current_user):
     price = aapl_price()['quotes']['quote']['last']
     buy = round(float(amount) * price,2)
     data = {
+    'user': current_user,
     'symbol': 'AAPL',
-    "Bought": buy,
-    "Amount": amount,
-    "Purchase Price": price,
-    "time":  str(datetime.datetime.now())
+    "share_price": price,
+    "shares_bought": amount,
+    "created_at": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+    "payment": price
     }
-    dbfire.child("Bought").child(current_user).push(data)
-    # print(current_user)
+    dbfire.child('transactions').child(current_user).child('bought').push(data)
+    
     return 'Bought'
 
 @aapl_api.route('/aapl/sell/')
@@ -79,30 +93,21 @@ def sell_shares(current_user):
     amount = request.args.get('amount')
     price = aapl_price()['quotes']['quote']['last']
     sell = round(float(amount) * price,2)
+    
     data = {
+    'user': current_user,
     'symbol': 'AAPL',
-    "Sold": sell,
-    "Amount": amount,
-    "Purchase Price": price,
-    "time":  str(datetime.datetime.now())
+    "share_price": price,
+    "shares_sold": amount,
+    "created_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+    "payment": sell
     }
-    dbfire.child("Sell").child(current_user).push(data)
+    dbfire.child('transactions').child(current_user).child('sell').push(data)
     return 'Sold'
 
 @aapl_api.route('/aapl/shares/')
 @token_required
 def total_shares(current_user):
-    # shares = Share.query.filter_by(id=id).all();
-    # output = []
-    # for share in shares:
-    #     if(share['id'] == id):
-    #         share_data={}
-    #         share_data['user'] = share.id
-    #         share_data['symbol'] = share.symbol
-    #         share_data['price'] = share.price
-    #         share_data['shares'] = share.shares
-    #         output.append(share_data)
-    # return jsonify({'shares':output})
     all_users = dbfire.child("Bought").child(current_user).get()
     output = []
     #Checks if any purchases in database
@@ -119,10 +124,10 @@ def total_shares(current_user):
 def aapl_price():
     response = requests.get('https://sandbox.tradier.com/v1/markets/quotes', 
                     params={'symbols': 'AAPL'}, 
-                    headers={'Accept': 'application/json','Authorization': 'Bearer q7HoHM5iKOZ1WGou3gguoTqle4VF'})
+                    headers={'Accept': 'application/json','Authorization': 'Bearer ' + os.getenv("AAPL_BEARER")})
     json_response = response.json()
     return json_response
 
 if __name__ == "__main__":
-    app.register_blueprint(aapl_api)
+    aapl_api.run(port=5001)
     
