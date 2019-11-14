@@ -116,3 +116,7 @@ stockAPIs/config.json
 bin/
 include/
 .vscode/settings.json
+
+db_temp.sqlite
+config.json
+config/

@@ -71,7 +71,7 @@ def generate_token( username, seconds=0, minutes=30, hours=0):
 
     payload = {'username': username,
                'exp': exp_time
-               }
+              }
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return token
