@@ -28,7 +28,7 @@ class FBTransaction(db.Model):
     amount = db.Column(db.Integer)
     trans_type = db.Column(db.String(4))
     price = db.Column(db.Float)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
+    user_email = db.Column(db.Integer, db.ForeignKey('user.email'))
     user = db.relationship('User', backref='fbtransactions')
 
     def __init__(self, timestamp, amount, trans_type, price, user_id):

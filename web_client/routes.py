@@ -70,9 +70,8 @@ def generate_token( username, seconds=0, minutes=30, hours=0):
         timedelta(seconds=seconds, minutes=minutes, hours=hours)
 
     payload = {'username': username,
-               'iss': 'appl_api',
                'exp': exp_time
-               }
+              }
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return token

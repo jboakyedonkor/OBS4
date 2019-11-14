@@ -10,7 +10,7 @@ import requests
 sys.path.append(os.getcwd())
 import dotenv
 from models.fb_models import db, ma, User, user_schema, users_schema, FBTransaction, transaction_FB_schema, transactions_FB_schema, Asset, asset_schema, assets_schema
-
+# TODO: CONFORM JSON RESPONSES AND TOKEN VERIFICATION
 dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 
 app = Flask(__name__)
