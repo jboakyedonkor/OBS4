@@ -12,14 +12,14 @@ def create_firebase_app():
     dotenv.load_dotenv(dotenv_path=env_file)
     config = {
 
-        "apiKey": os.getenv('FIREBASE_API_KEY'),
-        "authDomain": os.getenv('FIREBASE_AUTH_DOMAIN'),
-        "databaseURL": os.getenv('FIREBASE_DB_URL'),
-        "projectId": os.getenv('FIREBASE_PROJECT_ID'),
-        "storageBucket": os.getenv('FIREBASE_STORAGE_BUCKET'),
-        "messagingSenderId": os.getenv('FIREBASE_MSG_SENDER_ID'),
-        "appId": os.getenv('FIREBASE_APP_ID'),
-        "serviceAccount": os.getenv('FIREBASE_CRED_PATH')
+        "apiKey": os.getenv('MSFT_FIREBASE_API_KEY'),
+        "authDomain": os.getenv('MSFT_FIREBASE_AUTH_DOMAIN'),
+        "databaseURL": os.getenv('MSFT_FIREBASE_DB_URL'),
+        "projectId": os.getenv('MSFT_FIREBASE_PROJECT_ID'),
+        "storageBucket": os.getenv('MSFT_FIREBASE_STORAGE_BUCKET'),
+        "messagingSenderId": os.getenv('MSFT_FIREBASE_MSG_SENDER_ID'),
+        "appId": os.getenv('MSFT_FIREBASE_APP_ID'),
+        "serviceAccount": os.getenv('MSFT_FIREBASE_CRED_PATH')
     }
 
     firebase = pyrebase.initialize_app(config)
@@ -82,7 +82,7 @@ def get_quote():
     Get market quotes for Micrsoft using the Tradier API
     """
     api_url = "https://sandbox.tradier.com/v1/markets/quotes"
-    api_key = os.getenv("TRADIER_API_KEY")
+    api_key = os.getenv("MSFT_TRADIER_API_KEY")
 
     params = {'symbols': 'MSFT'}
 
