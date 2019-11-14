@@ -79,11 +79,12 @@ def buy_share():
             'share_price': api_response['last'],
             'shares_bought': purchase_request['shares'],
             'created_at': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-            'payment': payment
+            'payment': -1 * payment
         }
 
         # store into firebase
-        fire_db.child('transactions').push(transaction_response)
+        
+        fire_db.child('transactions').child(user).child('bought').push(transaction_response)
 
         buy_response = jsonify(transaction_response)
 
@@ -134,7 +135,7 @@ def sell_share():
         }
 
         # store into firebase
-        fire_db.child('transactions').push(transaction_response)
+        fire_db.child('transactions').child(user).child('sold').push(transaction_response)
 
         sell_response = jsonify(transaction_response)
 
