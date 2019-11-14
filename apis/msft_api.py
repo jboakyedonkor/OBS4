@@ -171,7 +171,7 @@ def buy_share():
             'symbol': transaction.symbol,
             'share_price': transaction.share_price,
             'shares_bought': transaction.shares_bought,
-            'created_at': transaction.created_at,
+            'created_at': datetime.utcnow(),
             'payment': transaction.payment
         }
 
@@ -248,7 +248,7 @@ def sell_share():
             'symbol': transaction.symbol,
             'share_price': transaction.share_price,
             'shares_sold': transaction.shares_sold,
-            'created_at': transaction.created_at,
+            'created_at': datetime.utcnow(),
             'payment': transaction.payment
         }
 
@@ -285,6 +285,7 @@ def get_price():
     # TODO implement logging
     user = msg
     api_response = get_quote()
+
     response = {
         'symbol': api_response['symbol'],
         'name': api_response['description'],
