@@ -118,3 +118,4 @@ include/
 .vscode/settings.json
 
 db_temp.sqlite
+config.json
