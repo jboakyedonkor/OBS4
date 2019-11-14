@@ -6,8 +6,8 @@ import os
 import sys
 import jwt
 from models.goog_models import db, Stock, Transaction
+from models.log_db import updateMethods, insertMethods, checkMethods
 
-#goog_api = Blueprint('goog_api', __name__)
 app = Flask(__name__)
 
 def get_quote():
@@ -24,7 +24,6 @@ def get_quote():
 
 @app.route('/gen_token/<username>', methods=['GET'])
 def generate_token(username):
-    db.create_all()
     current_time = datetime.utcnow()
     exp_time = current_time + \
                timedelta(seconds=0, minutes=30, hours=0)
@@ -40,26 +39,24 @@ def generate_token(username):
 def get_price():
     return jsonify({"Price": get_quote()['last']})
 
-
 def token_check(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-
-        if 'goog_key' in request.headers:
-            token = request.headers['goog_key']
+        if 'key' in request.headers:
+            token = request.headers['key']
         if not token:
-            return Flask.make_response(jsonify({'error': 'Missing token'}), 401)
+            return jsonify('Error - missing token')
         try:
             SECRET_KEY = os.getenv('welp')
             data = jwt.decode(token, str(SECRET_KEY))
             current_user = data['username']
         except jwt.ExpiredSignatureError:
-            return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
+            return jsonify('Error - Invalid Token')
         except jwt.InvalidSignatureError:
-            return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
+            return jsonify('Error - Invalid Token')
         except jwt.InvalidTokenError:
-            return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
+            return jsonify('Error - Invalid Token')
         return f(current_user, *args, **kwargs)
 
     return decorated
@@ -68,74 +65,43 @@ def token_check(f):
 @app.route('/goog/buy/')
 @token_check
 def buy_shares(current_user):
-    if checkMethods.checkUsername(current_user) == True:
-        symbol = 'GOOG'
-        amount = request.args.get('amount')
-        share_price = get_quote()['last']
-        payment = share_price * amount
-        goog_stock = Stock.query.filter_by(symbol=symbol).first()
-
-        if not goog_stock:
-            goog_stock = Stock(
-                symbol=symbol,
-                price=share_price)
-            db.session.add(goog_stock)
-
-        else:
-            goog_stock.price = api_response['last']
-
-        transaction = Transaction(
-            user=current_user,
-            symbol=symbol,
-            payment=payment,
-            share_price=share_price,
-            shares_bought=amount,
-            shares_sold=None)
-        db.session.add(transaction)
+    symbol = 'GOOG'
+    amount = int(request.headers['amount'])
+    share_price = get_quote()['last']
+    possibleRemain = checkMethods.checkBankTableStock(symbol) - int(amount)
+    if possibleRemain > 0:
+        updateMethods.update_bank_table(symbol, amount, True)
+        updateMethods.update_client_table(symbol, amount, True)
+        insertMethods.insert_transaction_logs_table(symbol, share_price, amount, current_user, 'Buy')
         return jsonify('Bought')
-        db.session.commit()
     else:
-        return jsonify('Error - user not found')
+        updateMethods.update_bank_table(symbol, amount - abs(possibleRemain), True)
+        updateMethods.update_client_table(symbol, amount, True)
+        return jsonify('Bought - purchased more than excess')
 
 
 @app.route('/goog/sell/')
 @token_check
 def sell_shares(current_user):
-    if checkMethods.checkUsername(current_user) == True:
-        symbol = 'GOOG'
-        amount = request.args.get('amount')
-        share_price = get_quote()['last']
-        payment = share_price * amount
-        goog_stock = Stock.query.filter_by(symbol=symbol).first()
-        if not goog_stock:
-            goog_stock = Stock(
-                symbol=symbol,
-                price=share_price)
-            db.session.add(goog_stock)
-        else:
-            goog_stock.price = api_response['last']
-
-        transaction = Transaction(
-            user=current_user,
-            symbol=symbol,
-            payment=payment,
-            share_price=share_price,
-            shares_bought=None,
-            shares_sold=amount)
-        db.session.add(transaction)
-        db.session.commit()
-
+    symbol = 'GOOG'
+    amount = int(request.headers['amount'])
+    share_price = get_quote()['last']
+    possibleRemain = checkMethods.checkClientTableStock(symbol) - int(amount)
+    if possibleRemain > 0:
+        updateMethods.update_bank_table(symbol, amount, False)
+        updateMethods.update_client_table(symbol, amount, False)
+        insertMethods.insert_transaction_logs_table(symbol, share_price, amount, current_user, 'Sell')
         return jsonify('Sold')
     else:
-        return jsonify('Error - user not found')
+        return jsonify('Error - client lacks stocks to sell')
 
 
-#@app.route('/goog/shares/', methods=['GET'])
-#@token_check
-#def total_shares(current_user):
-   #     googNetWorth = get_quote()['last'] * Stock.query.with_entites(func.sum(Transaction.share_price))filter_by(user=current_user).first()
-    #    return jsonify(googNetWorth)
-    
+@app.route('/goog/shares', methods=['GET'])
+@token_check
+def total_shares(current_user):
+    symbol = 'GOOG'
+    googNetWorth = get_quote()['last'] * checkMethods.checkClientTableStock('GOOG')
+    return jsonify(round(float(googNetWorth), 2))
 
 if __name__ == "__main__":
     app.run()
