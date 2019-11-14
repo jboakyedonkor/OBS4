@@ -29,7 +29,6 @@ def generate_token(username):
     exp_time = current_time + \
                timedelta(seconds=0, minutes=30, hours=0)
     payload = {'username': username,
-               'iss': 'goog_API',
                'exp': exp_time
                }
     SECRET_KEY = os.getenv('welp')
