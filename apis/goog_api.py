@@ -5,7 +5,6 @@ import requests
 import os
 import sys
 import jwt
-from models.goog_models import db, Stock, Transaction
 from models.log_db import updateMethods, insertMethods, checkMethods
 
 app = Flask(__name__)
