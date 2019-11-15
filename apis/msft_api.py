@@ -15,7 +15,9 @@ dotenv.load_dotenv(dotenv_path=env_file)
 
 microsoft_api = Flask(__name__)
 
-fire_db = create_firebase_app().database()
+fire_db = create_firebase_app()
+if fire_db:
+    fire_db =fire_db.database()
 
 
 @microsoft_api.route('/msft/gen_token', methods=['POST'])
@@ -84,8 +86,9 @@ def buy_share():
 
         # store into firebase
 
-        fire_db.child('transactions').child(user).child(
-            'bought').push(transaction_response)
+        if fire_db:
+            fire_db.child('transactions').child(user).child(
+                'bought').push(transaction_response)
 
         buy_response = jsonify(transaction_response)
 
@@ -136,8 +139,9 @@ def sell_share():
         }
 
         # store into firebase
-        fire_db.child('transactions').child(user).child(
-            'sold').push(transaction_response)
+        if fire_db:
+            fire_db.child('transactions').child(user).child(
+                'sold').push(transaction_response)
 
         sell_response = jsonify(transaction_response)
 
