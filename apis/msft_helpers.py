@@ -21,9 +21,11 @@ def create_firebase_app():
         "appId": os.getenv('MSFT_FIREBASE_APP_ID')
 
     }
-
-    firebase = pyrebase.initialize_app(config)
-    return firebase
+    if config["apiKey"]:
+        firebase = pyrebase.initialize_app(config)
+        return firebase
+    else:
+        return None
 
 
 def get_token(headers):
