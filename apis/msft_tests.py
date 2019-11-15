@@ -4,11 +4,10 @@ import time
 import unittest
 import dotenv
 import jwt
-import json
-from subprocess import Popen
+from multiprocessing import Process
 from datetime import datetime, timedelta
-from flask import Flask
 from msft_helpers import *
+from msft_api import microsoft_api
 
 
 class MsftHelperTestCase (unittest.TestCase):
@@ -292,15 +291,19 @@ class MsftRoutesTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    cmd = ['python3', '.' + os.sep + 'apis' + os.sep + 'msft_api.py', "debug"]
+    # cmd = ['python3', '.' + os.sep + 'apis' + os.sep + 'msft_api.py', "debug"]
 
-    if os.name == 'nt':
-        cmd[0] = 'python'
+    # if os.name == 'nt':
+    #     cmd[0] = 'python'
 
-    api_proc = Popen(cmd)
+    # api_proc = Popen(cmd)
+    # time.sleep(4)
+    server = Process(target=microsoft_api.run)
+    server.start()
     time.sleep(4)
     unittest.main(exit=False, verbosity=3)
-    api_proc.kill()
+    server.terminate()
+    server.join()
     time.sleep(4)
 
     db = create_firebase_app().database()

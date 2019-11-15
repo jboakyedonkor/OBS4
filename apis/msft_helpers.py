@@ -18,8 +18,8 @@ def create_firebase_app():
         "projectId": os.getenv('MSFT_FIREBASE_PROJECT_ID'),
         "storageBucket": os.getenv('MSFT_FIREBASE_STORAGE_BUCKET'),
         "messagingSenderId": os.getenv('MSFT_FIREBASE_MSG_SENDER_ID'),
-        "appId": os.getenv('MSFT_FIREBASE_APP_ID'),
-    
+        "appId": os.getenv('MSFT_FIREBASE_APP_ID')
+
     }
 
     firebase = pyrebase.initialize_app(config)
