@@ -5,5 +5,4 @@ WORKDIR /OBS4
 COPY . .
 RUN apk --no-cache add build-base
 RUN pip install -r requirements.txt
-
-ENTRYPOINT [ "echo","Hello World" ]
+ENTRYPOINT [ "python3","apis/msft_tests.py" ]
