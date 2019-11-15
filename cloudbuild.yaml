@@ -1,5 +1,7 @@
 steps:
-- name: 'gcr.io/cloud-builders/docker'
+- name: 'build gcr.io/cloud-builders/docker'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4','.']
-- name: 'gcr.io/cloud-builders/docker'
+- name: 'test microsoft microservice'
+  args: ['python', 'apis/msft_tests.py']
+- name: 'push gcr.io/cloud-builders/docker'
   args: ['push','gcr.io/$PROJECT_ID/obs4']
