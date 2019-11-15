@@ -1,4 +1,5 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build','-t','obs4:new_begin,'.']
-images: ['obs4:new_begin']
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4','.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','gcr.io/$PROJECT_ID/obs4']
