@@ -5,8 +5,6 @@ from datetime import datetime, timedelta
 import jwt
 import pyrebase
 import os
-from multiprocessing import Process
-from fb_api import app
 
 class FBRoutesTestCase(unittest.TestCase):
     def setUp(self):
@@ -76,8 +74,4 @@ class FBRoutesTestCase(unittest.TestCase):
         self.assertIsInstance(res, dict, 'Did not return valid json.')
 
 if __name__ == '__main__':
-    server = Process(target=app.run)
-    server.start()
     unittest.main(exit=False)
-    server.terminate()
-    server.join()
