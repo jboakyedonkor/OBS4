@@ -176,4 +176,7 @@ def get_price():
 if __name__ == "__main__":
     app = Flask(__name__)
     app.register_blueprint(microsoft_api)
-    app.run()
+    if len(sys.argv) >1 and sys.argv[1] == 'debug':
+        app.run(debug=True)
+    else:
+        app.run()
