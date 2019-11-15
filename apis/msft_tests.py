@@ -1,14 +1,14 @@
-
-import datetime
-from subprocess import Popen
 import requests
 import os
 import time
 import unittest
 import dotenv
 import jwt
-from flask import Flask
-from msft_api import generate_token, verify_token, get_quote, get_token
+from multiprocessing import Process
+from datetime import datetime, timedelta
+from msft_helpers import *
+from msft_api import microsoft_api
+
 
 class MsftHelperTestCase (unittest.TestCase):
     def setUp(self):
@@ -16,7 +16,7 @@ class MsftHelperTestCase (unittest.TestCase):
             dotenv_path=".{}config{}.env".format(
                 os.sep, os.sep))
         self.secret_key = os.getenv('SECRET_KEY')
-        self.api_key = os.getenv('API_KEY')
+        self.api_key = os.getenv('MSFT_TRADIER_API_KEY')
 
     def test_get_quote(self):
         api_url = "https://sandbox.tradier.com/v1/markets/quotes"
@@ -36,12 +36,11 @@ class MsftHelperTestCase (unittest.TestCase):
         #     api_response['symbol'],
         #     test_json['quotes']['quote']['symbol'],
         #     "not the same company")
-        
+
         self.assertEqual(
             api_response['description'],
             test_json['quotes']['quote']['description'],
             "not the same company")
-
 
     def test_get_token(self):
         test_header = {'Authorization': 'check'}
@@ -63,7 +62,7 @@ class MsftHelperTestCase (unittest.TestCase):
     def test_generate_token(self):
 
         token = generate_token("test", self.secret_key, seconds=10, minutes=0)
-        exp_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=10)
+        exp_time = datetime.utcnow() + timedelta(seconds=10)
 
         test_payload = {
 
@@ -98,7 +97,7 @@ class MsftHelperTestCase (unittest.TestCase):
 
     def test_verify_token(self):
 
-        exp_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=10)
+        exp_time = datetime.utcnow() + timedelta(seconds=10)
         test_payload = {
 
             'username': "test",
@@ -117,10 +116,10 @@ class MsftHelperTestCase (unittest.TestCase):
 
         output2 = verify_token(token, self.secret_key)
 
-        exp_time = datetime.datetime.utcnow() + datetime.timedelta(seconds=30)
+        exp_time = datetime.utcnow() + timedelta(seconds=30)
         test_payload2 = {
 
-            'username': "test",
+            'username': "testuser",
             'iss': 'Micrsosoft_API',
             'exp': exp_time
         }
@@ -156,28 +155,162 @@ class MsftHelperTestCase (unittest.TestCase):
 
 class MsftRoutesTestCase(unittest.TestCase):
 
-    def test_get_shares(self):
-        pass
+    def setUp(self):
+        self.msft_url = "http://localhost:5000"
+        self.price_route = "/msft/share_price"
+        self.buy_route = "/msft/buy"
+        self.sell_route = "/msft/sell"
+
+        dotenv.load_dotenv(
+            dotenv_path=".{}config{}.env".format(
+                os.sep, os.sep))
+        self.secret_key = os.getenv('SECRET_KEY')
+        self.api_key = os.getenv('MSFT_TRADIER_API_KEY')
 
     def test_get_price(self):
-        pass
+        token = generate_token('testuser', self.secret_key)
+        headers = {'Authorization': token.decode()}
+        api_response = requests.get(
+            self.msft_url + self.price_route,
+            headers=headers).json()
+
+        token2 = generate_token(
+            'testuser',
+            self.secret_key,
+            seconds=1,
+            minutes=0)
+        time.sleep(2)
+        headers = {'Authorization': token2.decode()}
+        api_response2 = requests.get(
+            self.msft_url + self.price_route,
+            headers=headers).json()
+
+        self.assertEqual(
+            api_response['symbol'],
+            'MSFT',
+            'incorrect user made a requests')
+        self.assertEqual(
+            api_response['name'],
+            'Microsoft Corp',
+            'incorrect company')
+
+        self.assertEqual(
+            api_response2['error'],
+            "token expired",
+            "incorrect error response")
 
     def test_post_buy(self):
-        pass
+
+        token = generate_token('testuser', self.secret_key)
+
+        headers = {'Authorization': token.decode()}
+        json_data = {'shares': 45}
+
+        api_response = requests.post(
+            self.msft_url + self.buy_route,
+            json=json_data,
+            headers=headers).json()
+
+        token2 = generate_token(
+            'testuser',
+            self.secret_key,
+            seconds=1,
+            minutes=0)
+
+        time.sleep(2)
+
+        headers = {'Authorization': token2.decode()}
+
+        api_response2 = requests.post(
+            self.msft_url + self.buy_route,
+            json=json_data,
+            headers=headers).json()
+
+        self.assertEqual(
+            api_response['shares_bought'],
+            45,
+            "incorrect amount shares sold")
+
+        self.assertEqual(api_response['symbol'], 'MSFT', 'incorrect quote')
+
+        self.assertEqual(
+            api_response['payment'],
+            api_response['shares_bought'] *
+            api_response['share_price'] * -1,
+            "incorrect payment")
+
+        self.assertEqual(
+            api_response2['error'],
+            "token expired",
+            "incorrect error response")
 
     def test_post_sell(self):
-        pass
+        token = generate_token('testuser', self.secret_key)
+
+        headers = {'Authorization': token.decode()}
+        json_data = {'shares': 45}
+
+        api_response = requests.post(
+            self.msft_url + self.sell_route,
+            json=json_data,
+            headers=headers).json()
+
+        token2 = generate_token(
+            'testuser',
+            self.secret_key,
+            seconds=1,
+            minutes=0)
+
+        time.sleep(2)
+
+        headers = {'Authorization': token2.decode()}
+
+        api_response2 = requests.post(
+            self.msft_url + self.sell_route,
+            json=json_data,
+            headers=headers).json()
+
+        self.assertEqual(
+            api_response['shares_sold'],
+            45,
+            "incorrect amount shares bought")
+
+        self.assertEqual(api_response['symbol'], 'MSFT', 'incorrect quote')
+
+        self.assertEqual(
+            api_response['payment'],
+            api_response['shares_sold'] *
+            api_response['share_price'],
+            "incorrect payment")
+
+        self.assertEqual(
+            api_response2['error'],
+            "token expired",
+            "incorrect error response")
 
 
 if __name__ == "__main__":
 
-    cmd = ['python3', '.' + os.sep + 'StockAPIs' + os.sep + 'msft_api.py']
+    # cmd = ['python3', '.' + os.sep + 'apis' + os.sep + 'msft_api.py', "debug"]
 
-    if os.name == 'nt':
-        cmd[0] = 'python'
+    # if os.name == 'nt':
+    #     cmd[0] = 'python'
 
-    api_proc = Popen(cmd)
-    time.sleep(0.7)
+    # api_proc = Popen(cmd)
+    # time.sleep(4)
+    server = Process(target=microsoft_api.run)
+    server.start()
+    
+    time.sleep(4)
     unittest.main(exit=False, verbosity=3)
-    api_proc.kill()
-    time.sleep(0.2)
+    
+    server.terminate()
+    server.join()
+    
+    time.sleep(4)
+
+
+    db = create_firebase_app()
+    if db:
+        db = db.database()
+        db.child("transcations").child("testuser").remove()

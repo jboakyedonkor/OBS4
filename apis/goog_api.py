@@ -5,9 +5,10 @@ import requests
 import os
 import sys
 import jwt
-from models.log_db import updateMethods, insertMethods, checkMethods
+from testPostgres import updateMethods, insertMethods, checkMethods, clientMethods
 
 app = Flask(__name__)
+
 
 def get_quote():
     api_url = "https://sandbox.tradier.com/v1/markets/quotes"
@@ -19,6 +20,11 @@ def get_quote():
     response = response.json()
     response = response['quotes']['quote']
     return response
+
+
+def createNewTable(username):
+    clientMethods.create_client_table(username)
+    clientMethods.populate_client_table(username)
 
 
 @app.route('/gen_token/<username>', methods=['GET'])
@@ -37,6 +43,7 @@ def generate_token(username):
 @app.route('/goog/share_price', methods=['GET'])
 def get_price():
     return jsonify({"Price": get_quote()['last']})
+
 
 def token_check(f):
     @wraps(f)
@@ -67,15 +74,20 @@ def buy_shares(current_user):
     symbol = 'GOOG'
     amount = int(request.headers['amount'])
     share_price = get_quote()['last']
+    if checkMethods.checkTableExists(current_user) == False:
+        createNewTable(current_user)
+
     possibleRemain = checkMethods.checkBankTableStock(symbol) - int(amount)
+
     if possibleRemain > 0:
         updateMethods.update_bank_table(symbol, amount, True)
-        updateMethods.update_client_table(symbol, amount, True)
+        updateMethods.update_client_table(current_user, symbol, amount, True)
         insertMethods.insert_transaction_logs_table(symbol, share_price, amount, current_user, 'Buy')
         return jsonify('Bought')
+
     else:
-        updateMethods.update_bank_table(symbol, amount - abs(possibleRemain), True)
-        updateMethods.update_client_table(symbol, amount, True)
+        updateMethods.update_bank_table(symbol, amount - abs(possibleRemain) - 1, True)
+        updateMethods.update_client_table(current_user, symbol, amount, True)
         return jsonify('Bought - purchased more than excess')
 
 
@@ -85,10 +97,14 @@ def sell_shares(current_user):
     symbol = 'GOOG'
     amount = int(request.headers['amount'])
     share_price = get_quote()['last']
-    possibleRemain = checkMethods.checkClientTableStock(symbol) - int(amount)
+
+    if checkMethods.checkTableExists(current_user) == False:
+        createNewTable(current_user)
+
+    possibleRemain = checkMethods.checkClientTableStock(symbol, current_user) - int(amount)
     if possibleRemain > 0:
         updateMethods.update_bank_table(symbol, amount, False)
-        updateMethods.update_client_table(symbol, amount, False)
+        updateMethods.update_client_table(current_user, symbol, amount, False)
         insertMethods.insert_transaction_logs_table(symbol, share_price, amount, current_user, 'Sell')
         return jsonify('Sold')
     else:
@@ -99,7 +115,7 @@ def sell_shares(current_user):
 @token_check
 def total_shares(current_user):
     symbol = 'GOOG'
-    googNetWorth = get_quote()['last'] * checkMethods.checkClientTableStock('GOOG')
+    googNetWorth = get_quote()['last'] * checkMethods.checkClientTableStock(symbol, current_user)
     return jsonify(round(float(googNetWorth), 2))
 
 if __name__ == "__main__":
