@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 import jwt
 import pyrebase
 import os
+from multiprocessing import Process
+from fb_api import app
+import time
 
 
 class FBRoutesTestCase(unittest.TestCase):
@@ -112,4 +115,9 @@ class FBRoutesTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    server = Process(target=app.run)
+    server.start()
+    time.sleep(2)
     unittest.main(exit=False)
+    server.terminate()
+    server.join()
