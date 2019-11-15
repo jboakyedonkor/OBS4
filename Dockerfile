@@ -5,4 +5,4 @@ WORKDIR /OBS4
 COPY . .
 RUN pip install -r requirements.txt
 
-ENTRYPOINT [ "python3","./apis/msft_tests.py" ]
+ENTRYPOINT [ "echo","Hello World" ]
