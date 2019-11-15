@@ -174,7 +174,7 @@ def buy_share():
         new_asset = { "symbol": symbol, "pl": num_owned*price*-1, "num_owned": num_owned, "username": username }
         fire_db.child('assets').push(new_asset)
         requests.post('http://localhost:5000/api/transactions/FB', json={'trans_type': 'BUY', 'amount': num_owned, 'username': username, 'price': price})
-        return jsonify(user=username, symbol='FB', share_price=price, shares_bought=num_owned, created_at=datetime.utcnow(), payment=pl_added)
+        return jsonify(user=username, symbol='FB', share_price=price, shares_bought=num_owned, created_at=datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'), payment=pl_added)
 
 @app.route('/fb/sell', methods=['POST'])
 def sell_share():
