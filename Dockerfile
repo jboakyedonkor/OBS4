@@ -1,4 +1,4 @@
-FROM gcr.io/google-appengine/python:latest
+FROM python:3.7-alpine
 
 EXPOSE 5000
 WORKDIR /OBS4
