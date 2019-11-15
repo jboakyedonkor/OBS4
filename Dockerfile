@@ -1,6 +1,8 @@
-FROM docker pull gcr.io/google-appengine/python:latest
+FROM gcr.io/google-appengine/python:latest
 
 EXPOSE 5000
+WORKDIR /OBS4
+COPY . .
+RUN pip -r requirments.txt
 
-ADD apis /usr/src/app/apis
-ADD web_client /usr/src/app/web_client
+ENTRYPOINT [ "python3","./apis/msft_tests.py" ]
