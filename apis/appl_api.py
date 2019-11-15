@@ -8,23 +8,10 @@ import json
 import datetime
 import pyrebase
 from functools import wraps
-import dotenv
- 
-dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
-
+from aapl_helper import intialize_firebase
 aapl_api = Flask( __name__)
-config = {
-     "apiKey": os.getenv("FIRE_API_KEY"),
-    "authDomain": os.getenv("AUTH_DOMAIN"),
-    "databaseURL": os.getenv("DATABASE_URL"),
-    "projectId": os.getenv("PROJECT_ID"),
-    "storageBucket": os.getenv("STORAGE_BUCKET"),
-    "messagingSenderId": os.getenv("MESS_SENDER_ID"),
-    "appId": os.getenv("APP_ID")
-}
 
-firebase = pyrebase.initialize_app(config)
-dbfire = firebase.database()
+dbfire = intialize_firebase().database()
 
     # Generates Token
 @aapl_api.route('/gen/<username>')
@@ -34,13 +21,7 @@ def generate_token( seconds=0, minutes=30, hours=0):
         timedelta(seconds=seconds, minutes=minutes, hours=hours)
 
     payload = {'username': request.args.get('username'),
-<<<<<<< HEAD
                'exp': exp_time
-=======
-               'iss': 'appl_api',
-               'exp': exp_time,
-               'load': 'blown'
->>>>>>> a1a49c505a00ebfd5ae7f20c440a6715fe4ec4b8
                }
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
@@ -72,7 +53,6 @@ def token_required(f):
 @aapl_api.route('/aapl/share_price')
 def get_price():
     price = aapl_price()
-    print(os.getenv("DATABASE_URL"))
     return jsonify({"Price" : price['quotes']['quote']['last']})
 
 @aapl_api.route('/aapl/buy/')
@@ -86,12 +66,12 @@ def buy_shares(current_user):
     'symbol': 'AAPL',
     "share_price": price,
     "shares_bought": amount,
-    "created_at": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+    "created_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
     "payment": price
     }
     dbfire.child('transactions').child(current_user).child('bought').push(data)
     
-    return 'Bought'
+    return data
 
 @aapl_api.route('/aapl/sell/')
 @token_required
@@ -109,12 +89,12 @@ def sell_shares(current_user):
     "payment": sell
     }
     dbfire.child('transactions').child(current_user).child('sell').push(data)
-    return 'Sold'
+    return data
 
 @aapl_api.route('/aapl/shares/')
 @token_required
 def total_shares(current_user):
-    all_users = dbfire.child("Bought").child(current_user).get()
+    all_users = dbfire.child("transactions").child(current_user).child("bought").get()
     output = []
     #Checks if any purchases in database
     if(all_users.each() is None):
