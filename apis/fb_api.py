@@ -3,9 +3,7 @@ from datetime import datetime, timedelta
 import os
 import sys
 import jwt
-from flask import Flask, request, jsonify, Blueprint
-from flask_sqlalchemy import SQLAlchemy
-from flask_marshmallow import Marshmallow
+from flask import Flask, request, jsonify
 import requests
 sys.path.append(os.getcwd())
 import dotenv
