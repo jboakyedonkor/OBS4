@@ -5,7 +5,6 @@ import time
 
 conn = psycopg2.connect('postgres://bdhcskpn:aN7RtxPZgnKxxjWBhOGzaSi5uVigON4l@salt.db.elephantsql.com:5432/bdhcskpn')
 
-
 class checkMethods:
 
     def checkTableExists(pass_username):
@@ -99,6 +98,8 @@ class updateMethods:
         command = "UPDATE client_table_" + current_user + " SET num_shares = " + str(
             final_client_stock) + " WHERE symbol = '" + stock_symbol + "'"
         execute_sql(command)
+        
+        return "Successfully updated client table"
 
 
 def execute_sql(command):
