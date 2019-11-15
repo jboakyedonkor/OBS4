@@ -300,11 +300,17 @@ if __name__ == "__main__":
     # time.sleep(4)
     server = Process(target=microsoft_api.run)
     server.start()
+    
     time.sleep(4)
     unittest.main(exit=False, verbosity=3)
+    
     server.terminate()
     server.join()
+    
     time.sleep(4)
 
-    db = create_firebase_app().database()
-    db.child("transcations").child("testuser").remove()
+
+    db = create_firebase_app()
+    if db:
+        db = db.database()
+        db.child("transcations").child("testuser").remove()
