@@ -9,5 +9,5 @@ steps:
 
 #test
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['container','run','--name','obs4_container','-p','5000','obs4:latest']
+  args: ['container','run','--name','obs4_container','-p','5000','gcr.io/$PROJECT_ID/obs4']
 
