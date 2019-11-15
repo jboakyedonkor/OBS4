@@ -27,7 +27,6 @@ def createNewTable(username):
     clientMethods.populate_client_table(username)
 
 
-@app.route('/gen_token/<username>', methods=['GET'])
 def generate_token(username):
     current_time = datetime.utcnow()
     exp_time = current_time + \
@@ -37,8 +36,12 @@ def generate_token(username):
                }
     SECRET_KEY = os.getenv('welp')
     token = jwt.encode(payload, key=str(SECRET_KEY), algorithm='HS256')
-    return jsonify({'token': token.decode('UTF-8')})
+    return token
 
+@app.route('/gen_token/<username>', methods=['GET'])
+def showToken(username):
+    token = generate_token(username)
+    return jsonify({'token': token.decode('UTF-8')})
 
 @app.route('/goog/share_price', methods=['GET'])
 def get_price():
@@ -100,6 +103,7 @@ def sell_shares(current_user):
 
     if checkMethods.checkTableExists(current_user) == False:
         createNewTable(current_user)
+
 
     possibleRemain = checkMethods.checkClientTableStock(symbol, current_user) - int(amount)
     if possibleRemain > 0:
