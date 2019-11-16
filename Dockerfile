@@ -1,6 +1,8 @@
 FROM python:3.7-alpine
 
 EXPOSE 5000
+EXPOSE 5432
+
 WORKDIR /OBS4
 COPY . .
 RUN apk --no-cache add build-base
