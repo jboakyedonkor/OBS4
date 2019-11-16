@@ -2,10 +2,12 @@ import jwt
 import unittest
 import os
 from aapl_helper import generate_token
-from appl_api import aapl_price
+from appl_api import aapl_price, aapl_api
 import json
 import dotenv
 import requests
+import multiprocessing 
+import time
 dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 
 
@@ -59,4 +61,10 @@ class TestAPI(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    server = multiprocessing.Process(target=aapl_api.run)
+    server.start()
+    time.sleep(2)
+    unittest.main(exit=False)
+    server.terminate()
+    server.join()
+    
