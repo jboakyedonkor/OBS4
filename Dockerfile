@@ -46,5 +46,6 @@ EXPOSE 5432
 
 WORKDIR /OBS4
 COPY . .
-RUN pip install -r requirements.txt
+RUN apt install python3 python3-pip
+RUN pip3 install -r requirements.txt
 RUN python3 apis/msft_tests.py
