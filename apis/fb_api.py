@@ -13,74 +13,17 @@ dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 app = Flask(__name__)
 
 config = {
-    "apiKey": os.getenv('FIREBASE_API_KEY'),
-    "authDomain": os.getenv('FIREBASE_AUTH_DOMAIN'),
-    "databaseURL": os.getenv('FIREBASE_DB_URL'),
-    "projectId": os.getenv('FIREBASE_PROJECT_ID'),
-    "storageBucket": os.getenv('FIREBASE_STORAGE_BUCKET'),
-    "messagingSenderId": os.getenv('FIREBASE_MSG_SENDER_ID'),
-    "appId": os.getenv('FIREBASE_APP_ID'),
-    "measurementId": os.getenv('FIREBASE_MEASUREMENT_ID')
+    "apiKey": os.getenv('FB_FIREBASE_API_KEY'),
+    "authDomain": os.getenv('FB_FIREBASE_AUTH_DOMAIN'),
+    "databaseURL": os.getenv('FB_FIREBASE_DB_URL'),
+    "projectId": os.getenv('FB_FIREBASE_PROJECT_ID'),
+    "storageBucket": os.getenv('FB_FIREBASE_STORAGE_BUCKET'),
+    "messagingSenderId": os.getenv('FB_FIREBASE_MSG_SENDER_ID'),
+    "appId": os.getenv('FB_FIREBASE_APP_ID'),
+    "measurementId": os.getenv('FB_FIREBASE_MEASUREMENT_ID')
 }
 
 fire_db = pyrebase.initialize_app(config).database()
-
-
-@app.route('/api/user/register', methods=['POST'])
-def register_user():
-    register_user_request = request.get_json()
-
-    if not register_user_request:
-        return jsonify(
-            status=400,
-            description='You must enter an email and password to register.')
-
-    try:
-        user_exist = fire_db.child('users').order_by_child(
-            'email').equal_to(register_user_request['username']).get().val()
-        return jsonify(error="User already exists.")
-    except BaseException:
-        pass
-
-    email = register_user_request['email']
-    password = register_user_request['password']
-
-    secret = os.getenv('SERVER_KEY')
-    payload = {'username': email, 'exp': datetime.utcnow() +
-               timedelta(minutes=30)}
-    encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
-
-    new_user = {
-        "email": email,
-        "password": password,
-        "token": encoded_jwt.decode()
-    }
-    fire_db.child('users').push(new_user)
-
-    return jsonify(new_user)
-
-
-@app.route('/api/user/login', methods=['PUT'])
-def login_user():
-    email = request.json['email']
-    password = request.json['password']
-    try:
-        user_login = fire_db.child('users').order_by_child(
-            'email').equal_to(email).get()
-        user_key = list(user_login.val().items())[0][0]
-        user_info = list(user_login.val().items())[0][1]
-    except BaseException:
-        return jsonify(error='User does not exist.')
-
-    secret = os.getenv('SERVER_KEY')
-    payload = {'username': email, 'exp': datetime.utcnow() +
-               timedelta(minutes=30)}
-    encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
-
-    user_info['token'] = encoded_jwt.decode()
-    fire_db.child('users').child(user_key).update(user_info)
-    return jsonify(user_info)
-
 
 @app.route('/api/user/verify', methods=['GET', 'POST'])
 def verify_user():
@@ -92,7 +35,7 @@ def verify_user():
             description='Authentication token not sent.',
             authenticated=False)
 
-    decoded = jwt.decode(token, os.getenv('SERVER_KEY'), algorithm='HS256')
+    decoded = jwt.decode(token, os.getenv('SECRET_KEY'), algorithm='HS256')
 
     return jsonify(
         status=200,
