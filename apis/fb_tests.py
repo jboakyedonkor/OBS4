@@ -16,7 +16,7 @@ class FBRoutesTestCase(unittest.TestCase):
 
     def test_verify_user(self):
         username = 'fakeemail@faketaxi.com'
-        secret = os.getenv('SERVER_KEY')
+        secret = os.getenv('SECRET_KEY')
         payload = {'username': username,
                    'exp': datetime.utcnow() + timedelta(minutes=30)}
         encoded = jwt.encode(payload, secret, algorithm='HS256')
@@ -77,7 +77,7 @@ class FBRoutesTestCase(unittest.TestCase):
 
     def test_buy_share(self):
         username = 'fakeemail@faketaxi.com'
-        secret = os.getenv('SERVER_KEY')
+        secret = os.getenv('SECRET_KEY')
         payload = {'username': username,
                    'exp': datetime.utcnow() + timedelta(minutes=30)}
         encoded = jwt.encode(payload, secret, algorithm='HS256')
@@ -96,7 +96,7 @@ class FBRoutesTestCase(unittest.TestCase):
 
     def test_sell_share(self):
         username = 'fakeemail@faketaxi.com'
-        secret = os.getenv('SERVER_KEY')
+        secret = os.getenv('SECRET_KEY')
         payload = {'username': username,
                    'exp': datetime.utcnow() + timedelta(minutes=30)}
         encoded = jwt.encode(payload, secret, algorithm='HS256')
