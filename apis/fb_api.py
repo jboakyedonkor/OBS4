@@ -13,14 +13,14 @@ dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 app = Flask(__name__)
 
 config = {
-    "apiKey": os.getenv('FIREBASE_API_KEY'),
-    "authDomain": os.getenv('FIREBASE_AUTH_DOMAIN'),
-    "databaseURL": os.getenv('FIREBASE_DB_URL'),
-    "projectId": os.getenv('FIREBASE_PROJECT_ID'),
-    "storageBucket": os.getenv('FIREBASE_STORAGE_BUCKET'),
-    "messagingSenderId": os.getenv('FIREBASE_MSG_SENDER_ID'),
-    "appId": os.getenv('FIREBASE_APP_ID'),
-    "measurementId": os.getenv('FIREBASE_MEASUREMENT_ID')
+    "apiKey": os.getenv('FB_FIREBASE_API_KEY'),
+    "authDomain": os.getenv('FB_FIREBASE_AUTH_DOMAIN'),
+    "databaseURL": os.getenv('FB_FIREBASE_DB_URL'),
+    "projectId": os.getenv('FB_FIREBASE_PROJECT_ID'),
+    "storageBucket": os.getenv('FB_FIREBASE_STORAGE_BUCKET'),
+    "messagingSenderId": os.getenv('FB_FIREBASE_MSG_SENDER_ID'),
+    "appId": os.getenv('FB_FIREBASE_APP_ID'),
+    "measurementId": os.getenv('FB_FIREBASE_MEASUREMENT_ID')
 }
 
 fire_db = pyrebase.initialize_app(config).database()
@@ -45,7 +45,7 @@ def register_user():
     email = register_user_request['email']
     password = register_user_request['password']
 
-    secret = os.getenv('SERVER_KEY')
+    secret = os.getenv('SECRET_KEY')
     payload = {'username': email, 'exp': datetime.utcnow() +
                timedelta(minutes=30)}
     encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
@@ -72,7 +72,7 @@ def login_user():
     except BaseException:
         return jsonify(error='User does not exist.')
 
-    secret = os.getenv('SERVER_KEY')
+    secret = os.getenv('SECRET_KEY')
     payload = {'username': email, 'exp': datetime.utcnow() +
                timedelta(minutes=30)}
     encoded_jwt = jwt.encode(payload, secret, algorithm='HS256')
@@ -92,7 +92,7 @@ def verify_user():
             description='Authentication token not sent.',
             authenticated=False)
 
-    decoded = jwt.decode(token, os.getenv('SERVER_KEY'), algorithm='HS256')
+    decoded = jwt.decode(token, os.getenv('SECRET_KEY'), algorithm='HS256')
 
     return jsonify(
         status=200,
