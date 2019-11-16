@@ -61,7 +61,7 @@ class TestAPI(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    server = multiprocessing.Process(target=aapl_api.run(port=5001))
+    server = multiprocessing.Process(target=aapl_api.run, args=(None,5001))
     server.start()
     time.sleep(2)
     unittest.main(exit=False)
