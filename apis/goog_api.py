@@ -123,4 +123,4 @@ def total_shares(current_user):
     return jsonify(round(float(googNetWorth), 2))
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=5003)
