@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM python:3.7-alpine
 
 ARG MSFT_FIREBASE_API_KEY_G
 ARG MSFT_FIREBASE_AUTH_DOMAIN_G
@@ -46,6 +46,7 @@ EXPOSE 5432
 
 WORKDIR /OBS4
 COPY . .
-RUN apt install python3 python3-pip
+RUN apk --no-cache add build-base
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 RUN pip3 install -r requirements.txt
 RUN python3 apis/msft_tests.py
