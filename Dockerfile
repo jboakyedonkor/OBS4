@@ -47,5 +47,6 @@ EXPOSE 5432
 WORKDIR /OBS4
 COPY . .
 RUN apk --no-cache add build-base
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
 RUN pip install -r requirements.txt
-
+RUN python3 apis/msft_tests.py

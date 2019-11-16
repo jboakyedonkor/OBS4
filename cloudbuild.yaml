@@ -78,9 +78,26 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
 
-  #push
+  #push_base
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push','gcr.io/$PROJECT_ID/obs4']
+
+  #push_msft
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','gcr.io/$PROJECT_ID/obs4_msft']
+
+  #push_goog
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','gcr.io/$PROJECT_ID/obs4_goog']
+
+  #push_aapl
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','gcr.io/$PROJECT_ID/obs4_aapl']
+
+  #push_fb
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push','gcr.io/$PROJECT_ID/obs4_fb']
+
 
 #test
 - name: 'gcr.io/cloud-builders/docker'
