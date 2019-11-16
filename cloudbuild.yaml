@@ -64,19 +64,19 @@ steps:
 
   #build  microsoft container
   - name: 'gcr.io/cloud-builders/docker'
-  - args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./msft_dockerfile']
+    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./msft_dockerfile']
 
   #build  apple container
   - name: 'gcr.io/cloud-builders/docker'
-  - args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./aapl_dockerfile']
+    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./aapl_dockerfile']
 
   #build  google container
   - name: 'gcr.io/cloud-builders/docker'
-  - args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./goog_dockerfile']
+    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./goog_dockerfile']
 
   #build fb container
   - name: 'gcr.io/cloud-builders/docker'
-  - args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
+    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
 
   #push
 - name: 'gcr.io/cloud-builders/docker'
