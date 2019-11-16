@@ -2,6 +2,17 @@ steps:
   # build
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4','.']
+  env:
+  - 'MSFT_FIREBASE_API_KEY=$_MSFT_FB_API_KEY'
+  - 'MSFT_FIREBASE_AUTH_DOMAIN=$_MSFT_FB_APP_ID'
+  - 'MSFT_FIREBASE_DB_URL=$_MSFT_FB_AUTH_DOMAIN'
+  - 'MSFT_FIREBASE_PROJECT_ID=$_MSFT_FB_DB_URL'
+  - 'MSFT_FIREBASE_STORAGE_BUCKET=$_MSFT_FB_SENDER_ID'
+  - 'MSFT_FIREBASE_MSG_SENDER_ID=$_MSFT_FB_STORAGE_BUCKET'
+  - 'MSFT_FIREBASE_APP_ID=$_SECRET_KEY'
+  - 'SECRET_KEY=$_SECRET_KEY'
+  - 'MSFT_TRADIER_API_KEY=$_MSFT_TD_API_KEY'
+
 
 #push
 - name: 'gcr.io/cloud-builders/docker'
