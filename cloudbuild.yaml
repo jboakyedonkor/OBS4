@@ -42,41 +42,41 @@ steps:
   - '--build-arg' 
   - 'SQLALCHEMY_DATABASE_URI_G=${_SQLALCHEMY_DATABASE_URI}'
   - '.'
-  env:
-  - 'MSFT_FIREBASE_API_KEY=${_MSFT_FB_API_KEY}'
-  - 'MSFT_FIREBASE_AUTH_DOMAIN=${_MSFT_FB_AUTH_DOMAIN}'
-  - 'MSFT_FIREBASE_DB_URL=${_MSFT_FB_DB_URL}'
-  - 'MSFT_FIREBASE_PROJECT_ID=${_MSFT_FB_PROJECT_ID}'
-  - 'MSFT_FIREBASE_STORAGE_BUCKET=${_MSFT_FB_STORAGE_BUCKET}'
-  - 'MSFT_FIREBASE_MSG_SENDER_ID=${_MSFT_FB_SENDER_ID}'
-  - 'MSFT_FIREBASE_APP_ID=${_MSFT_FB_APP_ID}'
-  - 'SECRET_KEY=${_SECRET_KEY}'
-  - 'MSFT_TRADIER_API_KEY=${_MSFT_TD_API_KEY}'
-  - 'AAPL_FIRE_API_KEY=${_AAPL_FIRE_API_KEY}'
-  - 'AAPL_AUTH_DOMAIN=${_AAPL_AUTH_DOMAIN}'
-  - 'AAPL_DATABASE_URL=${_AAPL_DATABASE_URL}'
-  - 'AAPL_PROJECT_ID=${_AAPL_PROJECT_ID}'
-  - 'AAPL_STORAGE_BUCKET=${_AAPL_STORAGE_BUCKET}'
-  - 'AAPL_MESS_SENDER_ID=${_AAPL_MESS_SENDER_ID}'
-  - 'AAPL_APP_ID=${_AAPL_APP_ID}'
-  - 'AAPL_BEARER=${_AAPL_BEARER}'
-  - 'SQLALCHEMY_DATABASE_URI=${_SQLALCHEMY_DATABASE_URI}'
+  # env:
+  # - 'MSFT_FIREBASE_API_KEY=${_MSFT_FB_API_KEY}'
+  # - 'MSFT_FIREBASE_AUTH_DOMAIN=${_MSFT_FB_AUTH_DOMAIN}'
+  # - 'MSFT_FIREBASE_DB_URL=${_MSFT_FB_DB_URL}'
+  # - 'MSFT_FIREBASE_PROJECT_ID=${_MSFT_FB_PROJECT_ID}'
+  # - 'MSFT_FIREBASE_STORAGE_BUCKET=${_MSFT_FB_STORAGE_BUCKET}'
+  # - 'MSFT_FIREBASE_MSG_SENDER_ID=${_MSFT_FB_SENDER_ID}'
+  # - 'MSFT_FIREBASE_APP_ID=${_MSFT_FB_APP_ID}'
+  # - 'SECRET_KEY=${_SECRET_KEY}'
+  # - 'MSFT_TRADIER_API_KEY=${_MSFT_TD_API_KEY}'
+  # - 'AAPL_FIRE_API_KEY=${_AAPL_FIRE_API_KEY}'
+  # - 'AAPL_AUTH_DOMAIN=${_AAPL_AUTH_DOMAIN}'
+  # - 'AAPL_DATABASE_URL=${_AAPL_DATABASE_URL}'
+  # - 'AAPL_PROJECT_ID=${_AAPL_PROJECT_ID}'
+  # - 'AAPL_STORAGE_BUCKET=${_AAPL_STORAGE_BUCKET}'
+  # - 'AAPL_MESS_SENDER_ID=${_AAPL_MESS_SENDER_ID}'
+  # - 'AAPL_APP_ID=${_AAPL_APP_ID}'
+  # - 'AAPL_BEARER=${_AAPL_BEARER}'
+  # - 'SQLALCHEMY_DATABASE_URI=${_SQLALCHEMY_DATABASE_URI}'
 
-  #build  microsoft container
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./msft_dockerfile']
+#build  microsoft container
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./msft_dockerfile']
 
-  #build  apple container
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./aapl_dockerfile']
+#build  apple container
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./aapl_dockerfile']
 
-  #build  google container
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./goog_dockerfile']
+#build  google container
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./goog_dockerfile']
 
-  #build fb container
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
+#build fb container
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
 
   #push
 - name: 'gcr.io/cloud-builders/docker'
