@@ -49,4 +49,4 @@ COPY . .
 RUN apk --no-cache add build-base
 RUN pip install -r requirements.txt
 
-CMD ["python3","apis/fb_tests.py"]
+CMD ["python3","apis/aapl_tests.py"]
