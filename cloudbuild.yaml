@@ -16,13 +16,12 @@ steps:
   - '--build-arg AAPL_FIRE_API_KEY_G=${_AAPL_FIRE_API_KEY}'
   - '--build-arg AAPL_AUTH_DOMAIN_G=${_AAPL_AUTH_DOMAIN}'
   - '--build-arg AAPL_DATABASE_URL_G=${_AAPL_DATABASE_URL}'
-  - '--build-arg AAPL_PROJECT_ID_G=${_AAPL_PROJECT_ID}
+  - '--build-arg AAPL_PROJECT_ID_G=${_AAPL_PROJECT_ID}'
   - '--build-arg AAPL_STORAGE_BUCKET_G=${_AAPL_STORAGE_BUCKET}'
   - '--build-arg AAPL_MESS_SENDER_ID_G=${_AAPL_MESS_SENDER_ID}'
   - '--build-arg AAPL_APP_ID_G=${_AAPL_APP_ID}'
   - '--build-arg AAPL_BEARER_G=${_AAPL_BEARER}'
   - '--build-arg SQLALCHEMY_DATABASE_URI_G=${_SQLALCHEMY_DATABASE_URI}'
-
   - 'gcr.io/$PROJECT_ID/obs4'
   - '.'
   env:
