@@ -20,24 +20,6 @@ if fire_db:
     fire_db =fire_db.database()
 
 
-@microsoft_api.route('/msft/gen_token', methods=['POST'])
-def gen_token():
-    """
-    Route for gnera
-    """
-    user_info = request.get_json()
-    if not user_info:
-
-        return jsonify({'error': 'wrong  format'})
-
-    user = user_info['user']
-
-    secret_key = os.getenv('SECRET_KEY')
-    token = generate_token(user, secret_key)
-
-    return jsonify({'token': token.decode()})
-
-
 @microsoft_api.route('/msft/buy', methods=['POST'])
 def buy_share():
     """
