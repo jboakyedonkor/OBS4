@@ -1,7 +1,7 @@
 steps:
 - name: 'python:3.7'
   id: 'INSTALL'
-  entrypoint: pip
+  entrypoint: 'pip'
   args:
   - '-r'
   - 'requirements.txt'
@@ -9,7 +9,7 @@ steps:
 
 - name: 'python:3.7'
   id: 'UNIT TESTS'
-  entrypoint: python3
+  entrypoint: 'python3'
   args:
   - 'apis/msft_tests.py'
  env:
