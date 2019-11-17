@@ -95,7 +95,7 @@ steps:
 
 #build fb container
 - name: 'gcr.io/cloud-builders/docker'
-  id:   'BUILD GOOGLE API CONTAINER'
+  id:   'BUILD FB API CONTAINER'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
 
   #push_base
