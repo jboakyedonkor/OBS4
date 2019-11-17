@@ -115,9 +115,9 @@ class FBRoutesTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # server = Process(target=app.run)
-    # server.start()
-    # time.sleep(2)
+    server = Process(target=app.run)
+    server.start()
+    time.sleep(2)
     unittest.main()
-    # server.terminate()
-    # server.join()
+    server.terminate()
+    server.join()
