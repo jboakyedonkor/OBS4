@@ -1,0 +1,481 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OBS4",
+    "description": "This is a Online Banking Serive which will allow users to login and recieve a token. This token will give users access to four apis to purchase and sell shares.For this sample, you can use the SECRET_KEY `welp` to test the authorization     .",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": ""
+    }
+  ],
+  "tags": [
+    {
+      "name": "MSFT",
+      "description": "Access to buy and sell GOOG shares"
+    },
+    {
+      "name": "GOOG",
+      "description": "Access to buy and sell GOOG shares"
+    },
+    {
+      "name": "FB",
+      "description": "Access to buy and sell GOOG shares"
+    },
+    {
+      "name": "AAPL",
+      "description": "Access to buy and sell AAPL shares"
+    }
+  ],
+  "paths": {
+    "/goog/buy/": {
+      "get": {
+        "tags": [
+          "GOOG"
+        ],
+        "summary": "Buy amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "googBuyID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully bought"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/msft/buy/": {
+      "get": {
+        "tags": [
+          "MSFT"
+        ],
+        "summary": "Buy amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "msftBuyID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully bought"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/fb/buy/": {
+      "get": {
+        "tags": [
+          "FB"
+        ],
+        "summary": "Buy amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "fbBuyID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully bought"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/aapl/buy/": {
+      "get": {
+        "tags": [
+          "AAPL"
+        ],
+        "summary": "Buy amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "aaplBuyID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully bought"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/aapl/sell/": {
+      "get": {
+        "tags": [
+          "AAPL"
+        ],
+        "summary": "Sell amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "aaplSellID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully sold"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/goog/sell/": {
+      "get": {
+        "tags": [
+          "GOOG"
+        ],
+        "summary": "Sell amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "googSellID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully sold"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/msft/sell/": {
+      "get": {
+        "tags": [
+          "MSFT"
+        ],
+        "summary": "Sell amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "msftSellID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully sold"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/fb/sell/": {
+      "get": {
+        "tags": [
+          "FB"
+        ],
+        "summary": "Sell amount of shares passed by params called \"amount\"",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "fbSellID",
+        "parameters": [
+          {
+            "name": "amount",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully sold"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/api/user/verify/": {
+      "get": {
+        "tags": [
+          "FB"
+        ],
+        "summary": "Verify user",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "fbUserVerifyID",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "description": "variable that must be passed",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "str"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully verified"
+          },
+          "400": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Token supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/goog/get_price/": {
+      "get": {
+        "tags": [
+          "GOOG"
+        ],
+        "summary": "Return current price of GOOG Stock",
+        "description": "For valid response must use a valid symbol.         Other values will generate exceptions",
+        "operationId": "googSharePriceID",
+        "responses": {
+          "200": {
+            "description": "Successfully returned stock price"
+          },
+          "400": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/fb/share_price/": {
+      "get": {
+        "tags": [
+          "FB"
+        ],
+        "summary": "Return current price of FB Stock",
+        "description": "For valid response must use a token.         Other values will generate exceptions",
+        "operationId": "fbSharePriceID",
+        "responses": {
+          "200": {
+            "description": "Successfully returned stock price"
+          },
+          "400": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/aapl/share_price/": {
+      "get": {
+        "tags": [
+          "AAPL"
+        ],
+        "summary": "Returns current price of AAPL Stock",
+        "description": "Returns a JSON of {\"Price\":price}",
+        "operationId": "aaplSharePriceID",
+        "responses": {
+          "200": {
+            "description": "Successfully returned stock price"
+          },
+          "400": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/aapl/shares/": {
+      "get": {
+        "tags": [
+          "AAPL"
+        ],
+        "summary": "Returns AAPL shares purchased by user",
+        "description": "Returns a JSON of {\"Total shares\":output}",
+        "operationId": "aaplShareID",
+        "responses": {
+          "200": {
+            "description": "Successfully returned stock price"
+          },
+          "400": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/goog/shares/": {
+      "get": {
+        "tags": [
+          "GOOG"
+        ],
+        "summary": "Returns GOOG shares purchased by user",
+        "description": "Returns a JSON of {\"Total shares\":output}",
+        "operationId": "googShareID",
+        "responses": {
+          "200": {
+            "description": "Successfully returned stock price"
+          },
+          "400": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          },
+          "404": {
+            "description": "Invalid Symbol supplied",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Stocks": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          }
+        },
+        "xml": {
+          "name": "Stocks"
+        }
+      }
+    }
+  }
+}
