@@ -141,7 +141,7 @@ def get_price():
     """
     token = get_token(request.headers)
     if not token:
-        return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
+        return jsonify({'error': 'Invalid token'})
 
     secret_key = os.getenv('SECRET_KEY')
     valid, msg = verify_token(token.encode(), secret_key)
