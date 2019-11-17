@@ -53,5 +53,5 @@ RUN rm -rvf venv
 RUN rm -rvf *_dockerfile/
 RUN rm -v README.md
 RUN apk --no-cache add build-base
-RUN apk update && apk add postgresql-dev
+RUN apk update && apk --no-cache add postgresql-dev
 RUN pip3 install -r requirements.txt
