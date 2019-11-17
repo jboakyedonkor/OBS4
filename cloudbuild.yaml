@@ -76,7 +76,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/obs4'
   id: 'RUN AAPL API TESTS'
   entrypoint: 'python'
-  args: ['apis/appl_tests.py']
+  args: ['apis/aapl_tests.py']
 
 #build  microsoft container
 - name: 'gcr.io/cloud-builders/docker'
