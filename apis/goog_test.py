@@ -42,10 +42,19 @@ class TestGoogApi(unittest.TestCase):
         test_load = {'username': "TestUser",
                      'exp': exp_time}
 
-        test_toke2 = jwt.encode(test_load, key=str(secret_key), algorithm='HS256')
+        test_toke2 = jwt.encode(
+            test_load,
+            key=str(secret_key),
+            algorithm='HS256')
 
-        decode_toke1 = jwt.decode(test_toke1, str(secret_key), algorithms='HS256')
-        decode_toke2 = jwt.decode(test_toke2, str(secret_key), algorithms='HS256')
+        decode_toke1 = jwt.decode(
+            test_toke1,
+            str(secret_key),
+            algorithms='HS256')
+        decode_toke2 = jwt.decode(
+            test_toke2,
+            str(secret_key),
+            algorithms='HS256')
 
         self.assertEqual(decode_toke1['exp'], decode_toke2['exp'],
                          "Token expirations match")
@@ -56,9 +65,10 @@ class TestGoogApi(unittest.TestCase):
     def test_get_price(self):
         test_api_url = "https://sandbox.tradier.com/v1/markets/quotes"
         test_api_key = "Jo5Qmiac0PqN8dG360REQq8oGbNY"
-        response = requests.get(test_api_url, params={'symbols': 'GOOGL'}, headers={'Accept':
-                                                                                   'application/json',
-                                                                               'Authorization': 'Bearer ' + test_api_key})
+        response = requests.get(
+            test_api_url, params={
+                'symbols': 'GOOGL'}, headers={
+                'Accept': 'application/json', 'Authorization': 'Bearer ' + test_api_key})
         response = response.json()
         test_response1 = response['quotes']['quote']
         test_response2 = get_quote()
@@ -67,9 +77,11 @@ class TestGoogApi(unittest.TestCase):
                          "get prices match")
 
     def test_database_connection(self):
-        testConn = psycopg2.connect('postgres://bdhcskpn:aN7RtxPZgnKxxjWBhOGzaSi5uVigON4l@salt.db.elephantsql.com:5432/bdhcskpn')
+        testConn = psycopg2.connect(
+            'postgres://bdhcskpn:aN7RtxPZgnKxxjWBhOGzaSi5uVigON4l@salt.db.elephantsql.com:5432/bdhcskpn')
         if (testConn):
             pass
+
 
 if __name__ == "__main__":
     unittest.main()

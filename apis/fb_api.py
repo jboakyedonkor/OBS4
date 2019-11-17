@@ -36,6 +36,7 @@ config = {
 
 fire_db = pyrebase.initialize_app(config).database()
 
+
 @app.route('/api/user/verify', methods=['GET', 'POST'])
 def verify_user():
     token = request.headers.get('token')
@@ -290,4 +291,4 @@ def sell_share():
 
 
 if __name__ == "__main__":
-    app.run('localhost', 5000, debug=True)
+    app.run('0.0.0.0', 5000, debug=True)
