@@ -10,6 +10,17 @@ import requests
 sys.path.append(os.getcwd())
 dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 
+# FB_ACCESS_TOKEN = "Bearer 72ECqEr0M29wMCDGz1e61g1SebYL"
+# SECRET_KEY = "welp"
+# FB_FIREBASE_API_KEY = "AIzaSyDE6PdiUQWWFGSEzT4ECLIte5V2St5S8q0"
+# FB_FIREBASE_AUTH_DOMAIN = "fir-fb-obs.firebaseapp.com"
+# FB_FIREBASE_DB_URL = "https://fir-fb-obs.firebaseio.com"
+# FB_FIREBASE_PROJECT_ID = "fir-fb-obs"
+# FB_FIREBASE_STORAGE_BUCKET = "fir-fb-obs.appspot.com"
+# FB_FIREBASE_MSG_SENDER_ID = "108432807982"
+# FB_FIREBASE_APP_ID = "1:108432807982:web:df6c06d0a0138e995da7bf"
+# FB_FIREBASE_MEASUREMENT_ID = "G-QNQLJ0LFVM"
+
 app = Flask(__name__)
 
 config = {
