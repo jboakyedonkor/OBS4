@@ -60,9 +60,6 @@ ENV FB_FIREBASE_MSG_SENDER_ID FB_FIREBASE_MSG_SENDER_ID_G
 ENV FB_FIREBASE_PROJECT FB_FIREBASE_PROJECT_G 
 ENV FB_FIREBASE_STORAGE_BUCKET FB_FIREBASE_STORAGE_BUCKET_G 
 
-
-
-
 ENV PORT 8080
 
 EXPOSE 5000
@@ -77,6 +74,6 @@ RUN rm  -v *.json
 RUN rm  -rvf venv
 RUN rm  -rvf *_dockerfile/
 RUN rm  -v README.md
-RUN apk --no-cache add build base
+RUN apk --no-cache add build-base
 RUN apk update && apk --no-cache add postgresql-dev
 RUN pip3 install  -r requirements.txt
