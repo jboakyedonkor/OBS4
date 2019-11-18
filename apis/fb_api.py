@@ -53,7 +53,7 @@ def get_price():
             'symbols': 'FB',
             'greeks': 'false'},
         headers={
-            'Authorization': os.getenv('FB_ACCESS_TOKEN'),
+            'Authorization':'Bearer ' +os.getenv('FB_ACCESS_TOKEN'),
             'Accept': 'application/json'})
     fb_quote = response.json()['quotes']['quote']
     return jsonify(
