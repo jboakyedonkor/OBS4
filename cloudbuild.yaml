@@ -71,7 +71,7 @@ steps:
   - '--build-arg'
   - 'FB_FIREBASE_APP_ID_G=${_FB_FIREBASE_APP_ID}'
   - '--build-arg'
-  - 'FB_FIREBASE_AUTH_DOMAIN_G =${_FB_FIREBASE_AUTH_DOMAIN}'
+  - 'FB_FIREBASE_AUTH_DOMAIN_G=${_FB_FIREBASE_AUTH_DOMAIN}'
   - '--build-arg'
   - 'FB_FIREBASE_DB_URL_G=${_FB_FIREBASE_DB_URL}'
   - '--build-arg'
@@ -79,9 +79,9 @@ steps:
   - '--build-arg'
   - 'FB_FIREBASE_MSG_SENDER_ID_G=${_FB_FIREBASE_MSG_SENDER_ID}'
   - '--build-arg'
-  - 'FB_FIREBASE_PROJECT_G =${_FB_FIREBASE_PROJECT_ID}'
+  - 'FB_FIREBASE_PROJECT_G=${_FB_FIREBASE_PROJECT_ID}'
   - '--build-arg'
-  - 'FB_FIREBASE_STORAGE_BUCKET_G = ${_FB_FIREBASE_STORAGE_BUCKET}'
+  - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
   - '.'
 
 #msft tests
