@@ -100,7 +100,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/obs4'
   id: 'RUN FB API TESTS'
   entrypoint: 'python'
-  args: ['apis/FB_tests.py']
+  args: ['apis/fb_tests.py']
 
 
 
