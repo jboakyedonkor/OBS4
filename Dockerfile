@@ -1,4 +1,4 @@
-FROM python:3.7 alpine
+FROM python:3.7-alpine
 
 ARG MSFT_FIREBASE_API_KEY_G
 ARG MSFT_FIREBASE_AUTH_DOMAIN_G
@@ -71,12 +71,12 @@ EXPOSE 5432
 
 WORKDIR /OBS4
 COPY . .
-RUN rm  v *.png
-RUN rm  v *.yaml
-RUN rm  v *.json
-RUN rm  rvf venv
-RUN rm  rvf *_dockerfile/
-RUN rm  v README.md
-RUN apk   no cache add build base
-RUN apk update && apk   no cache add postgresql dev
-RUN pip3 install  r requirements.txt
+RUN rm  -v *.png
+RUN rm  -v *.yaml
+RUN rm  -v *.json
+RUN rm  -rvf venv
+RUN rm  -rvf *_dockerfile/
+RUN rm  -v README.md
+RUN apk --no-cache add build base
+RUN apk update && apk --no-cache add postgresql-dev
+RUN pip3 install  -r requirements.txt
