@@ -17,7 +17,7 @@ microsoft_api = Flask(__name__)
 
 fire_db = create_firebase_app()
 if fire_db:
-    fire_db =fire_db.database()
+    fire_db = fire_db.database()
 
 
 @microsoft_api.route('/msft/buy', methods=['POST'])
@@ -141,7 +141,7 @@ def get_price():
     """
     token = get_token(request.headers)
     if not token:
-        return Flask.make_response(jsonify({'error': 'Invalid token'}), 400)
+        return jsonify({'error': 'Invalid token'})
 
     secret_key = os.getenv('SECRET_KEY')
     valid, msg = verify_token(token.encode(), secret_key)
@@ -165,4 +165,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         microsoft_api.run(debug=True)
     else:
-        microsoft_api.run()
+        microsoft_api.run(host='0.0.0.0')

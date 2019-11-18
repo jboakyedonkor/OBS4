@@ -21,7 +21,7 @@ def create_firebase_app():
         "appId": os.getenv('MSFT_FIREBASE_APP_ID')
 
     }
-    print(config)
+   # print(config)
     if config["apiKey"]:
         firebase = pyrebase.initialize_app(config)
         return firebase
@@ -84,8 +84,8 @@ def get_quote():
     """
     Get market quotes for Micrsoft using the Tradier API
     """
-    print(os.getenv("MSFT_TRADIER_API_KEY")
-)
+    # print(os.getenv("MSFT_TRADIER_API_KEY")
+
     api_url = "https://sandbox.tradier.com/v1/markets/quotes"
     api_key = os.getenv("MSFT_TRADIER_API_KEY")
 

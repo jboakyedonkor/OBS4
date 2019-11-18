@@ -38,7 +38,7 @@ ENV AAPL_MESS_SENDER_ID ${AAPL_MESS_SENDER_ID_G}
 ENV AAPL_APP_ID ${AAPL_APP_ID_G}
 ENV AAPL_BEARER ${AAPL_BEARER_G}
 ENV SQLALCHEMY_DATABASE_URI ${SQLALCHEMY_DATABASE_URI_G}
-
+ENV PORT 8080
 
 EXPOSE 5000
 EXPOSE 5001
@@ -46,8 +46,12 @@ EXPOSE 5432
 
 WORKDIR /OBS4
 COPY . .
+RUN rm -v *.png
+RUN rm -v *.yaml
+RUN rm -v *.json
+RUN rm -rvf venv
+RUN rm -rvf *_dockerfile/
+RUN rm -v README.md
 RUN apk --no-cache add build-base
-RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
+RUN apk update && apk --no-cache add postgresql-dev
 RUN pip3 install -r requirements.txt
-
-ENTRYPOINT [ "python3","apis/fb_tests.py" ]

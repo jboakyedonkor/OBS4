@@ -185,6 +185,14 @@ class MsftRoutesTestCase(unittest.TestCase):
             self.msft_url + self.price_route,
             headers=headers).json()
 
+        api_response3 = requests.get(
+            self.msft_url + self.price_route).json()
+
+        self.assertEqual(
+            api_response3['error'],
+            "Invalid token",
+            "incorrect error response")
+
         self.assertEqual(
             api_response['symbol'],
             'MSFT',
@@ -225,6 +233,24 @@ class MsftRoutesTestCase(unittest.TestCase):
             self.msft_url + self.buy_route,
             json=json_data,
             headers=headers).json()
+
+        api_response3 = requests.post(
+            self.msft_url + self.buy_route).json()
+
+        api_response4 = requests.post(
+            self.msft_url + self.buy_route,
+            headers={
+                'Authorization': '223443dd'}).json()
+
+        self.assertEqual(
+            ('error' in api_response4.keys()),
+            True,
+            "should not valid")
+
+        self.assertEqual(
+            api_response3['error'],
+            "Invalid token",
+            "incorrect error response")
 
         self.assertEqual(
             api_response['shares_bought'],
@@ -270,6 +296,23 @@ class MsftRoutesTestCase(unittest.TestCase):
             json=json_data,
             headers=headers).json()
 
+        api_response3 = requests.post(
+            self.msft_url + self.sell_route).json()
+
+        api_response4 = requests.post(
+            self.msft_url + self.sell_route,
+            headers={
+                'Authorization': '223443dd'}).json()
+
+        self.assertEqual(
+            ('error' in api_response4.keys()),
+            True,
+            "should not valid")
+
+        self.assertEqual(
+            api_response3['error'],
+            "Invalid token",
+            "incorrect error response")
         self.assertEqual(
             api_response['shares_sold'],
             45,
@@ -291,24 +334,16 @@ class MsftRoutesTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    # cmd = ['python3', '.' + os.sep + 'apis' + os.sep + 'msft_api.py', "debug"]
-
-    # if os.name == 'nt':
-    #     cmd[0] = 'python'
-
-    # api_proc = Popen(cmd)
-    # time.sleep(4)
     server = Process(target=microsoft_api.run)
     server.start()
-    
+
     time.sleep(4)
     unittest.main(exit=False, verbosity=3)
-    
+
     server.terminate()
     server.join()
-    
-    time.sleep(4)
 
+    time.sleep(4)
 
     db = create_firebase_app()
     if db:
