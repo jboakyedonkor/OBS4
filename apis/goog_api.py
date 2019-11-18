@@ -5,7 +5,7 @@ import requests
 import os
 import sys
 import jwt
-from testPostgres import updateMethods, insertMethods, checkMethods, clientMethods
+from models.goog_table import updateMethods, insertMethods, checkMethods, clientMethods
 
 app = Flask(__name__)
 
