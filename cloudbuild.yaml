@@ -137,3 +137,19 @@ steps:
 #test
 - name: 'gcr.io/cloud-builders/docker'
   args: ['container','run','--name','obs4_container','-p','5001','gcr.io/$PROJECT_ID/obs4']
+
+
+#deploy
+- name:'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY MSFT API SERVICE'
+  args:
+  - 'run'
+  - 'deploy'
+  - 'msft_api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_msft'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
