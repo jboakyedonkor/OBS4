@@ -146,7 +146,7 @@ steps:
   - 'beta'
   - 'run'
   - 'deploy'
-  - 'msft_api'
+  - 'msft-api'
   - '--image'
   - 'gcr.io/$PROJECT_ID/obs4_msft'
   - '--region'
