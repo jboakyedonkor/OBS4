@@ -140,9 +140,10 @@ steps:
 
 
 #deploy
-- name:'gcr.io/cloud-builders/gcloud'
+- name: 'gcr.io/cloud-builders/gcloud'
   id: 'DEPLOY MSFT API SERVICE'
   args:
+  - 'beta'
   - 'run'
   - 'deploy'
   - 'msft_api'
