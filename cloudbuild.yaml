@@ -141,7 +141,7 @@ steps:
 
   #push_web
 - name: 'gcr.io/cloud-builders/docker'
-  id  : 'STORE FB API CONTAINER IMAGE'
+  id  : 'STORE WEB API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_web']
 
 #deploy
