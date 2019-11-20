@@ -37,3 +37,19 @@ Scenario: Authenticated users can not be permitted to open more than 3 accounts.
 Given: The authenticated user has OBS access AND has no more than 3 assets accounts.
 When: The authenticated user attempts to create a new assets account on their personal “Dashboard” page by clicking on the “Add Account” button AND redirected to a “New Account” page.
 Then: The user will receive an error message saying that they have reached the maximum number of assets account for that user AND be redirected back to the “Dashboard” when they click on the “Return to Dashboard” button that is the only option available on the page.
+
+
+Scenario: Joe wants to diversify his portfolio in an organized way and want to create another account
+Given: Joe has not previously registered for three accounts AND uses the same email
+When: Joe opens the “Registration” page in a web browser AND properly enters the required registration fields (should list what they are and any requirements e.g., 8 character password) 
+Then: Bob sees a registration confirmation AND is logged in to the system (i.e., token provided) AND transferred to the OBS dashboard  
+
+Scenario: A user Sam wants to add funds to an account
+Given: Sam has previously registered for an account(s) AND signed in using his email and password
+When: Sam signs in and gets redirects to the home page showing a token 
+Then: Sam can specify which account of the three that he wants to use to adds funds.
+
+Scenario: A user Joe has created multiple accounts and wants to view stock and cash earnings for each sub account. 
+Given: Joe has previously registered for an account(s) AND signed in using his email and password
+When: Joe signs in and gets redirects to the home page showing a token AND Joe can specify which account of the three that he wants to use to make a transaction.
+Then: Joe selects the account he wanted to use AND places the token given to view shares AND purchase shares AND that’s stored in OBS database based on the username Joe selected
