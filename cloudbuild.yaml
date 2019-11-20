@@ -62,7 +62,7 @@ steps:
   - '--build-arg'
   - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
   - '.'
-
+  images: ['gcr.io/$PROJECT_ID/obs4']
 #msft tests
 - name: 'gcr.io/$PROJECT_ID/obs4'
   id: 'RUN MSFT API TESTS'
@@ -92,52 +92,50 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   id: 'BUILD MSFT API CONTAINER'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./msft_dockerfile']
+  images: ['gcr.io/$PROJECT_ID/obs4_msft']
 
 #build  apple container 
 - name: 'gcr.io/cloud-builders/docker'
   id: 'BUILD APPLE API CONTAINER'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./aapl_dockerfile']
+  images: ['gcr.io/$PROJECT_ID/obs4_aapl']
 
 #build  google container
 - name: 'gcr.io/cloud-builders/docker'
   id: 'BUILD GOOGLE API CONTAINER'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./goog_dockerfile']
+  images: ['gcr.io/$PROJECT_ID/obs4_goog']
 
 #build fb container
 - name: 'gcr.io/cloud-builders/docker'
   id:   'BUILD FB API CONTAINER'
   args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
+  images: ['gcr.io/$PROJECT_ID/obs4_fb']
 
-  #push_base
-- name: 'gcr.io/cloud-builders/docker'
-  id:   'STORE BASE CONTAINER IMAGE'
-  args: ['push','gcr.io/$PROJECT_ID/obs4']
+#   #push_base
+# - name: 'gcr.io/cloud-builders/docker'
+#   id:   'STORE BASE CONTAINER IMAGE'
+#   args: ['push','gcr.io/$PROJECT_ID/obs4']
 
-  #push_msft
-- name: 'gcr.io/cloud-builders/docker'
-  id  : 'STORE MSFT API CONTAINER IMAGE'
-  args: ['push','gcr.io/$PROJECT_ID/obs4_msft']
+#   #push_msft
+# - name: 'gcr.io/cloud-builders/docker'
+#   id  : 'STORE MSFT API CONTAINER IMAGE'
+#   args: ['push','gcr.io/$PROJECT_ID/obs4_msft']
 
-  #push_goog
-- name: 'gcr.io/cloud-builders/docker'
-  id  : 'STORE GOOGLE API CONTAINER IMAGE'
-  args: ['push','gcr.io/$PROJECT_ID/obs4_goog']
+#   #push_goog
+# - name: 'gcr.io/cloud-builders/docker'
+#   id  : 'STORE GOOGLE API CONTAINER IMAGE'
+#   args: ['push','gcr.io/$PROJECT_ID/obs4_goog']
 
-  #push_aapl
-- name: 'gcr.io/cloud-builders/docker'
-  id  : 'STORE APPL API CONTAINER IMAGE'
-  args: ['push','gcr.io/$PROJECT_ID/obs4_aapl']
+#   #push_aapl
+# - name: 'gcr.io/cloud-builders/docker'
+#   id  : 'STORE APPL API CONTAINER IMAGE'
+#   args: ['push','gcr.io/$PROJECT_ID/obs4_aapl']
 
-  #push_fb
-- name: 'gcr.io/cloud-builders/docker'
-  id  : 'STORE FB API CONTAINER IMAGE'
-  args: ['push','gcr.io/$PROJECT_ID/obs4_fb']
-
-
-#test
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['container','run','--name','obs4_container','-p','5001','gcr.io/$PROJECT_ID/obs4']
-
+#   #push_fb
+# - name: 'gcr.io/cloud-builders/docker'
+#   id  : 'STORE FB API CONTAINER IMAGE'
+#   args: ['push','gcr.io/$PROJECT_ID/obs4_fb']
 
 #deploy
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -149,6 +147,51 @@ steps:
   - 'msft-api'
   - '--image'
   - 'gcr.io/$PROJECT_ID/obs4_msft'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY AAPL API SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'aapl-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_aapl'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY GOOG API SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'goog-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_goog'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY FB API SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'fb-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_fb'
   - '--region'
   - 'us-east1'
   - '--platform'
