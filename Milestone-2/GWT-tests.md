@@ -13,3 +13,13 @@ Scenario: Jeremy wants to purchase stocks that are valued greater than his curre
 Given: Jeremy is currently logged into the OBS system as an authenticated user AND has access to purchase stocks AND can decide how many stocks he would like to purchase at a given price
 When: Jeremy attempts to purchase stocks that are valued greater than the cash held in his account AND he is unable to fulfill the transaction AND receives an error relating to insufficient funds
 Then: Jeremy is unable to purchase stocks that are valued greater than the cash he currently has in his account
+
+Scenario: Authenticated users can purchase shares and sell existing shares.
+Given: The authenticated user has OBS access AND has at least one assets account that owns shares AND has enough funds to buy assets.
+When: The user accesses one of their assets accounts in the web browser AND opens the “Manage shares” page in a web browser AND has an authentication token.
+Then: The user will be able to select any of the four available assets AND be able to buy more assets AND be able to sell assets AND view the prices for each asset AND be able to view how many of each asset that the user owns AND receive an error notification on the page when the user doesn’t have enough funds to purchase the selected amount of assets.
+
+Scenario: Authenticated users can not be permitted to open more than 3 accounts.
+Given: The authenticated user has OBS access AND has no more than 3 assets accounts.
+When: The authenticated user attempts to create a new assets account on their personal “Dashboard” page by clicking on the “Add Account” button AND redirected to a “New Account” page.
+Then: The user will receive an error message saying that they have reached the maximum number of assets account for that user AND be redirected back to the “Dashboard” when they click on the “Return to Dashboard” button that is the only option available on the page.
