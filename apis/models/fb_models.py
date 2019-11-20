@@ -4,6 +4,7 @@ from flask_marshmallow import Marshmallow
 db = SQLAlchemy()
 ma = Marshmallow()
 
+
 class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100))
@@ -15,12 +16,15 @@ class User(db.Model):
         self.password = password
         self.token = token
 
+
 class UserSchema(ma.Schema):
     class Meta:
         fields = ('user_id', 'email', 'password', 'token')
 
+
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
+
 
 class FBTransaction(db.Model):
     trans_id = db.Column(db.Integer, primary_key=True)
@@ -38,12 +42,21 @@ class FBTransaction(db.Model):
         self.price = price
         self.user_id = user_id
 
+
 class FBTransactionSchema(ma.Schema):
     class Meta:
-        fields = ('trans_id', 'timestamp', 'amount', 'trans_type', 'price', 'user_id')
+        fields = (
+            'trans_id',
+            'timestamp',
+            'amount',
+            'trans_type',
+            'price',
+            'user_id')
+
 
 transaction_FB_schema = FBTransactionSchema()
 transactions_FB_schema = FBTransactionSchema(many=True)
+
 
 class Asset(db.Model):
     asset_id = db.Column(db.Integer, primary_key=True)
@@ -59,9 +72,11 @@ class Asset(db.Model):
         self.num_owned = num_owned
         self.user_id = user_id
 
+
 class AssetSchema(ma.Schema):
     class Meta:
         fields = ('asset_id', 'symbol', 'pl', 'num_owned', 'user_id')
-        
+
+
 asset_schema = AssetSchema()
 assets_schema = AssetSchema(many=True)

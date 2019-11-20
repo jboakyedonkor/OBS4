@@ -1,4 +1,6 @@
-"""Modules include sql ORM, time formatting, http requests, and secret key storage."""
+"""
+Modules include sql ORM, time formatting, http requests, and secret key storage.
+"""
 import pyrebase
 import dotenv
 from datetime import datetime, timedelta
@@ -9,17 +11,6 @@ from flask import Flask, request, jsonify
 import requests
 sys.path.append(os.getcwd())
 dotenv.load_dotenv(dotenv_path='.\\config\\.env')
-
-# FB_ACCESS_TOKEN = "Bearer 72ECqEr0M29wMCDGz1e61g1SebYL"
-# SECRET_KEY = "welp"
-# FB_FIREBASE_API_KEY = "AIzaSyDE6PdiUQWWFGSEzT4ECLIte5V2St5S8q0"
-# FB_FIREBASE_AUTH_DOMAIN = "fir-fb-obs.firebaseapp.com"
-# FB_FIREBASE_DB_URL = "https://fir-fb-obs.firebaseio.com"
-# FB_FIREBASE_PROJECT_ID = "fir-fb-obs"
-# FB_FIREBASE_STORAGE_BUCKET = "fir-fb-obs.appspot.com"
-# FB_FIREBASE_MSG_SENDER_ID = "108432807982"
-# FB_FIREBASE_APP_ID = "1:108432807982:web:df6c06d0a0138e995da7bf"
-# FB_FIREBASE_MEASUREMENT_ID = "G-QNQLJ0LFVM"
 
 app = Flask(__name__)
 
@@ -35,6 +26,7 @@ config = {
 }
 
 fire_db = pyrebase.initialize_app(config).database()
+
 
 @app.route('/api/user/verify', methods=['GET', 'POST'])
 def verify_user():
@@ -63,7 +55,7 @@ def get_price():
             'symbols': 'FB',
             'greeks': 'false'},
         headers={
-            'Authorization': os.getenv('FB_ACCESS_TOKEN'),
+            'Authorization': 'Bearer ' + os.getenv('FB_ACCESS_TOKEN'),
             'Accept': 'application/json'})
     fb_quote = response.json()['quotes']['quote']
     return jsonify(
@@ -290,4 +282,4 @@ def sell_share():
 
 
 if __name__ == "__main__":
-    app.run('localhost', 5000, debug=True)
+    app.run('0.0.0.0', 5000, debug=True)

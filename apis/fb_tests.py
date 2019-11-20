@@ -12,7 +12,7 @@ import time
 
 class FBRoutesTestCase(unittest.TestCase):
     def setUp(self):
-        dotenv.load_dotenv(dotenv_path='.\\config\.env')
+        dotenv.load_dotenv(dotenv_path=r'.\\config\.env')
 
     def test_verify_user(self):
         username = 'fakeemail@faketaxi.com'
@@ -118,6 +118,6 @@ if __name__ == '__main__':
     server = Process(target=app.run)
     server.start()
     time.sleep(2)
-    unittest.main()
+    unittest.main(exit=False)
     server.terminate()
     server.join()

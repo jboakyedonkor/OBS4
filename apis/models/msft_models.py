@@ -19,7 +19,7 @@ class Transaction (db.Model):
     payment = db.Column(db.Float, nullable=False)
     share_price = db.Column(db.Float, nullable=False)
     shares_bought = db.Column(db.Integer)
-    shares_sold =db.Column(db.Integer)
+    shares_sold = db.Column(db.Integer)
     symbol = db.Column(db.String(20), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 

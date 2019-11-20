@@ -1,7 +1,9 @@
 steps:
+
   # build
 - name: 'gcr.io/cloud-builders/docker'
-  args: #['build','-t','gcr.io/$PROJECT_ID/obs4','.']
+  id: ' BUILD BASE IMAGE'
+  args: 
   - 'build'
   - '-t'
   - 'gcr.io/$PROJECT_ID/obs4'
@@ -41,64 +43,182 @@ steps:
   - 'AAPL_BEARER_G=${_AAPL_BEARER}'
   - '--build-arg' 
   - 'SQLALCHEMY_DATABASE_URI_G=${_SQLALCHEMY_DATABASE_URI}'
+  - '--build-arg'
+  - 'FB_ACCESS_TOKEN_G=${_FB_ACCESS_TOKEN}'
+  - '--build-arg'
+  - 'FB_FIREBASE_API_KEY_G=${_FB_FIREBASE_API_KEY}'
+  - '--build-arg'
+  - 'FB_FIREBASE_APP_ID_G=${_FB_FIREBASE_APP_ID}'
+  - '--build-arg'
+  - 'FB_FIREBASE_AUTH_DOMAIN_G=${_FB_FIREBASE_AUTH_DOMAIN}'
+  - '--build-arg'
+  - 'FB_FIREBASE_DB_URL_G=${_FB_FIREBASE_DB_URL}'
+  - '--build-arg'
+  - 'FB_FIREBASE_MEASUREMENT_ID_G=${_FB_FIREBASE_MEASUREMENT_ID}'
+  - '--build-arg'
+  - 'FB_FIREBASE_MSG_SENDER_ID_G=${_FB_FIREBASE_MSG_SENDER_ID}'
+  - '--build-arg'
+  - 'FB_FIREBASE_PROJECT_G=${_FB_FIREBASE_PROJECT_ID}'
+  - '--build-arg'
+  - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
   - '.'
-  # env:
-  # - 'MSFT_FIREBASE_API_KEY=${_MSFT_FB_API_KEY}'
-  # - 'MSFT_FIREBASE_AUTH_DOMAIN=${_MSFT_FB_AUTH_DOMAIN}'
-  # - 'MSFT_FIREBASE_DB_URL=${_MSFT_FB_DB_URL}'
-  # - 'MSFT_FIREBASE_PROJECT_ID=${_MSFT_FB_PROJECT_ID}'
-  # - 'MSFT_FIREBASE_STORAGE_BUCKET=${_MSFT_FB_STORAGE_BUCKET}'
-  # - 'MSFT_FIREBASE_MSG_SENDER_ID=${_MSFT_FB_SENDER_ID}'
-  # - 'MSFT_FIREBASE_APP_ID=${_MSFT_FB_APP_ID}'
-  # - 'SECRET_KEY=${_SECRET_KEY}'
-  # - 'MSFT_TRADIER_API_KEY=${_MSFT_TD_API_KEY}'
-  # - 'AAPL_FIRE_API_KEY=${_AAPL_FIRE_API_KEY}'
-  # - 'AAPL_AUTH_DOMAIN=${_AAPL_AUTH_DOMAIN}'
-  # - 'AAPL_DATABASE_URL=${_AAPL_DATABASE_URL}'
-  # - 'AAPL_PROJECT_ID=${_AAPL_PROJECT_ID}'
-  # - 'AAPL_STORAGE_BUCKET=${_AAPL_STORAGE_BUCKET}'
-  # - 'AAPL_MESS_SENDER_ID=${_AAPL_MESS_SENDER_ID}'
-  # - 'AAPL_APP_ID=${_AAPL_APP_ID}'
-  # - 'AAPL_BEARER=${_AAPL_BEARER}'
-  # - 'SQLALCHEMY_DATABASE_URI=${_SQLALCHEMY_DATABASE_URI}'
+  
+#msft tests
+- name: 'gcr.io/$PROJECT_ID/obs4'
+  id: 'RUN MSFT API TESTS'
+  entrypoint: 'python'
+  args: ['apis/msft_tests.py']
+
+#appl tests
+- name: 'gcr.io/$PROJECT_ID/obs4'
+  id: 'RUN AAPL API TESTS'
+  entrypoint: 'python'
+  args: ['apis/aapl_tests.py']
+
+#fb tests
+- name: 'gcr.io/$PROJECT_ID/obs4'
+  id: 'RUN FB API TESTS'
+  entrypoint: 'python'
+  args: ['apis/fb_tests.py']
+
+#goog tests
+- name: 'gcr.io/$PROJECT_ID/obs4'
+  id: 'RUN GOOG API TESTS'
+  entrypoint: 'python'
+  args: ['apis/goog_test.py']
+
 
 #build  microsoft container
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./msft_dockerfile']
-
-#build  apple container
+  id: 'BUILD MSFT API CONTAINER'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./dockerfiles/msft_dockerfile']
+  
+#build  apple container 
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./aapl_dockerfile']
-
+  id: 'BUILD APPLE API CONTAINER'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./dockerfiles/aapl_dockerfile']
+  
 #build  google container
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./goog_dockerfile']
-
+  id: 'BUILD GOOGLE API CONTAINER'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./dockerfiles/goog_dockerfile']
+  
 #build fb container
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
+  id:   'BUILD FB API CONTAINER'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./dockerfiles/fb_dockerfile']
 
+#build web container
+- name: 'gcr.io/cloud-builders/docker'
+  id:   'BUILD WEB API CONTAINER'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_web','./dockerfiles/web_dockerfile']
+  
   #push_base
 - name: 'gcr.io/cloud-builders/docker'
+  id:   'STORE BASE CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4']
 
   #push_msft
 - name: 'gcr.io/cloud-builders/docker'
+  id  : 'STORE MSFT API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_msft']
 
   #push_goog
 - name: 'gcr.io/cloud-builders/docker'
+  id  : 'STORE GOOGLE API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_goog']
 
   #push_aapl
 - name: 'gcr.io/cloud-builders/docker'
+  id  : 'STORE APPL API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_aapl']
 
   #push_fb
 - name: 'gcr.io/cloud-builders/docker'
+  id  : 'STORE FB API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_fb']
 
 
-#test
+  #push_web
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['container','run','--name','obs4_container','-p','5001','gcr.io/$PROJECT_ID/obs4']
+  id  : 'STORE WEB API CONTAINER IMAGE'
+  args: ['push','gcr.io/$PROJECT_ID/obs4_web']
+
+#deploy
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY MSFT API SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'msft-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_msft'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY AAPL API SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'aapl-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_aapl'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY GOOG API SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'goog-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_goog'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY FB API SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'fb-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_fb'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
+
+
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   id: 'DEPLOY OBS4 WEB SERVICE'
+#   args:
+#   - 'beta'
+#   - 'run'
+#   - 'deploy'
+#   - 'fb-api'
+#   - '--image'
+#   - 'gcr.io/$PROJECT_ID/obs4_web'
+#   - '--region'
+#   - 'us-east1'
+#   - '--platform'
+#   - 'managed'
+#   - '--allow-unauthenticated'
+
+  

@@ -6,7 +6,7 @@ from appl_api import aapl_price, aapl_api
 import json
 import dotenv
 import requests
-import multiprocessing 
+import multiprocessing
 import time
 dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 
@@ -69,15 +69,15 @@ class TestAPI(unittest.TestCase):
             self.aapl_shares,
             headers=headers).json()
         headers = {"aapl_token": token}
-     
+
         # print(r['Total Shares'][0['symbol']])
         self.assertEqual(r['Total Shares'][0]['symbol'], 'AAPL')
 
+
 if __name__ == "__main__":
-    server = multiprocessing.Process(target=aapl_api.run, args=(None,5001))
+    server = multiprocessing.Process(target=aapl_api.run, args=(None, 5001))
     server.start()
     time.sleep(2)
     unittest.main(exit=False)
     server.terminate()
     server.join()
-    

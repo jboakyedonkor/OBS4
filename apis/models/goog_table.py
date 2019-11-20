@@ -3,11 +3,13 @@ from datetime import datetime
 import datetime
 import time
 
-conn = psycopg2.connect('postgres://bdhcskpn:aN7RtxPZgnKxxjWBhOGzaSi5uVigON4l@salt.db.elephantsql.com:5432/bdhcskpn')
+conn = psycopg2.connect(
+    'postgres://bdhcskpn:aN7RtxPZgnKxxjWBhOGzaSi5uVigON4l@salt.db.elephantsql.com:5432/bdhcskpn')
+
 
 class checkMethods:
 
-    def checkTableExists(pass_username):
+    def checkTableExists(self, pass_username):
 
         cursor = conn.cursor()
         command = "Select Exists( SELECT COUNT(*) FROM client_table_" + pass_username + ");"
@@ -24,7 +26,7 @@ class checkMethods:
 
         return tabExist
 
-    def checkUsername(pass_username):
+    def checkUsername(self, pass_username):
         cursor = conn.cursor()
         command = "SELECT COUNT(*) FROM user_table WHERE username = '" + pass_username + "'"
         cursor.execute(command)
@@ -36,7 +38,7 @@ class checkMethods:
         else:
             return False
 
-    def checkBankTableStock(pass_symbol):
+    def checkBankTableStock(self, pass_symbol):
         cursor = conn.cursor()
         command = "SELECT num_shares FROM bank_table WHERE symbol = '" + pass_symbol + "'"
         cursor.execute(command)
@@ -45,9 +47,10 @@ class checkMethods:
         conn.commit()
         return int(numBankStock)
 
-    def checkClientTableStock(pass_symbol, pass_username):
+    def checkClientTableStock(self, pass_symbol, pass_username):
         cursor = conn.cursor()
-        command = "SELECT num_shares FROM client_table_" + pass_username + " WHERE symbol = '" + pass_symbol + "'"
+        command = "SELECT num_shares FROM client_table_" + \
+            pass_username + " WHERE symbol = '" + pass_symbol + "'"
         cursor.execute(command)
         numClientStock = int(cursor.fetchone()[0])
         cursor.close()
@@ -57,15 +60,20 @@ class checkMethods:
 
 class insertMethods:
 
-    def insert_transaction_logs_table(symbol, ask_price, num_shares, username, buy_or_sell):
+    def insert_transaction_logs_table(
+            self,
+            symbol,
+            ask_price,
+            num_shares,
+            username,
+            buy_or_sell):
         command = "INSERT INTO  transaction_logs_table (tran_timestmp, symbol, ask_price, num_shares, username,  buy_or_sell) VALUES( now(), '" + symbol + "', '" + str(
-            ask_price) + "', '" + str(num_shares) + "', '" \
-                  + username + "', '" + buy_or_sell + "')"
+            ask_price) + "', '" + str(num_shares) + "', '" + username + "', '" + buy_or_sell + "')"
         execute_sql(command)
 
 
 class updateMethods:
-    def update_bank_table(stock_symbol, stock_purchased, buy):
+    def update_bank_table(self, stock_symbol, stock_purchased, buy):
         cursor = conn.cursor()
         remaining_bank_stock = "SELECT * " + "FROM bank_table WHERE symbol = '" + stock_symbol + "'"
         cursor.execute(remaining_bank_stock)
@@ -73,7 +81,7 @@ class updateMethods:
         cursor.close()
         conn.commit()
 
-        if (buy == True):
+        if (buy):
             final_bank_stock = getCurrentBankStock - stock_purchased
         else:
             final_bank_stock = getCurrentBankStock + stock_purchased
@@ -82,23 +90,29 @@ class updateMethods:
             final_bank_stock) + " WHERE symbol = '" + stock_symbol + "'"
         execute_sql(command)
 
-    def update_client_table(current_user, stock_symbol, stock_purchased, buy):
+    def update_client_table(
+            self,
+            urrent_user,
+            stock_symbol,
+            stock_purchased,
+            buy):
         cursor = conn.cursor()
-        remaining_client_stock = "SELECT * " + "FROM client_table_" + current_user + " WHERE symbol = '" + stock_symbol + "'"
+        remaining_client_stock = "SELECT * " + "FROM client_table_" + \
+            current_user + " WHERE symbol = '" + stock_symbol + "'"
         cursor.execute(remaining_client_stock)
         getCurrentClientStock = int(cursor.fetchone()[2])
         cursor.close()
         conn.commit()
 
-        if (buy == True):
+        if (buy):
             final_client_stock = getCurrentClientStock + stock_purchased
         else:
             final_client_stock = getCurrentClientStock - stock_purchased
 
-        command = "UPDATE client_table_" + current_user + " SET num_shares = " + str(
-            final_client_stock) + " WHERE symbol = '" + stock_symbol + "'"
+        command = "UPDATE client_table_" + current_user + " SET num_shares = " + \
+            str(final_client_stock) + " WHERE symbol = '" + stock_symbol + "'"
         execute_sql(command)
-        
+
         return "Successfully updated client table"
 
 
@@ -123,19 +137,23 @@ def create_transaction_table():
 
 class clientMethods:
 
-    def create_client_table(pass_username):
+    def create_client_table(self, pass_username):
         command = "CREATE TABLE client_table_" + pass_username + \
                   " ( auto_id SERIAL PRIMARY KEY, symbol TEXT NOT NULL, num_shares INT NOT NULL)"
         execute_sql(command)
 
-    def populate_client_table(pass_username):
-        command = "INSERT INTO client_table_" + pass_username + " (symbol, num_shares) VALUES ('MSFT', '0');"
+    def populate_client_table(self, pass_username):
+        command = "INSERT INTO client_table_" + pass_username + \
+            " (symbol, num_shares) VALUES ('MSFT', '0');"
         execute_sql(command)
-        command = "INSERT INTO client_table_" + pass_username + " (symbol, num_shares) VALUES ('AAPL', '0');"
+        command = "INSERT INTO client_table_" + pass_username + \
+            " (symbol, num_shares) VALUES ('AAPL', '0');"
         execute_sql(command)
-        command = "INSERT INTO client_table_" + pass_username + " (symbol, num_shares) VALUES ('GOOG', '0');"
+        command = "INSERT INTO client_table_" + pass_username + \
+            " (symbol, num_shares) VALUES ('GOOG', '0');"
         execute_sql(command)
-        command = "INSERT INTO client_table_" + pass_username + " (symbol, num_shares) VALUES ('FB', '0');"
+        command = "INSERT INTO client_table_" + pass_username + \
+            " (symbol, num_shares) VALUES ('FB', '0');"
         execute_sql(command)
 
 
@@ -169,6 +187,7 @@ def drop_user_table():
 def drop_transaction_logs_table():
     command = """ DROP TABLE transaction_logs_table """
     execute_sql(command)
+
 
 def drop_bank_table():
     command = " DROP TABLE bank_table"

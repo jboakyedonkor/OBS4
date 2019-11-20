@@ -193,8 +193,6 @@ class MsftRoutesTestCase(unittest.TestCase):
             "Invalid token",
             "incorrect error response")
 
-
-
         self.assertEqual(
             api_response['symbol'],
             'MSFT',
@@ -239,17 +237,20 @@ class MsftRoutesTestCase(unittest.TestCase):
         api_response3 = requests.post(
             self.msft_url + self.buy_route).json()
 
-
         api_response4 = requests.post(
-            self.msft_url + self.buy_route, headers={'Authorization':'223443dd'}).json()
+            self.msft_url + self.buy_route,
+            headers={
+                'Authorization': '223443dd'}).json()
 
-        self.assertEqual(('error' in api_response4.keys()), True, "should not valid" )
+        self.assertEqual(
+            ('error' in api_response4.keys()),
+            True,
+            "should not valid")
 
         self.assertEqual(
             api_response3['error'],
             "Invalid token",
             "incorrect error response")
-
 
         self.assertEqual(
             api_response['shares_bought'],
@@ -298,11 +299,15 @@ class MsftRoutesTestCase(unittest.TestCase):
         api_response3 = requests.post(
             self.msft_url + self.sell_route).json()
 
-
         api_response4 = requests.post(
-            self.msft_url + self.sell_route, headers={'Authorization':'223443dd'}).json()
+            self.msft_url + self.sell_route,
+            headers={
+                'Authorization': '223443dd'}).json()
 
-        self.assertEqual(('error' in api_response4.keys()), True, "should not valid" )
+        self.assertEqual(
+            ('error' in api_response4.keys()),
+            True,
+            "should not valid")
 
         self.assertEqual(
             api_response3['error'],
@@ -339,7 +344,6 @@ if __name__ == "__main__":
     server.join()
 
     time.sleep(4)
-
 
     db = create_firebase_app()
     if db:
