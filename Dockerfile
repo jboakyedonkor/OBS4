@@ -71,7 +71,7 @@ COPY . .
 RUN rm  -v *.yaml
 RUN rm  -v *.json
 RUN rm  -rvf venv
-RUN rm -rvf dockfiles
+RUN rm -rvf dockerfiles
 RUN rm -rvf Milestone-1
 RUN rm  -v README.md
 RUN apk --no-cache add build-base
