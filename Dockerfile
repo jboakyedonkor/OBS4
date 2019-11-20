@@ -74,6 +74,6 @@ RUN rm  -rvf venv
 RUN rm -rvf dockerfiles
 RUN rm -rvf Milestone-1
 RUN rm  -v README.md
-RUN apk --no-cache add build-base
+RUN apk --no-cache add build-base  libffi-dev
 RUN apk update && apk --no-cache add postgresql-dev
 RUN pip3 install --no-cache-dir  -r requirements.txt
