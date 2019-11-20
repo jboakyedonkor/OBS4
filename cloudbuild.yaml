@@ -3,7 +3,7 @@ steps:
   # build
 - name: 'gcr.io/cloud-builders/docker'
   id: ' BUILD BASE IMAGE'
-  args: #['build','-t','gcr.io/$PROJECT_ID/obs4','.']
+  args: 
   - 'build'
   - '-t'
   - 'gcr.io/$PROJECT_ID/obs4'
@@ -61,7 +61,7 @@ steps:
   - 'FB_FIREBASE_PROJECT_G=${_FB_FIREBASE_PROJECT_ID}'
   - '--build-arg'
   - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
-  - '.'
+  - './dockerfiles'
   
 #msft tests
 - name: 'gcr.io/$PROJECT_ID/obs4'
@@ -91,22 +91,27 @@ steps:
 #build  microsoft container
 - name: 'gcr.io/cloud-builders/docker'
   id: 'BUILD MSFT API CONTAINER'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./msft_dockerfile']
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_msft','./dockerfiles/msft_dockerfile']
   
 #build  apple container 
 - name: 'gcr.io/cloud-builders/docker'
   id: 'BUILD APPLE API CONTAINER'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./aapl_dockerfile']
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_aapl','./dockerfiles/aapl_dockerfile']
   
 #build  google container
 - name: 'gcr.io/cloud-builders/docker'
   id: 'BUILD GOOGLE API CONTAINER'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./goog_dockerfile']
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_goog','./dockerfiles/goog_dockerfile']
   
 #build fb container
 - name: 'gcr.io/cloud-builders/docker'
   id:   'BUILD FB API CONTAINER'
-  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./fb_dockerfile']
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_fb','./dockerfiles/fb_dockerfile']
+
+#build web container
+- name: 'gcr.io/cloud-builders/docker'
+  id:   'BUILD WEB API CONTAINER'
+  args: ['build','-t','gcr.io/$PROJECT_ID/obs4_web','./dockerfiles/web_dockerfile']
   
   #push_base
 - name: 'gcr.io/cloud-builders/docker'
@@ -132,6 +137,12 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   id  : 'STORE FB API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_fb']
+
+
+  #push_web
+- name: 'gcr.io/cloud-builders/docker'
+  id  : 'STORE FB API CONTAINER IMAGE'
+  args: ['push','gcr.io/$PROJECT_ID/obs4_web']
 
 #deploy
 - name: 'gcr.io/cloud-builders/gcloud'
@@ -193,3 +204,21 @@ steps:
   - '--platform'
   - 'managed'
   - '--allow-unauthenticated'
+
+
+# - name: 'gcr.io/cloud-builders/gcloud'
+#   id: 'DEPLOY OBS4 WEB SERVICE'
+#   args:
+#   - 'beta'
+#   - 'run'
+#   - 'deploy'
+#   - 'fb-api'
+#   - '--image'
+#   - 'gcr.io/$PROJECT_ID/obs4_web'
+#   - '--region'
+#   - 'us-east1'
+#   - '--platform'
+#   - 'managed'
+#   - '--allow-unauthenticated'
+
+  
