@@ -1,3 +1,17 @@
+Scenario: A new user name Carl wants to open a new account on OBS
+Given: Carl has not had an OBS account previously
+When: Carl clicks on the Sign Up page AND enters correct password and username.
+Then: Carl receives a confirmation AND Auth token AND is redirected to the OBS account page
+
+Scenario: Janice is an OBS client who wants to login access her account information
+Given: Janice a current OBS client with valid credentials.
+When: Janice clicks on the login page AND enters her username and  password
+Then: Janice is taken to the OBS dashboard where she can see all her account information
+
+Scenario : Alex is OBS client who wants to access his OBS dashboard
+Given: Alex has not logged into the system AND has URL to his OBS dashboard
+When: Alex pastes the URL in his browser
+Then:  Alex should be redirected to the login page. 
 
 Scenario: Client Johnny wishes to view current stock prices for Bank Inc stock, and see his client portfolio information
 Given: Johnny already has created an account with OBS AND has filled out his portfolio information during registration
