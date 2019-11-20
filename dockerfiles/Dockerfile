@@ -68,11 +68,11 @@ EXPOSE 8080
 
 WORKDIR /OBS4
 COPY . .
-RUN rm  -v *.png
 RUN rm  -v *.yaml
 RUN rm  -v *.json
 RUN rm  -rvf venv
-RUN rm  -rvf *_dockerfile/
+RUN rm -rvf dockfiles
+RUN rm -rvf Milestone-1
 RUN rm  -v README.md
 RUN apk --no-cache add build-base
 RUN apk update && apk --no-cache add postgresql-dev
