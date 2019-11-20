@@ -13,10 +13,11 @@ app = Flask(__name__)
 def get_quote():
     api_url = "https://sandbox.tradier.com/v1/markets/quotes"
     api_key = "Jo5Qmiac0PqN8dG360REQq8oGbNY"
+    params = {'symbols': 'GOOGL'}
+    headers = {'Accept': 'application/json',
+               'Authorization': 'Bearer ' + api_key}
     response = requests.get(
-        api_url, params={
-            'symbols': 'GOOGL'}, headers={
-            'Accept': 'application/json', 'Authorization': 'Bearer ' + api_key})
+        api_url, params=params, headers=headers)
 
     response = response.json()
     response = response['quotes']['quote']
@@ -80,7 +81,7 @@ def buy_shares(current_user):
     symbol = 'GOOG'
     amount = int(request.headers['amount'])
     share_price = get_quote()['last']
-    if checkMethods.checkTableExists(current_user) == False:
+    if checkMethods.checkTableExists(current_user) is False:
         createNewTable(current_user)
 
     possibleRemain = checkMethods.checkBankTableStock(symbol) - int(amount)
@@ -106,7 +107,7 @@ def sell_shares(current_user):
     amount = int(request.headers['amount'])
     share_price = get_quote()['last']
 
-    if checkMethods.checkTableExists(current_user) == False:
+    if checkMethods.checkTableExists(current_user) is False:
         createNewTable(current_user)
 
     possibleRemain = checkMethods.checkClientTableStock(
@@ -131,4 +132,4 @@ def total_shares(current_user):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0',port=5003)
+    app.run(host='0.0.0.0', port=5003)

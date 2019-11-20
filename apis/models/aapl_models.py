@@ -1,5 +1,6 @@
 from app import db
 
+
 class Share(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), nullable=False)
@@ -8,4 +9,4 @@ class Share(db.Model):
     shares = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        return ('<Stock {}>'.format(self.symbol)) 
+        return ('<Stock {}>'.format(self.symbol))

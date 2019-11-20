@@ -1,4 +1,6 @@
-"""Modules include sql ORM, time formatting, http requests, and secret key storage."""
+"""
+Modules include sql ORM, time formatting, http requests, and secret key storage.
+"""
 import pyrebase
 import dotenv
 from datetime import datetime, timedelta
@@ -53,7 +55,7 @@ def get_price():
             'symbols': 'FB',
             'greeks': 'false'},
         headers={
-            'Authorization':'Bearer ' +os.getenv('FB_ACCESS_TOKEN'),
+            'Authorization': 'Bearer ' + os.getenv('FB_ACCESS_TOKEN'),
             'Accept': 'application/json'})
     fb_quote = response.json()['quotes']['quote']
     return jsonify(

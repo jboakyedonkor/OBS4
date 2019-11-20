@@ -68,11 +68,10 @@ def buy_shares(current_user):
     price = aapl_price()['quotes']['quote']['last']
     buy = round(float(amount) * price, 2)
     data = {
-        'user': current_user,
-        'symbol': 'AAPL',
-        "share_price": price,
+        'user': current_user, 'symbol': 'AAPL', "share_price": price,
         "shares_bought": amount,
-        "created_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        "created_at": datetime.datetime.utcnow().strftime(
+            '%Y-%m-%dT%H:%M:%S.%f%z'),
         "payment": price}
     dbfire.child('transactions').child(current_user).child('bought').push(data)
 
