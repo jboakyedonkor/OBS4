@@ -61,7 +61,7 @@ steps:
   - 'FB_FIREBASE_PROJECT_G=${_FB_FIREBASE_PROJECT_ID}'
   - '--build-arg'
   - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
-  - './dockerfiles'
+  - '.'
   
 #msft tests
 - name: 'gcr.io/$PROJECT_ID/obs4'
