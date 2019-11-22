@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1 class="text-center">Dashboard</h1>
+<div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{ current_user.username }}
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#"></a>
+         
+        </div>
+      </div>
+      <br/>
+<div class="row">
+<div class="col-sm-12">
+        <div class="card text-center">
+          <div class="card-body">
+            <h5 class="card-title">Funds</h5>
+            <p class="card-text">Net Worth:</p>
+            <p class="card-text">Cash:</p>
+            <button type="button" class="btn btn-primary">Add Funds</button>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+    <br/>
+<div class="row">
+    
+    <div class="col-sm-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">GOOGL</h5>
+          <p class="card-text">Shares:</p>
+          <p class="card-text">Current Price:</p>
+          <a href="#" class="btn btn-primary">Buy</a>
+          <a href="#" class="btn btn-danger">Sell</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">AAPL</h5>
+          <p class="card-text">Shares:</p>
+          <p class="card-text">Current Price:</p>
+          <a href="#" class="btn btn-primary">Buy</a>
+          <a href="#" class="btn btn-danger">Sell</a>
+
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">FB</h5>
+          <p class="card-text">Shares:</p>
+          <p class="card-text">Current Price:</p>
+          <a href="#" class="btn btn-primary">Buy</a>
+          <a href="#" class="btn btn-danger">Sell</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Msft</h5>
+          <p class="card-text">Shares:</p>
+          <p class="card-text">Current Price:</p>
+          <a href="#" class="btn btn-primary">Buy</a>
+          <a href="#" class="btn btn-danger">Sell</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br/>
+<button type="button" class="btn btn-primary">Create Account</button>
+
+
+{% endblock content %}

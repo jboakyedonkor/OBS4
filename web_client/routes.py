@@ -63,10 +63,15 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route("/account")
+@app.route("/dashboard")
 @login_required
-def account():
-    return render_template('account.html', title='Account')
+def dashboard():
+    return render_template('dashboard.html', title='Dashboard')
+
+@app.route("/transactions")
+@login_required
+def transactions():
+    return render_template('transactions.html', title='Transactions')
 # Generates token
 
 
