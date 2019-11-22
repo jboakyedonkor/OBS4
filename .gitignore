@@ -120,4 +120,11 @@ Pipfile.lock
 bin/
 include/
 .vscode/settings.json
+<<<<<<< HEAD
+>>>>>>> master
+=======
+
+db_temp.sqlite
+config.json
+config/
 >>>>>>> master
