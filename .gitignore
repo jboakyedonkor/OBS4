@@ -110,21 +110,15 @@ venv.bak/
 .vscode/
 stockAPIs/config.json
 
-<<<<<<< HEAD
 Pipfile
 Pipfile.lock
-=======
+
 
 #vscode env
 
 bin/
 include/
 .vscode/settings.json
-<<<<<<< HEAD
->>>>>>> master
-=======
 
-db_temp.sqlite
 config.json
 config/
->>>>>>> master
