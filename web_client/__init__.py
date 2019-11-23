@@ -4,14 +4,13 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 import os
 import dotenv
-basedir = os.path.abspath(os.path.dirname(__file__))
+import psycopg2
 dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("USER_POSTGRES")
+
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)

@@ -1,5 +1,5 @@
 from flask import render_template, url_for, flash, redirect, request, session, jsonify
-from web_client import app, db, bcrypt
+from web_client import db,app,bcrypt
 from web_client.forms import RegistrationForm, LoginForm
 from web_client.models import User
 import json
@@ -7,8 +7,12 @@ from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
 import jwt
+
+
+
 @app.route("/")
 @app.route("/home")
+@login_required
 def home():
     return render_template('home.html')
 
@@ -30,6 +34,9 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=hashed_password)
+        
+       
+
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
