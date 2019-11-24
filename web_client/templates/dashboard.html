@@ -18,8 +18,33 @@
             <h5 class="card-title">Funds</h5>
             <p class="card-text">Net Worth:</p>
             <p class="card-text">Cash:</p>
-            <button type="button" class="btn btn-primary">Add Funds</button>
-          
+            <button type="button" class="btn btn-primary"
+            data-toggle="modal" data-target="#exampleModal">Add Funds</button>
+          <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Funds</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                      <form>
+                          <div class="form-group">
+                              <label for="addFunds">Fund Amount</label>
+                            <input type="number" class="form-control" id="addFunds" placeholder="$">
+                          </div>
+                        </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Confirm</button>
+                  </div>
+    </div>
+  </div>
+</div>
           </div>
         </div>
       </div>
@@ -33,6 +58,11 @@
           <h5 class="card-title">GOOGL</h5>
           <p class="card-text">Shares:</p>
           <p class="card-text">Current Price:</p>
+          <form>
+            <div class="form-group">
+              <input type="number" class="form-control" id="googlShareAmount" placeholder="Amount">
+            </div>
+          </form>
           <a href="#" class="btn btn-primary">Buy</a>
           <a href="#" class="btn btn-danger">Sell</a>
         </div>
@@ -44,6 +74,11 @@
           <h5 class="card-title">AAPL</h5>
           <p class="card-text">Shares:</p>
           <p class="card-text">Current Price:</p>
+          <form>
+            <div class="form-group">
+              <input type="number" class="form-control" id="aaplShareAmount" placeholder="Amount">
+            </div>
+          </form>
           <a href="#" class="btn btn-primary">Buy</a>
           <a href="#" class="btn btn-danger">Sell</a>
 
@@ -56,6 +91,11 @@
           <h5 class="card-title">FB</h5>
           <p class="card-text">Shares:</p>
           <p class="card-text">Current Price:</p>
+          <form>
+            <div class="form-group">
+              <input type="number" class="form-control" id="fbShareAmount" placeholder="Amount">
+            </div>
+          </form>
           <a href="#" class="btn btn-primary">Buy</a>
           <a href="#" class="btn btn-danger">Sell</a>
         </div>
@@ -67,6 +107,11 @@
           <h5 class="card-title">Msft</h5>
           <p class="card-text">Shares:</p>
           <p class="card-text">Current Price:</p>
+          <form>
+            <div class="form-group">
+              <input type="number" class="form-control" id="msftShareAmount" placeholder="Amount">
+            </div>
+          </form>
           <a href="#" class="btn btn-primary">Buy</a>
           <a href="#" class="btn btn-danger">Sell</a>
         </div>
@@ -75,6 +120,7 @@
   </div>
   <br/>
 <button type="button" class="btn btn-primary">Create Account</button>
+<script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
 
 
 {% endblock content %}
