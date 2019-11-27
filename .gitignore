@@ -120,3 +120,5 @@ include/
 db_temp.sqlite
 config.json
 config/
+node_modules
+package-lock.json
