@@ -1,15 +1,66 @@
-// const app = window.document.getElementById('root')
-// alert("yeeeer");
+function submit_funds() {
 
+  var fundAmount = document.getElementById("fundAmount");
+ 
 
+  var entry = {
+      fundAmount: fundAmount.value,
+ 
+  };
 
-
-var request = new XMLHttpRequest()
-request.open('GET', 'http://127.0.0.1:5001/aapl/share_price', true)
-request.onload = function() {
-  // Begin accessing JSON data here
-  var data = JSON.parse(this.response)
- console.log(data)
+  fetch(`${window.origin}/addFunds`, {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify(entry),
+    cache: "no-cache",
+    headers: new Headers({
+      "content-type": "application/json"
+    })
+  })
+  .then(function(response) {
+    if (response.status !== 200) {
+      console.log(`Looks like there was a problem. Status code: ${response.status}`);
+      return;
+    }
+    response.json().then(function(data) {
+      console.log(data);
+    });
+  })
+  .catch(function(error) {
+    console.log("Fetch error: " + error);
+});
 }
 
-request.send()
+function submit_purchase(val) {
+
+  var buyAmount = document.getElementById(val+"ShareAmount");
+ 
+
+  var entry = {
+      buyAmount: buyAmount.value,
+ 
+  };
+
+  fetch(`${window.origin}/buy`, {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify(entry),
+    cache: "no-cache",
+    headers: new Headers({
+      "content-type": "application/json"
+    })
+  })
+  .then(function(response) {
+    if (response.status !== 200) {
+      console.log(`Looks like there was a problem. Status code: ${response.status}`);
+      return;
+    }
+    response.json().then(function(data) {
+      console.log(data);
+      var buyAmount = document.getElementById(val+"ShareAmount").value =""
+    });
+  })
+  .catch(function(error) {
+    console.log("Fetch error: " + error);
+});
+}
