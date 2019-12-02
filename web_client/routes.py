@@ -1,5 +1,5 @@
-from flask import render_template, url_for, flash, redirect, request, session, jsonify
-from web_client import app, db, bcrypt
+from flask import render_template, url_for, flash, redirect, request, session, jsonify,make_response
+from web_client import db,app,bcrypt,intialize_firebase
 from web_client.forms import RegistrationForm, LoginForm
 from web_client.models import User
 import json
@@ -7,8 +7,14 @@ from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
 import jwt
+
+
+
+
+
 @app.route("/")
 @app.route("/home")
+@login_required
 def home():
     return render_template('home.html')
 
@@ -30,6 +36,9 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=hashed_password)
+        
+       
+
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -63,10 +72,12 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
+   
     return render_template('dashboard.html', title='Dashboard')
+
 
 @app.route("/transactions")
 @login_required
@@ -86,3 +97,34 @@ def generate_token(username, seconds=0, minutes=30, hours=0):
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return token
+
+@app.route("/addFunds", methods=["POST"])
+def addFunds():
+
+    req = request.get_json()
+
+    print ( str(current_user) + str(req))
+
+    res = make_response(jsonify({"message": "OK"}), 200)
+
+    return res
+@app.route("/buy", methods=["POST"])
+def sellShares():
+
+    req = request.get_json()
+
+    print ( str(current_user) + str(req))
+
+    res = make_response(jsonify({"message": "OK"}), 200)
+
+    return res
+@app.route("/sell", methods=["POST"])
+def buyShares():
+
+    req = request.get_json()
+
+    print ( str(current_user) + str(req))
+
+    res = make_response(jsonify({"message": "OK"}), 200)
+
+    return res

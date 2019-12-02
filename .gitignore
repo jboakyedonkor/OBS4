@@ -122,8 +122,5 @@ include/
 
 config.json
 config/
-<<<<<<< HEAD
-=======
 node_modules
 package-lock.json
->>>>>>> master
