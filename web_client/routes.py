@@ -1,5 +1,5 @@
-from flask import render_template, url_for, flash, redirect, request, session, jsonify
-from web_client import app, db, bcrypt
+from flask import render_template, url_for, flash, redirect, request, session, jsonify,make_response
+from web_client import db,app,bcrypt,intialize_firebase
 from web_client.forms import RegistrationForm, LoginForm
 from web_client.models import User
 import json
@@ -7,8 +7,14 @@ from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
 import jwt
+
+
+
+
+
 @app.route("/")
 @app.route("/home")
+@login_required
 def home():
     return render_template('home.html')
 
@@ -30,6 +36,9 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=hashed_password)
+        
+       
+
         db.session.add(user)
         db.session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
@@ -63,10 +72,29 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route("/account")
+@app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
-def account():
-    return render_template('account.html', title='Account')
+def dashboard():
+        # req = request.get_json()
+        token = generate_token(current_user.username)
+        aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
+        # print(aapl_shares)
+        # print(req)
+        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+        # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+        # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares  )
+
+    
+    
+    # print(aapl_shares)
+
+
+@app.route("/transactions")
+@login_required
+def transactions():
+    return render_template('transactions.html', title='Transactions')
 # Generates token
 
 
@@ -81,3 +109,34 @@ def generate_token(username, seconds=0, minutes=30, hours=0):
 
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return token
+
+@app.route("/addFunds", methods=["POST"])
+def addFunds():
+    # Retrieve amount and its in JSON form
+    req = request.get_json()
+
+    print ( str(current_user) + str(req))
+
+    res = make_response(jsonify({"message": "OK"}), 200)
+
+    return res
+@app.route("/buy", methods=["POST"])
+def buyShares():
+     # Retrieve amount and its in JSON form
+    req = request.get_json()
+
+    print ( str(current_user) + str(req))
+
+    res = make_response(jsonify({"message": "OK"}), 200)
+
+    return res
+@app.route("/sell", methods=["POST"])
+def sellShares():
+     # Retrieve amount and its in JSON form
+    req = request.get_json()
+
+    print ( str(current_user) + str(req))
+
+    res = make_response(jsonify({"message": "OK"}), 200)
+
+    return res
