@@ -75,14 +75,20 @@ def logout():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-    # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
-    # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-    # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
-     
-    db.child("users").child("Morty").update({"name": "Mortiest Morty"})
-   
-    return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares)
+        # req = request.get_json()
+        token = generate_token(current_user.username)
+        aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
+        # print(aapl_shares)
+        # print(req)
+        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+        # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+        # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares  )
+
+    
+    
+    # print(aapl_shares)
 
 
 @app.route("/transactions")

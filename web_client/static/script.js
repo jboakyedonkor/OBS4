@@ -136,18 +136,12 @@ function submit_sell(val) {
 
 // window.onload = function(){ 
 // //  console.log("Loaded")
-   
-//     var token = JSON.parse(localStorage.getItem('token'));
-//     console.log(`Authorization=Bearer ${token.token}`)
-//     let data = {
-//       'amount':1299
-//   }
-//     fetch('http://localhost:5001/aapl/share_price' )
-//         .then(res => res.json())
-//         .then(data => {
-//           document.getElementById("aapl-price").innerHTML += data.Price;
-//             console.log(data.Price)
-            
-//         })
-//         .catch(err => { console.log(err) })
+// const url = 'http://localhost:5000/dashboard';
+
+// var token = JSON.parse(localStorage.getItem('token'))
+// console.log(`Authorization=Bearer ${token.token}`)
+// var xhr = new XMLHttpRequest();
+// xhr.open("POST", url, true);
+// xhr.setRequestHeader('Content-Type', 'application/json');
+// xhr.send(JSON.stringify({ 'token': token.token}));
 // }
