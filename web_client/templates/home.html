@@ -7,6 +7,9 @@
 let params = (new URL(document.location)).searchParams;
 let name = params.get("token");
 localStorage.setItem('token',name);
+var token = JSON.parse(localStorage.getItem('token'));
+// console.log("Yo soy a " +token["token"])
+
 </script>
 
 {{ request.args.get('token') }}  

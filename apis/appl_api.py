@@ -1,5 +1,5 @@
 import requests
-from flask import Flask, Blueprint, jsonify, request
+from flask import Flask, Blueprint, jsonify, request,make_response
 from datetime import datetime, timedelta
 from flask_sqlalchemy import SQLAlchemy
 import jwt
@@ -10,6 +10,9 @@ import pyrebase
 from functools import wraps
 from aapl_helper import intialize_firebase
 aapl_api = Flask(__name__)
+from flask_cors import CORS
+
+CORS(aapl_api)
 
 dbfire = intialize_firebase().database()
 
@@ -73,8 +76,22 @@ def buy_shares(current_user):
         "created_at": datetime.datetime.utcnow().strftime(
             '%Y-%m-%dT%H:%M:%S.%f%z'),
         "payment": price}
+    
+    output = []
+    # Gets initial amount of the apple shares
+    initial = dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').get()
+    if(initial.each() is None):
+        data2={"shares_bought": (float)(amount)}
+        dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
+    else:
+        for user in initial.each():
+            output.append(user.val())
+            print(output)
+        val = ((float)(output[0]) + (float)(amount))
+        data2={"shares_bought": val}
+        dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
+    
     dbfire.child('transactions').child(current_user).child('bought').push(data)
-
     return data
 
 
@@ -84,7 +101,8 @@ def sell_shares(current_user):
     amount = request.args.get('amount')
     price = aapl_price()['quotes']['quote']['last']
     sell = round(float(amount) * price, 2)
-
+    # Intial value in case that user never bought any stocks
+    val =-1
     data = {
         'user': current_user,
         'symbol': 'AAPL',
@@ -92,8 +110,28 @@ def sell_shares(current_user):
         "shares_sold": amount,
         "created_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
         "payment": sell}
-    dbfire.child('transactions').child(current_user).child('sell').push(data)
-    return data
+    
+    output = []
+    # Gets initial amount of the apple shares
+    initial = dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').get()
+    if(initial.each() is None):
+         dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update({"shares_bought": 0 })
+    else:
+        for user in initial.each():
+            output.append(user.val())
+            print(output)
+        val = ((float)(output[0]) - (float)(amount))
+    
+    
+    if(val >= 0):
+        data2={"shares_bought": val }
+        dbfire.child('transactions').child(current_user).child('sell').push(data)
+        dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
+        return data
+    else:
+        res = make_response(jsonify({"Error": "Trying to sell more shares then you own"}), 409)
+        return res
+    
 
 
 @aapl_api.route('/aapl/shares/')
@@ -102,16 +140,30 @@ def total_shares(current_user):
     all_users = dbfire.child("transactions").child(
         current_user).child("bought").get()
     output = []
+    
     # Checks if any purchases in database
     if(all_users.each() is None):
         return jsonify({"Total Shares": " No apple stock purchased"})
     for user in all_users.each():
-
-        # print(user.val()) # {name": "Mortimer 'Morty' Smith"}
         output.append(user.val())
-    # print(all_users)
+    
     return jsonify({"Total Shares": output})
 
+@aapl_api.route('/aapl/share_amount/')
+@token_required
+def tot_shares(current_user):
+    output = []
+    # Gets initial amount of the apple shares
+    initial = dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').get()
+    if(initial.each() is None):
+          return jsonify({"total_shares": 0})
+    else:
+        for user in initial.each():
+            output.append(user.val())
+            print(output)
+        val = ((float)(output[0]))
+    
+    return jsonify({"total_shares": val})
 
 def aapl_price():
     response = requests.get(
@@ -127,3 +179,4 @@ def aapl_price():
 
 if __name__ == "__main__":
     aapl_api.run(port=5001)
+

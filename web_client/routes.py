@@ -75,8 +75,20 @@ def logout():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-   
-    return render_template('dashboard.html', title='Dashboard')
+        # req = request.get_json()
+        token = generate_token(current_user.username)
+        aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
+        # print(aapl_shares)
+        # print(req)
+        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+        # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+        # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares  )
+
+    
+    
+    # print(aapl_shares)
 
 
 @app.route("/transactions")
@@ -100,7 +112,7 @@ def generate_token(username, seconds=0, minutes=30, hours=0):
 
 @app.route("/addFunds", methods=["POST"])
 def addFunds():
-
+    # Retrieve amount and its in JSON form
     req = request.get_json()
 
     print ( str(current_user) + str(req))
@@ -109,8 +121,8 @@ def addFunds():
 
     return res
 @app.route("/buy", methods=["POST"])
-def sellShares():
-
+def buyShares():
+     # Retrieve amount and its in JSON form
     req = request.get_json()
 
     print ( str(current_user) + str(req))
@@ -119,8 +131,8 @@ def sellShares():
 
     return res
 @app.route("/sell", methods=["POST"])
-def buyShares():
-
+def sellShares():
+     # Retrieve amount and its in JSON form
     req = request.get_json()
 
     print ( str(current_user) + str(req))
