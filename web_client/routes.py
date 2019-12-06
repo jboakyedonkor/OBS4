@@ -6,11 +6,10 @@ import json
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
+import pyrebase
 import jwt
 
-
-
-
+dbfire = intialize_firebase().database()
 
 @app.route("/")
 @app.route("/home")
@@ -84,7 +83,7 @@ def dashboard():
         # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
         # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
         # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
-        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares  )
+        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares)
 
     
     
@@ -116,7 +115,11 @@ def addFunds():
     req = request.get_json()
 
     print ( str(current_user) + str(req))
-
+    cash = (float)(req["fundAmount"])
+    data ={
+        "cash": cash
+    }
+    dbfire.child('transactions').child(current_user.username).child('funds').update(data)
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res

@@ -6,7 +6,6 @@ import jwt
 import os
 import json
 import datetime
-import pyrebase
 from functools import wraps
 from aapl_helper import intialize_firebase
 aapl_api = Flask(__name__)
