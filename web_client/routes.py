@@ -1,8 +1,9 @@
-from flask import render_template, url_for, flash, redirect, request, session, jsonify,make_response
-from web_client import db,app,bcrypt,intialize_firebase
+from flask import render_template, url_for, flash, redirect, request, session, jsonify, make_response
+from web_client import db, app, bcrypt, intialize_firebase
 from web_client.forms import RegistrationForm, LoginForm
-from web_client.models import User
+from web_client.models import Users
 import json
+import os
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
@@ -10,6 +11,25 @@ import pyrebase
 import jwt
 
 dbfire = intialize_firebase().database()
+msft_api_uri = os.getenv("MSFT_API_URI")
+goog_api_uri = os.getenv("GOOG_API_URI")
+aapl_api_uri = os.getenv("AAPL_API_URI")
+fb_api_uri = os.getenv("FB_API_URI")
+
+# Generates token
+def generate_token(username, seconds=0, minutes=30, hours=0):
+
+    exp_time = datetime.utcnow() + \
+        timedelta(seconds=seconds, minutes=minutes, hours=hours)
+
+    payload = {'username': username,
+               'exp': exp_time,
+               'iss': 'OBS4'
+               }
+
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+    return token
+
 
 @app.route("/")
 @app.route("/home")
@@ -31,12 +51,19 @@ def register():
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(
             form.password.data).decode('utf-8')
-        user = User(
+
+        account1 = {
+            'balance': 0,
+            'msft_shares': 0,
+            'fb_shares': 0,
+            'goog_shares': 0,
+            'aapl_shares': 0}
+
+        user = Users(
             username=form.username.data,
             email=form.email.data,
-            password=hashed_password)
-        
-       
+            password=hashed_password,
+            account1=json.dumps(account1))
 
         db.session.add(user)
         db.session.commit()
@@ -51,7 +78,7 @@ def login():
         return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = Users.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(
                 user.password, form.password.data):
             login_user(user, remember=form.remember.data)
@@ -75,18 +102,24 @@ def logout():
 @login_required
 def dashboard():
         # req = request.get_json()
-        token = generate_token(current_user.username)
-        aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
-        # print(aapl_shares)
-        # print(req)
-        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-        # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
-        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-        # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
-        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares)
+    token = generate_token(current_user.username)
+    aapl_shares = requests.get(
+        'http://localhost:5001/aapl/share_amount',
+        headers={
+            'aapl_token': token}).json()["total_shares"]
+    # print(aapl_shares)
+    # print(req)
+    aapl_price = requests.get(
+        'http://localhost:5001/aapl/share_price').json()["Price"]
+    # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+    # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+    # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+    return render_template(
+        'dashboard.html',
+        title='Dashboard',
+        aapl_price=aapl_price,
+        aapl_shares=aapl_shares)
 
-    
-    
     # print(aapl_shares)
 
 
@@ -94,51 +127,43 @@ def dashboard():
 @login_required
 def transactions():
     return render_template('transactions.html', title='Transactions')
-# Generates token
 
-
-def generate_token(username, seconds=0, minutes=30, hours=0):
-
-    exp_time = datetime.utcnow() + \
-        timedelta(seconds=seconds, minutes=minutes, hours=hours)
-
-    payload = {'username': username,
-               'exp': exp_time
-               }
-
-    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
-    return token
 
 @app.route("/addFunds", methods=["POST"])
 def addFunds():
     # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print ( str(current_user) + str(req))
+    print(str(current_user) + str(req))
     cash = (float)(req["fundAmount"])
-    data ={
+    data = {
         "cash": cash
     }
-    dbfire.child('transactions').child(current_user.username).child('funds').update(data)
+    dbfire.child('transactions').child(
+        current_user.username).child('funds').update(data)
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res
+
+
 @app.route("/buy", methods=["POST"])
 def buyShares():
      # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print ( str(current_user) + str(req))
+    print(str(current_user) + str(req))
 
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res
+
+
 @app.route("/sell", methods=["POST"])
 def sellShares():
      # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print ( str(current_user) + str(req))
+    print(str(current_user) + str(req))
 
     res = make_response(jsonify({"message": "OK"}), 200)
 

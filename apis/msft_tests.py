@@ -67,7 +67,7 @@ class MsftHelperTestCase (unittest.TestCase):
         test_payload = {
 
             'username': "test",
-            'iss': 'Microsoft_API',
+            'iss': 'OBS4',
             'exp': exp_time
         }
 
@@ -101,7 +101,7 @@ class MsftHelperTestCase (unittest.TestCase):
         test_payload = {
 
             'username': "test",
-            'iss': 'Microsoft_API',
+            'iss': 'OBS4',
             'exp': exp_time
         }
 
@@ -120,7 +120,7 @@ class MsftHelperTestCase (unittest.TestCase):
         test_payload2 = {
 
             'username': "testuser",
-            'iss': 'Micrsosoft_API',
+            'iss': 'OBS4',
             'exp': exp_time
         }
 

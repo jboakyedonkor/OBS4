@@ -49,7 +49,7 @@ def generate_token(username, key, seconds=0, minutes=30, hours=0):
         timedelta(seconds=seconds, minutes=minutes, hours=hours)
 
     payload = {'username': username,
-               'iss': 'Microsoft_API',
+               'iss': 'OBS4',
                'exp': exp_time
                }
 
@@ -65,7 +65,7 @@ def verify_token(token, key):
         payload = jwt.decode(token, key, algorithms='HS256')
 
         # check if the issuer of the token it this API
-        if payload['iss'] == 'Microsoft_API':
+        if payload['iss'] == 'OBS4':
             return True, payload['username']
         else:
             return False, 'invalid iss'
