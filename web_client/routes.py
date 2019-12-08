@@ -115,11 +115,23 @@ def addFunds():
     req = request.get_json()
 
     print ( str(current_user) + str(req))
-    cash = (float)(req["fundAmount"])
-    data ={
-        "cash": cash
-    }
-    dbfire.child('transactions').child(current_user.username).child('funds').update(data)
+    amount = (float)(req["fundAmount"])
+   
+    cash = dbfire.child('transactions').child(current_user.username).child('funds').get()
+    if(cash.each() is None):
+            
+            data={ "cash": amount}
+            dbfire.child('transactions').child(current_user.username).child('funds').update(data)
+    else:
+        output = []
+        for user in cash.each():
+            output.append(user.val())
+            print(output)
+        cash = ((float)(output[0])+amount)
+        data ={
+            "cash": cash
+        }
+        dbfire.child('transactions').child(current_user.username).child('funds').update(data)
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res

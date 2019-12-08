@@ -69,29 +69,45 @@ def buy_shares(current_user):
     amount = request.args.get('amount')
     price = aapl_price()['quotes']['quote']['last']
     buy = round(float(amount) * price, 2)
+    output = []
     data = {
-        'user': current_user, 'symbol': 'AAPL', "share_price": price,
+        'user': current_user, 'symbol': 'AAPL', 
+        "share_price": price,
         "shares_bought": amount,
         "created_at": datetime.datetime.utcnow().strftime(
             '%Y-%m-%dT%H:%M:%S.%f%z'),
-        "payment": price}
+        "payment": buy}
+    cash = dbfire.child('transactions').child(current_user).child('funds').get()
+   
+    for user in cash.each():
+        output.append(user.val())
+        print(output)
+    cash = ((float)(output[0]))
+   
     
-    output = []
-    # Gets initial amount of the apple shares
-    initial = dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').get()
-    if(initial.each() is None):
-        data2={"shares_bought": (float)(amount)}
-        dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
+    if(cash > buy):
+        output = []
+        # Gets initial amount of the apple shares
+        initial = dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').get()
+        if(initial.each() is None):
+            
+            data2={"shares_bought": (float)(amount)}
+            dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
+         
+                
+        else:
+            for user in initial.each():
+                output.append(user.val())
+                # print(output)
+            val = ((float)(output[0]) + (float)(amount))
+            data2={"shares_bought": val}
+            dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
+        
+            dbfire.child('transactions').child(current_user).child('bought').push(data)
+            return data
     else:
-        for user in initial.each():
-            output.append(user.val())
-            print(output)
-        val = ((float)(output[0]) + (float)(amount))
-        data2={"shares_bought": val}
-        dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
-    
-    dbfire.child('transactions').child(current_user).child('bought').push(data)
-    return data
+        res = make_response(jsonify({"Error": "Not enough Funds"}), 409);
+        return res
 
 
 @aapl_api.route('/aapl/sell/')
