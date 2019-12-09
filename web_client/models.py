@@ -17,3 +17,13 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
+
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(20), unique=True, nullable=False)
+    account_name = db.Column(db.String(20), unique=True, nullable=False)
+    cash = db.Column(db.Decimal, nullable=False)
+    msft_shares = db.Column(db.Integer, nullable=False)
+    fb_shares = db.Column(db.Integer, nullable=False)
+    goog_shares = db.Column(db.Integer, nullable=False)
+    aapl_shares = db.Column(db.Integer, nullable=False)
