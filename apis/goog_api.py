@@ -49,7 +49,7 @@ def showToken(username):
     return jsonify({'token': token.decode('UTF-8')})
 
 
-@app.route('/goog/share_price', methods=['GET'])
+@app.route('/share_price', methods=['GET'])
 def get_price():
     return jsonify({"Price": get_quote()['last']})
 
@@ -77,7 +77,7 @@ def token_check(f):
     return decorated
 
 
-@app.route('/goog/buy/')
+@app.route('/buy')
 @token_check
 def buy_shares(current_user):
     symbol = 'GOOG'
@@ -98,7 +98,7 @@ def buy_shares(current_user):
     return jsonify(response)
 
 
-@app.route('/goog/sell/')
+@app.route('/sell')
 @token_check
 def sell_shares(current_user):
     symbol = 'GOOG'
@@ -120,7 +120,7 @@ def sell_shares(current_user):
     return jsonify(response)
 
 
-@app.route('/goog/shares', methods=['GET'])
+@app.route('/shares', methods=['GET'])
 @token_check
 def total_shares(current_user):
     symbol = 'GOOG'
