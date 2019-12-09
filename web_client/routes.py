@@ -55,18 +55,38 @@ def login():
         if user and bcrypt.check_password_hash(
                 user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-
+            data ={
+            "email": form.email.data,
+            "status": "Success",
+            "time": str(datetime.utcnow())
+            }
+            dbfire.child('AUTH').child(str(user.username)).push(data)
             token = generate_token(user.username)
             return redirect(url_for('home', token=json.dumps(
                 {'token': token.decode('UTF-8')})))
 
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
+            data ={
+            "email": form.email.data,
+            "status": "Failure",
+            "time": str(datetime.utcnow())
+            }
+            email = str(user.username)
+            dbfire.child('AUTH').child(email).push(data)
     return render_template('login.html', title='Login', form=form)
 
 
 @app.route("/logout")
 def logout():
+    username = str(current_user.username)
+    data ={
+            "user":username,
+            "status": "Logout",
+            "time": str(datetime.utcnow())
+            }
+    
+    dbfire.child('AUTH').child(username).push(data)
     logout_user()
     return redirect(url_for('login'))
 
