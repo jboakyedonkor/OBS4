@@ -15,14 +15,13 @@ dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 app = Flask(__name__)
 
 config = {
-    "apiKey": os.getenv('FB_FIREBASE_API_KEY'),
-    "authDomain": os.getenv('FB_FIREBASE_AUTH_DOMAIN'),
-    "databaseURL": os.getenv('FB_FIREBASE_DB_URL'),
-    "projectId": os.getenv('FB_FIREBASE_PROJECT_ID'),
-    "storageBucket": os.getenv('FB_FIREBASE_STORAGE_BUCKET'),
-    "messagingSenderId": os.getenv('FB_FIREBASE_MSG_SENDER_ID'),
-    "appId": os.getenv('FB_FIREBASE_APP_ID'),
-    "measurementId": os.getenv('FB_FIREBASE_MEASUREMENT_ID')
+    "apiKey": os.getenv('FIREBASE_API_KEY'),
+    "authDomain": os.getenv('FIREBASE_AUTH_DOMAIN'),
+    "databaseURL": os.getenv('FIREBASE_DB_URL'),
+    "projectId": os.getenv('FIREBASE_PROJECT_ID'),
+    "storageBucket": os.getenv('FIREBASE_STORAGE_BUCKET'),
+    "messagingSenderId": os.getenv('FIREBASE_MSG_SENDER_ID'),
+    "appId": os.getenv('FIREBASE_APP_ID'),
 }
 
 fire_db = pyrebase.initialize_app(config).database()
@@ -67,14 +66,19 @@ def get_price():
 @app.route('/api/transactions/FB', methods=['POST'])
 def create_transaction():
     new_transaction = {
-        "timestamp": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-        "trans_type": request.json['trans_type'],
-        "amount": request.json['amount'],
-        "price": request.json['price'],
+        "created_at": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        "payment": request.json['payment'],
+        "share_price": request.json['price'],
+        "symbol": "FB",
         "username": request.json['username']
     }
 
-    fire_db.child('transactions').push(new_transaction)
+    if (request.json['trans_type'] == 'BUY'):
+        new_transaction['shares_bought'] = request.json['amount']
+        fire_db.child('transactions').child(request.json['username']).child('bought').push(new_transaction)
+    elif (request.json['trans_type'] == 'SELL'):
+        new_transaction['shares_sold'] = request.json['amount']
+        fire_db.child('transactions').child(request.json['username']).child('sold').push(new_transaction)
 
     return jsonify(new_transaction)
 
@@ -87,7 +91,7 @@ def get_FB_transactions():
 
 @app.route('/fb/buy', methods=['POST'])
 def buy_share():
-    verify = requests.get('http://localhost:5000/api/user/verify',
+    verify = requests.get('http://localhost:5002/api/user/verify',
                           headers={'token': request.headers.get('token')})
 
     try:
@@ -97,9 +101,9 @@ def buy_share():
 
     symbol = "FB"
     num_owned = request.json["amount"]
-    username = request.json["username"]
+    username = verify['user']
     price = requests.get(
-        'http://localhost:5000/fb/share_price').json()['share_price']
+        'http://localhost:5002/fb/share_price').json()['share_price']
     trans_type = "BUY"
     pl = 0
     pl_added = num_owned * price
@@ -129,6 +133,7 @@ def buy_share():
         requests.post(
             'http://localhost:5000/api/transactions/FB',
             json={
+                'payment': -1 * 5000 * price,
                 'trans_type': 'BUY',
                 'amount': 5000,
                 'username': "obs@04.ssgj",
@@ -147,6 +152,7 @@ def buy_share():
         requests.post(
             'http://localhost:5000/api/transactions/FB',
             json={
+                'payment': -1 * price * (asset_diff + 5000),
                 'trans_type': 'BUY',
                 'amount': asset_diff + 5000,
                 'username': "obs@04.ssgj",
@@ -163,6 +169,7 @@ def buy_share():
         requests.post(
             'http://localhost:5000/api/transactions/FB',
             json={
+                'payment': -1 * price * num_owned, 
                 'trans_type': 'BUY',
                 'amount': num_owned,
                 'username': username,
@@ -184,6 +191,7 @@ def buy_share():
         requests.post(
             'http://localhost:5000/api/transactions/FB',
             json={
+                'payment': -1 * price * num_owned,
                 'trans_type': 'BUY',
                 'amount': num_owned,
                 'username': username,
@@ -209,7 +217,7 @@ def sell_share():
 
     symbol = "FB"
     num_owned = request.json["amount"]
-    username = request.json["username"]
+    username = verify['user']
     price = requests.get(
         'http://localhost:5000/fb/share_price').json()['share_price']
     trans_type = "SELL"
@@ -241,6 +249,7 @@ def sell_share():
         requests.post(
             'http://localhost:5000/api/transactions/FB',
             json={
+                'payment': price * 5000,
                 'trans_type': 'BUY',
                 'amount': 5000,
                 'username': "obs@04.ssgj",
@@ -266,6 +275,7 @@ def sell_share():
         requests.post(
             'http://localhost:5000/api/transactions/FB',
             json={
+                'payment': num_owned * price,
                 'trans_type': 'SELL',
                 'amount': num_owned,
                 'username': username,
@@ -282,4 +292,5 @@ def sell_share():
 
 
 if __name__ == "__main__":
-    app.run('0.0.0.0', 5000, debug=True)
+    # app.run('0.0.0.0', 5000, debug=True)
+    app.run(port=5002)
