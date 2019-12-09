@@ -109,7 +109,7 @@ def sell_shares(current_user):
         'user': current_user,
         'symbol': symbol,
         'share_price': share_price,
-        'shares_bought': amount,
+        'shares_sold': amount,
         'created_at': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
         'payment': amount * share_price}
 
