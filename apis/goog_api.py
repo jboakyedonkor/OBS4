@@ -6,8 +6,10 @@ import os
 import sys
 import jwt
 from models.goog_table import updateMethods, insertMethods, checkMethods, clientMethods
-
+from msft_helpers import create_firebase_app
 app = Flask(__name__)
+
+firedb = create_firebase_app().database()
 
 
 def get_quote():
@@ -56,8 +58,8 @@ def token_check(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = None
-        if 'key' in request.headers:
-            token = request.headers['key']
+        if 'token' in request.headers:
+            token = request.headers['token']
         if not token:
             return jsonify('Error - missing token')
         try:
@@ -81,23 +83,19 @@ def buy_shares(current_user):
     symbol = 'GOOG'
     amount = int(request.headers['amount'])
     share_price = get_quote()['last']
-    if checkMethods.checkTableExists(current_user) is False:
-        createNewTable(current_user)
 
-    possibleRemain = checkMethods.checkBankTableStock(symbol) - int(amount)
+    response = {
+        'user': current_user,
+        'symbol': symbol,
+        'share_price': share_price,
+        'shares_bought': amount,
+        'created_at': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        'payment': -1 * amount * share_price}
 
-    if possibleRemain > 0:
-        updateMethods.update_bank_table(symbol, amount, True)
-        updateMethods.update_client_table(current_user, symbol, amount, True)
-        insertMethods.insert_transaction_logs_table(
-            symbol, share_price, amount, current_user, 'Buy')
-        return jsonify('Bought')
-
-    else:
-        updateMethods.update_bank_table(
-            symbol, amount - abs(possibleRemain) - 1, True)
-        updateMethods.update_client_table(current_user, symbol, amount, True)
-        return jsonify('Bought - purchased more than excess')
+    if firedb:
+        firedb.child('transactions').child(
+            current_user).child('bought').push(response)
+    return jsonify(response)
 
 
 @app.route('/goog/sell/')
@@ -107,19 +105,19 @@ def sell_shares(current_user):
     amount = int(request.headers['amount'])
     share_price = get_quote()['last']
 
-    if checkMethods.checkTableExists(current_user) is False:
-        createNewTable(current_user)
+    response = {
+        'user': current_user,
+        'symbol': symbol,
+        'share_price': share_price,
+        'shares_bought': amount,
+        'created_at': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        'payment': amount * share_price}
 
-    possibleRemain = checkMethods.checkClientTableStock(
-        symbol, current_user) - int(amount)
-    if possibleRemain > 0:
-        updateMethods.update_bank_table(symbol, amount, False)
-        updateMethods.update_client_table(current_user, symbol, amount, False)
-        insertMethods.insert_transaction_logs_table(
-            symbol, share_price, amount, current_user, 'Sell')
-        return jsonify('Sold')
-    else:
-        return jsonify('Error - client lacks stocks to sell')
+    if firedb:
+        firedb.child('transactions').child(
+            current_user).child('sold').push(response)
+
+    return jsonify(response)
 
 
 @app.route('/goog/shares', methods=['GET'])
