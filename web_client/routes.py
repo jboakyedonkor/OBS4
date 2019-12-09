@@ -45,7 +45,8 @@ def register():
 
         db.session.add(user)
         db.session.commit()
-        flash('Your account has been created! You are now able to log in', 'success')
+        flash('Your account has been created! You are now able to log in',
+              'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -66,7 +67,8 @@ def login():
                 {'token': token.decode('UTF-8')})))
 
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('Login Unsuccessful. Please check email and password',
+                  'danger')
     return render_template('login.html', title='Login', form=form)
 
 
@@ -143,11 +145,56 @@ def buyShares():
      # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print(str(current_user) + str(req))
+    if req is None:
+        return jsonify({"message": "No sell amount provided"})
 
-    res = make_response(jsonify({"message": "OK"}), 200)
+    try:
 
-    return res
+        buy_amount = req['sellAmount']
+        symbol = req['symbol']
+        req['account']
+        if buy_amount <= 0 or symbol not in set('AAPL', 'GOOG', 'FB', 'MSFT'):
+            raise Exception
+    except Exception:
+        return jsonify({"message": "invalid sell amount or symbol"})
+
+    stock_uri = uri_dict[symbol]
+    token = generate_token(current_user.username)
+    headers = {"Token": token}
+
+    current_account = Account.query.filter_by(
+        account_name=req['account']).first()
+
+    price_response = requests.post(
+        url=stock_uri + '/share_price',
+        headers=headers)
+    share_price = price_response.json()['Price']
+    total_price = share_price * buy_amount
+    api_response = None
+
+    if current_account.cash >= total_price:
+        api_response = requests.post(url=stock_uri + '/buy', headers=headers)
+        api_json = api_response.json()
+        shares = api_json['shares_bought']
+        payment = api_json['payment']
+        current_account.cash += payment
+
+        if symbol == 'AAPL':
+            current_account.aapl_shares += shares
+
+        elif symbol == 'FB':
+            current_account.fb_shares += shares
+        elif symbol == 'GOOG':
+            current_account.goog_shares += shares
+        elif symbol == 'MSFT':
+            current_account.msft_shares += shares
+
+        return jsonify({"message": "success"})
+    else:
+        return jsonify({"message": "insufficent funds"})
+
+    db.session.add(current_account)
+    db.session.commit()
 
 
 @app.route("/sell", methods=["POST"])
@@ -162,6 +209,7 @@ def sellShares():
 
         sell_amount = req['sellAmount']
         symbol = req['symbol']
+        req['account']
         if sell_amount <= 0 or symbol not in set('AAPL', 'GOOG', 'FB', 'MSFT'):
             raise Exception
     except Exception:
@@ -181,8 +229,8 @@ def sellShares():
         api_json = api_response.json()
         shares = api_json['shares_sold']
         payment = api_json['payment']
-        current_account.aapl_shares = current_account.aapl_shares - shares
-        current_account.cash = current_account.cash + payment
+        current_account.aapl_shares -= shares
+        current_account.cash += payment
 
     elif symbol == 'FB' and current_account.fb_shares >= sell_amount:
 
@@ -190,8 +238,8 @@ def sellShares():
         api_json = api_response.json()
         shares = api_json['shares_sold']
         payment = api_json['payment']
-        current_account.aapl_shares = current_account.fb_shares - shares
-        current_account.cash = current_account.cash + payment
+        current_account.aapl_shares -= shares
+        current_account.cash += payment
 
     elif symbol == 'GOOG' and current_account.goog_shares >= sell_amount:
 
@@ -199,8 +247,8 @@ def sellShares():
         api_json = api_response.json()
         shares = api_json['shares_sold']
         payment = api_json['payment']
-        current_account.aapl_shares = current_account.goog_shares - shares
-        current_account.cash = current_account.cash + payment
+        current_account.aapl_shares -= shares
+        current_account.cash += payment
 
     elif symbol == 'MSFT' and current_account.msft_shares >= sell_amount:
 
@@ -208,10 +256,10 @@ def sellShares():
         api_json = api_response.json()
         shares = api_json['shares_sold']
         payment = api_json['payment']
-        current_account.aapl_shares = current_account.msft_shares - shares
-        current_account.cash = current_account.cash + payment
+        current_account.aapl_shares -= shares
+        current_account.cash += payment
     else:
-        return jsonify({"message": "insufficent funds"})
+        return jsonify({"message": "insufficent shares"})
 
     db.session.add(current_account)
     db.session.commit()
