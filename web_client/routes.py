@@ -12,7 +12,6 @@ import pyrebase
 fire_db = intialize_firebase().database()
 
 
-
 @app.route("/")
 @app.route("/home")
 @login_required
@@ -74,24 +73,40 @@ def logout():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-        token = generate_token(current_user.username)
-        aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
-        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-        fb_price = requests.get('http://localhost:5002/fb/share_price').json()["share_price"]
-        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-        # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
-        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares, fb_price=fb_price)
-
-    
-    
-    # print(aapl_shares)
+    token = generate_token(current_user.username)
+    aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
+    aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+    fb_price = requests.get('http://localhost:5002/fb/share_price').json()["share_price"]
+    # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+    # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+    return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares, fb_price=fb_price)
 
 
 @app.route("/transactions")
 @login_required
 def transactions():
-    return render_template('transactions.html', title='Transactions')
+    all_transactions = requests.get('http://localhost:5000/tests/transaction_parse').json()
+    return render_template('transactions.html', title='Transactions', all_transactions=all_transactions)
 
+@app.route('/tests/transaction_parse', methods=["GET", "POST"])
+def parse_trans():
+    all_transactions = requests.get('http://localhost:5002/api/transactions/admin').json()
+    present_trans = []
+
+    for user_value in all_transactions.values():
+        try:
+            for trans_value in user_value["bought"].values():
+                present_trans.append(trans_value)
+        except:
+            continue
+        
+        try:
+            for trans_value in user_value["sold"].values():
+                present_trans.append(trans_value)
+        except:
+            continue
+
+    return jsonify(sorted(present_trans, key=lambda i: i["created_at"], reverse=True))
 
 def generate_token(username, seconds=0, minutes=30, hours=0):
 

@@ -83,7 +83,7 @@ def create_transaction():
     return jsonify(new_transaction)
 
 
-@app.route('/api/transactions/admin/FB', methods=['GET', 'POST'])
+@app.route('/api/transactions/admin', methods=['GET', 'POST'])
 def get_FB_transactions():
     all_transactions = fire_db.child('transactions').get()
     return jsonify(all_transactions.val())

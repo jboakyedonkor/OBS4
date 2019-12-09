@@ -1,4 +1,37 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>Transactions</h1>
+<h1>Transactions</h1>
+
+<table class="table table-striped table-bordered table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Date & Time</th>
+            <th scope="col">User</th>
+            <th scope="col">Share Type</th>
+            <th scope="col">Share Price</th>
+            <th scope="col">Transaction Type</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Payment</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for trans in all_transactions %}
+        <tr>
+            <th scope="row">{{trans["created_at"]}}</th>
+            <td>{{trans["user"]}}</td>
+            <td>{{trans["symbol"]}}</td>
+            <td>{{trans["share_price"]}}</td>
+            {% if trans["shares_bought"] %}
+            <td>BUY</td>
+            <td>{{trans["shares_bought"]}}</td>
+            {% else %}
+            <td>SELL</td>
+            <td>{{trans["shares_sold"]}}</td>
+            {% endif %}
+            <td>{{trans["payment"]}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 {% endblock content %}
