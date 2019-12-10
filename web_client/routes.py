@@ -1,15 +1,14 @@
-from flask import render_template, url_for, flash, redirect, request, session, jsonify,make_response
-from web_client import db,app,bcrypt,intialize_firebase
+from flask import render_template, url_for, flash, redirect, request, session, jsonify, make_response
+from web_client import db, app, bcrypt, intialize_firebase
 from web_client.forms import RegistrationForm, LoginForm
 from web_client.models import User
+from web_client.username_table import *
+import time
 import json
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
 import jwt
-
-
-
 
 
 @app.route("/")
@@ -36,8 +35,11 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=hashed_password)
-        
-       
+        signOutUsers()
+        savedUser = str(form.username.data)
+        time.sleep(2)
+        insert_user_table(savedUser, savedUser, "0", "Y", "0", "0", "0", "0")
+
 
         db.session.add(user)
         db.session.commit()
@@ -57,10 +59,10 @@ def login():
                 user.password, form.password.data):
             login_user(user, remember=form.remember.data)
 
+
             token = generate_token(user.username)
             return redirect(url_for('home', token=json.dumps(
                 {'token': token.decode('UTF-8')})))
-
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -68,6 +70,8 @@ def login():
 
 @app.route("/logout")
 def logout():
+    signOutUsers()
+    time.sleep(2)
     logout_user()
     return redirect(url_for('login'))
 
@@ -75,68 +79,134 @@ def logout():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-        # req = request.get_json()
-        token = generate_token(current_user.username)
-        aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
-        # print(aapl_shares)
-        # print(req)
-        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-        # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
-        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-        # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
-        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares  )
+    # req = request.get_json()
+    token = generate_token(current_user.username)
+    print(str(current_user.username) + "dashboard username")
 
-    
-    
+
+    # aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
     # print(aapl_shares)
+    # print(req)
+    # aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+    # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+    # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+    # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+
+
+
+    return render_template('dashboard.html', title='Dashboard', aapl_price="46",  accountNum = getUserAccounts(str(current_user.username)),
+                           user_funds=getPrevFunds(str(current_user.username), returnAccount()),
+                           goog_share_num=getShareNum(str(current_user.username), returnAccount(), "googl"),
+                           aapl_share_num=getShareNum(str(current_user.username), returnAccount(), "aapl"),
+                           fb_share_num=getShareNum(str(current_user.username), returnAccount(), "fb"),
+                           msft_share_num=getShareNum(str(current_user.username), returnAccount(), "msft")
+                           )
 
 
 @app.route("/transactions")
 @login_required
 def transactions():
     return render_template('transactions.html', title='Transactions')
-# Generates token
+
 
 
 def generate_token(username, seconds=0, minutes=30, hours=0):
-
     exp_time = datetime.utcnow() + \
-        timedelta(seconds=seconds, minutes=minutes, hours=hours)
+               timedelta(seconds=seconds, minutes=minutes, hours=hours)
 
     payload = {'username': username,
                'exp': exp_time
                }
-
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return token
+
+
+def returnAccount():
+
+    return getAccUser("Y")
+
+@app.route("/getUser", methods=["POST"])
+def getUser():
+    req = request.get_json()
+
+    savedUser = str(current_user.username)
+
+    signOutUsers()
+    time.sleep(2)
+    updateSignIn("Y", savedUser, str(req))
+    res = make_response(jsonify({"message": "OK"}), 200)
+    return res
+
 
 @app.route("/addFunds", methods=["POST"])
 def addFunds():
     # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print ( str(current_user) + str(req))
+
+    insertFunds(str(current_user.username), returnAccount(), str(req["fundAmount"]))
+
 
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res
+
+
+
+@app.route("/addAccount", methods=["POST"])
+def addAccount():
+    req = request.get_json()
+
+    savedUser = str(current_user.username)
+    savedAcc = str(req['newAccount'])
+    print("saved user is " +savedUser )
+    accCount = (accNum(savedUser))
+
+    if (accCount <=2 and accCount > 0):
+        signOutUsers()
+        insert_user_table(savedUser, savedAcc, "0", "Y", "0", "0", "0", "0")
+        res = make_response(jsonify({"message": "OK"}), 200)
+    else:
+        res = make_response(jsonify({"message": "Err - no more than 3 accounts"}), 200)
+    return res
+
+
 @app.route("/buy", methods=["POST"])
 def buyShares():
-     # Retrieve amount and its in JSON form
+    # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print ( str(current_user) + str(req))
+    buyAmount = (int) (req["buyAmount"])
+    symPass = str(req["Symbol"])
 
+
+
+
+    updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount)
+
+    print(str(current_user) + str(req))
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res
+
+
 @app.route("/sell", methods=["POST"])
 def sellShares():
-     # Retrieve amount and its in JSON form
+    # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print ( str(current_user) + str(req))
 
+    sellAmount = (int) (req["sellAmount"])
+    print(req)
+    symPass = str(req["Symbol"])
+
+    updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount)
+
+
+
+
+    print(str(current_user.username) + str(req))
     res = make_response(jsonify({"message": "OK"}), 200)
-
     return res
+
+
