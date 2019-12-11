@@ -39,8 +39,8 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
 
-        if 'aapl_token' in request.headers:
-            token = request.headers['aapl_token']
+        if 'token' in request.headers:
+            token = request.headers['token']
         if not token:
             return jsonify({'message': 'Token Missing'}), 401
         try:

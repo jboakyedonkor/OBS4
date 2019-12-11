@@ -64,7 +64,7 @@ def login():
 
             token = generate_token(user.username)
             return redirect(url_for('home', token=json.dumps(
-                {'token': token.decode('UTF-8')})))
+                {'token': token})))
 
         else:
             flash('Login Unsuccessful. Please check email and password',
@@ -85,12 +85,14 @@ def dashboard():
     token = generate_token(current_user.username)
     aapl_shares = requests.get(
         'http://localhost:5001/aapl/share_amount',
-        headers={
-            'aapl_token': token}).json()["total_shares"]
+        headers={'token': token}).json()["total_shares"]
     # print(aapl_shares)
-    # print(req)
+    
+    accounts = current_account = Account.query.filter_by(
+        account_name=current_user.username).all()
     aapl_price = requests.get(
         'http://localhost:5001/aapl/share_price').json()["Price"]
+    
     # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
     # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
     # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
@@ -98,7 +100,8 @@ def dashboard():
         'dashboard.html',
         title='Dashboard',
         aapl_price=aapl_price,
-        aapl_shares=aapl_shares)
+        aapl_shares=aapl_shares,
+        accountNum = accounts.account_name)
 
     # print(aapl_shares)
 
@@ -144,19 +147,23 @@ def addFunds():
 def buyShares():
      # Retrieve amount and its in JSON form
     req = request.get_json()
-
+    print(req)
     if req is None:
         return jsonify({"message": "No sell amount provided"})
 
     try:
 
-        buy_amount = req['sellAmount']
-        symbol = req['symbol']
+        buy_amount = (float)(req['buyAmount'])
+        symbol = str(req['Symbol'])
         req['account']
-        if buy_amount <= 0 or symbol not in set('AAPL', 'GOOG', 'FB', 'MSFT'):
+        print("buy "+ str(buy_amount) + " account is " + str(req['account']) + symbol)
+      
+        # if buy_amount <= 0 or symbol not in set('AAPL', 'GOOG', 'FB', 'MSFT'):
+        if buy_amount <= 0:
             raise Exception
     except Exception:
-        return jsonify({"message": "invalid sell amount or symbol"})
+       
+        return jsonify({"message": "invalid buy amount or symbol"})
 
     stock_uri = uri_dict[symbol]
     token = generate_token(current_user.username)

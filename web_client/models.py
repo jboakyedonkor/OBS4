@@ -22,7 +22,7 @@ class Account(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     account_name = db.Column(db.String(20), unique=True, nullable=False)
-    cash = db.Column(db.Decimal, nullable=False)
+    cash = db.Column(db.Float, nullable=False)
     msft_shares = db.Column(db.Integer, nullable=False)
     fb_shares = db.Column(db.Integer, nullable=False)
     goog_shares = db.Column(db.Integer, nullable=False)

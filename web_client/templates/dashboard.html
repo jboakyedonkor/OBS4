@@ -1,20 +1,11 @@
 {% extends "layout.html" %} {% block content %}
 <h1 class="text-center">Dashboard</h1>
-<div class="dropdown">
-  <button
-    class="btn btn-secondary dropdown-toggle"
-    type="button"
-    id="dropdownMenuButton"
-    data-toggle="dropdown"
-    aria-haspopup="true"
-    aria-expanded="false"
-  >
-    {{ current_user.username }}
-  </button>
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-    <a class="dropdown-item" href="#"></a>
-  </div>
-</div>
+<select id = "userInfo"name=accountNum method="GET" action="/" onchange="">
+  {% for acc in accountNum %}
+  <option value="{{acc}}" SELECTED>{{ acc }}</option>
+  {% endfor %}
+</select>
+
 <br />
 <div class="row">
   <div class="col-sm-12">
