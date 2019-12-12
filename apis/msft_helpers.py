@@ -34,10 +34,10 @@ def get_token(headers):
     """
     Get auth token from request headers
     """
-    if 'Authorization' not in headers or not headers['Authorization']:
+    if 'token' not in headers or not headers['token']:
         return None
 
-    token = headers['Authorization']
+    token = headers['token']
     return token
 
 
