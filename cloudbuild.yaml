@@ -61,6 +61,14 @@ steps:
   - 'FB_FIREBASE_PROJECT_G=${_FB_FIREBASE_PROJECT_ID}'
   - '--build-arg'
   - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
+  - '--build-arg'
+  - 'FB_URI_G=temp_uri'
+  - '--build-arg'
+  - 'AAPL_URI_G=temp_uri'
+  - '--build-arg'
+  - 'GOOG_URI_G=temp_uri'
+  - '--build-arg'
+  - 'MSFT_URI_G=temp_uri'
   - '.'
   
 #msft tests
