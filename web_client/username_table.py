@@ -1,6 +1,6 @@
 import psycopg2
 
-conn = psycopg2.connect("postgres://bdhcskpn:aN7RtxPZgnKxxjWBhOGzaSi5uVigON4l@salt.db.elephantsql.com:5432/bdhcskpn")
+conn = psycopg2.connect("postgres://wxgvhaks:idl6hSvxU3pAFzs4Q7s8SQT30xyKPaiE@rajje.db.elephantsql.com:5432/wxgvhaks")
 
 
 def execute_sql(command):
@@ -65,14 +65,25 @@ def updateSignIn(sign, username, account):
     command = "UPDATE user_table SET signIn = \'" + sign + "\' " \
               + " WHERE account_name = \'" + account + "\' AND  username = \'" + username + "\'"
     execute_sql(command)
+    print(command)
 
 
-def insertFunds(username, account_name, cash):
-    prevCash = int(getPrevFunds(username, account_name))
-    print(prevCash)
-    print("previouscash$")
-    cash = int(cash) + prevCash
-    command = "UPDATE user_table SET cash = \'" + str(cash) + "\' " + " WHERE account_name = \'" + \
+def insertFunds(username, account_name, pass_cash):
+    prevCash = float(getPrevFunds(username, account_name))
+    prevCash = prevCash + float(pass_cash)
+    cash = str(prevCash)
+    command = "UPDATE user_table SET cash = \'" + cash + "\' " + " WHERE account_name = \'" + \
+              account_name + "\' AND  username = \'" + username + "\'"
+
+    print(command)
+    execute_sql(command)
+
+
+def insertBuyFunds(username, account_name, pass_cash):
+    prevCash = float(getPrevFunds(username, account_name))
+    prevCash = prevCash + float(pass_cash)
+    cash = str(prevCash)
+    command = "UPDATE user_table SET cash = \'" + cash + "\' " + " WHERE account_name = \'" + \
               account_name + "\' AND  username = \'" + username + "\'"
 
     print(command)
@@ -86,11 +97,13 @@ def getPrevFunds(username, account_name):
     cur = conn.cursor()
     cur.execute(command)
     prevFund = cur.fetchall()
-    print('PrevFunds: ' + str(prevFund))
     cur.close()
     conn.commit()
+    print(command)
+    print("YOOO")
+    print(prevFund)
 
-    return int(str((prevFund[0]))[2:-3])
+    return (str((prevFund[0]))[2:-3])
 
 
 def getShareNum(username, account_name, symbol):
@@ -100,28 +113,67 @@ def getShareNum(username, account_name, symbol):
     cur = conn.cursor()
     cur.execute(command)
     shareNum = cur.fetchall()
-    print('PrevFunds: ' + str(shareNum))
+    cur.close()
+    conn.commit()
+    print("yerrr")
+    print(shareNum)
+    print(shareNum[0])
+
+    return float(str((shareNum[0]))[2:-3])
+
+
+def getUserShare(username, symbol):
+
+    command = "SELECT SUM (CAST(" + symbol + " AS FLOAT)) as tot  FROM user_table WHERE username = \'" + username + "\'"
+    execute_sql(command)
+
+    cur = conn.cursor()
+    cur.execute(command)
+    shareNum = cur.fetchall()
     cur.close()
     conn.commit()
 
-    return int(str((shareNum[0]))[2:-3])
+    return float(str((shareNum))[2:-3])
 
+def getUserFund(username):
 
-def updateShares(username, account_name, symbol, buyBool, shares):
+    command = "SELECT SUM (CAST(cash AS FLOAT)) as tot_cash  FROM user_table WHERE username = \'" + username + "\'"
+    execute_sql(command)
+
+    cur = conn.cursor()
+    cur.execute(command)
+    shareNum = cur.fetchall()
+    cur.close()
+    conn.commit()
+
+    return float(str((shareNum))[2:-3])
+
+def getUserNetworth(username, aapl_price, fb_price, msft_price, goog_price):
+    aapl_tot_worth = getUserShare(username, "aapl") * aapl_price
+    goog_tot_worth = getUserShare(username, "googl") * goog_price
+    msft_tot_worth = getUserShare(username,  "msft") * msft_price
+    fb_tot_worth = getUserShare(username, "fb") * fb_price
+
+    return aapl_tot_worth + goog_tot_worth + msft_tot_worth + fb_tot_worth + getUserFund(username)
+
+def updateShares(username, account_name, symbol, buyBool, shares, total_cost):
     # buyBool
     # if true, add previous amount to shares
     # if false, subtract previous amount from shares
 
     if buyBool:
         prevShares = getShareNum(username, account_name, symbol) + int(shares)
+
+        finalCash = float(getPrevFunds(username, account_name)) - float(total_cost)
+
     else:
         prevShares = getShareNum(username, account_name, symbol) - int(shares)
 
-    command = "UPDATE user_table SET "+ symbol + " = \'" + str(prevShares) + "\' " \
-              + " WHERE account_name = \'" + account_name + "\' AND  username = \'" + username + "\'"
-    print(command)
-    execute_sql(command)
+        finalCash = float(getPrevFunds(username, account_name)) + float(total_cost)
 
+    command = "UPDATE user_table SET " + symbol + " = \'" + str(prevShares) + "\' , cash = \'" + str(finalCash) + \
+              "\' WHERE account_name = \'" + account_name + "\' AND  username = \'" + username + "\'"
+    execute_sql(command)
 
 
 def getAccUser(sign):
@@ -134,22 +186,21 @@ def getAccUser(sign):
     signAcc = cur.fetchall()
     cur.close()
     conn.commit()
+    print("getUserAccHere")
+    print(signAcc)
+    print(str(signAcc[0])[2:-3])
 
-    return (str(signAcc[0]))[2:-3]
+    return str(signAcc[0])[2:-3]
 
 
 def signOutUsers():
     command = "UPDATE user_table SET signIn = \'N\'"
-    print(command)
     execute_sql(command)
 
 
 def accNum(username):
     command = "SELECT COUNT(*) FROM user_table WHERE username = \'" + username + "\'"
-    print(command)
-
     execute_sql(command)
-    print(command)
 
     cur = conn.cursor()
 
@@ -181,4 +232,3 @@ def getCashAcc(account, username):
 def drop_user_table():
     command = """ DROP TABLE user_table """
     execute_sql(command)
-create_user_table()
