@@ -114,10 +114,10 @@ def buy_share():
     num_owned = request.json["amount"]
     username = verify.json()['user']
     price = requests.get(
-        'http://localhost:5000/fb/share_price').json()['Price']
+        'http://localhost:5002/fb/share_price').json()['Price']
     trans_type = "BUY"
     pl_added = num_owned * price
-        
+            
     requests.post(
         'http://localhost:5002/api/transactions/FB',
         json={
@@ -150,7 +150,7 @@ def sell_share():
     num_owned = request.json["amount"]
     username = verify.json()['user']
     price = requests.get(
-        'http://localhost:5000/fb/share_price').json()['Price']
+        'http://localhost:5002/fb/share_price').json()['Price']
     trans_type = "SELL"
     pl_added = num_owned * price
 
@@ -160,7 +160,7 @@ def sell_share():
             'payment': num_owned * price,
             'trans_type': 'SELL',
             'amount': num_owned,
-            'username': username,
+            'user': username,
             'price': price})
 
     return jsonify(

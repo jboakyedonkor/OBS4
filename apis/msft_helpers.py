@@ -33,10 +33,10 @@ def get_token(headers):
     """
     Get auth token from request headers
     """
-    if 'Authorization' not in headers or not headers['Authorization']:
+    if 'token' not in headers or not headers['token']:
         return None
 
-    token = headers['Authorization']
+    token = headers['token']
     return token
 
 
@@ -64,11 +64,7 @@ def verify_token(token, key):
     try:
         payload = jwt.decode(token, key, algorithms='HS256')
 
-        # check if the issuer of the token it this API
-        if payload['iss'] == 'Microsoft_API':
-            return True, payload['username']
-        else:
-            return False, 'invalid iss'
+        return True, payload['username']
 
     except jwt.ExpiredSignatureError:
         return False, 'token expired'
