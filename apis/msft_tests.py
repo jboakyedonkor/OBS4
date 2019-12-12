@@ -240,7 +240,7 @@ class MsftRoutesTestCase(unittest.TestCase):
         api_response4 = requests.post(
             self.msft_url + self.buy_route,
             headers={
-                'Authorization': '223443dd'}).json()
+                'token': '223443dd'}).json()
 
         self.assertEqual(
             ('error' in api_response4.keys()),
@@ -289,7 +289,7 @@ class MsftRoutesTestCase(unittest.TestCase):
 
         time.sleep(2)
 
-        headers = {'Authorization': token2.decode()}
+        headers = {'token': token2.decode()}
 
         api_response2 = requests.post(
             self.msft_url + self.sell_route,

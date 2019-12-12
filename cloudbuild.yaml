@@ -61,6 +61,14 @@ steps:
   - 'FB_FIREBASE_PROJECT_G=${_FB_FIREBASE_PROJECT_ID}'
   - '--build-arg'
   - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
+  - '--build-arg'
+  - 'FB_URI_G=temp_uri'
+  - '--build-arg'
+  - 'AAPL_URI_G=temp_uri'
+  - '--build-arg'
+  - 'GOOG_URI_G=temp_uri'
+  - '--build-arg'
+  - 'MSFT_URI_G=temp_uri'
   - '.'
   
 #msft tests
@@ -87,6 +95,16 @@ steps:
   entrypoint: 'python'
   args: ['apis/goog_test.py']
 
+#login tests
+- name: 'gcr.io/$PROJECT_ID/obs4'
+  id: 'RUN LOGIN TESTS'
+  entrypoint: 'python'
+  args: ['web_client/login_tests.py']
+
+#cypress tests
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'RUN CYPRESS TESTS'
+  args: ['run gcr.io/$PROJECT_ID/obs4 /bin/bash -c "cd OSB4; python main.py &;node_modules/bin/cypress run cypress/cypress/integration/sample.spec.js;exit"']
 
 #build  microsoft container
 - name: 'gcr.io/cloud-builders/docker'

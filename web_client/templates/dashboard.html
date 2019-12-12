@@ -65,6 +65,7 @@
 <br />
 
 
+<br />
 <div class="row">
   <div class="col-sm-3">
     <div class="card">
@@ -104,7 +105,7 @@
       <div class="card-body">
         <h5 class="card-title">FB</h5>
         <p class="card-text">Shares:{{fb_share_num}}</p>
-        <p class="card-text">Current Price: {{fb_price}}</p>
+        <p class="card-text">Current Price:</p>
         <form>
           <div class="form-group">
             <input type="number" class="form-control" id="fbShareAmount" placeholder="Amount" />
@@ -155,18 +156,20 @@
 
           <fieldset class="form-group">
 
-            <div class="mb-3">
-              <div class="form-group">
-                <label>Name</label>
-                <input type="number" class="form-control" id="fundAmount" placeholder="Add Amount">
-              </div>
 
-
-
-              <button class="btn btn-success" id="submit" onclick="submit_funds();">Confirm</button>
-            </div>
-
-          </fieldset>
+            <div class="row">
+              <div class="col-sm-3">
+                <div class="card">
+                  <div class="card-body">
+                    <h5 class="card-title">GOOGL</h5>
+                    <p class="card-text">Shares: {{goog_share_num}}</p>
+                    <p class="card-text">Current Price:</p>
+                    <form>
+                      <div class="form-group">
+                        <input type="number" class="form-control" id="googlShareAmount" placeholder="Amount" />
+                      </div>
+                    </form>
+                    <button class="btn btn-primary" id="googlBuyButton" onclick="submit_purchase('googl')">Buy</button>
 
         </form>
       </div>
@@ -178,76 +181,10 @@
     </div>
   </div>
 </div>
-</div>
-</div>
-<br />
-<div class="row">
-  <div class="col-sm-3">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">GOOGL</h5>
-        <p class="card-text">Shares:</p>
-        <p class="card-text">Current Price:</p>
-        <form>
-          <div class="form-group">
-            <input type="number" class="form-control" id="googlShareAmount" placeholder="Amount" />
-          </div>
-        </form>
-        <button class="btn btn-primary" onclick="submit_purchase('googl');">Buy</button>
-        <a href="#" class="btn btn-danger" onclick="submit_sell('googl')">Sell</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-3">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">AAPL</h5>
-        <p class="card-text">Shares: {{aapl_shares}}</p>
-        <p class="card-text" id="aapl-price">Current Price: {{aapl_price}}</p>
-        <form>
-          <div class="form-group">
-            <input type="number" class="form-control" id="aaplShareAmount" placeholder="Amount" />
-          </div>
-        </form>
-        <button class="btn btn-primary" onclick="submit_purchase('aapl')">Buy</button>
-        <a href="#" class="btn btn-danger" onclick="submit_sell('aapl')">Sell</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-3">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">FB</h5>
-        <p class="card-text">Shares:</p>
-        <p class="card-text">Current Price: {{fb_price}}</p>
-        <form>
-          <div class="form-group">
-            <input type="number" class="form-control" id="fbShareAmount" placeholder="Amount" />
-          </div>
-        </form>
-        <button class="btn btn-primary" onclick="submit_purchase('fb')">Buy</button>
-        <a href="#" class="btn btn-danger" onclick="submit_sell('fb')">Sell</a>
-      </div>
-    </div>
-  </div>
-  <div class="col-sm-3">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Msft</h5>
-        <p class="card-text">Shares:</p>
-        <p class="card-text">Current Price:</p>
-        <form>
-          <div class="form-group">
-            <input type="number" class="form-control" id="msftShareAmount" placeholder="Amount" />
-          </div>
-        </form>
-        <button class="btn btn-primary" onclick="submit_purchase('msft')">Buy</button>
-        <a href="#" class="btn btn-danger" onclick="submit_sell('msft')">Sell</a>
-      </div>
-    </div>
-  </div>
 
 
-  {% block script %}
-  <script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
-  {% endblock %} {% endblock content %}
+{% block script %}
+
+
+<script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
+{% endblock %} {% endblock content %}
