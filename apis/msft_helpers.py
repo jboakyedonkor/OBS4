@@ -29,6 +29,7 @@ def create_firebase_app():
         return None
 
 
+
 def get_token(headers):
     """
     Get auth token from request headers
