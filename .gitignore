@@ -110,6 +110,9 @@ venv.bak/
 .vscode/
 stockAPIs/config.json
 
+Pipfile
+Pipfile.lock
+
 
 #vscode env
 
@@ -117,7 +120,6 @@ bin/
 include/
 .vscode/settings.json
 
-db_temp.sqlite
 config.json
 config/
 node_modules

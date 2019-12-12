@@ -65,11 +65,9 @@ def verify_token(token, key):
         payload = jwt.decode(token, key, algorithms='HS256')
 
         # check if the issuer of the token it this API
-        if payload['iss'] == 'Microsoft_API':
-            return True, payload['username']
-        else:
-            return False, 'invalid iss'
 
+        return True, payload['username']
+        
     except jwt.ExpiredSignatureError:
         return False, 'token expired'
 

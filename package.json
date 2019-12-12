@@ -1,0 +1,23 @@
+{
+  "name": "obs4",
+  "version": "1.0.0",
+  "description": "obs4",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kwaku97/OBS4.git"
+  },
+  "author": "Team 4",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kwaku97/OBS4/issues"
+  },
+  "homepage": "https://github.com/kwaku97/OBS4#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "cyprus": "^1.0.0"
+  }
+}

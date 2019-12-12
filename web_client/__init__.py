@@ -7,6 +7,7 @@ import os
 import dotenv
 import pyrebase
 import psycopg2
+import pyrebase
 dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 
 app = Flask(__name__)
@@ -14,19 +15,15 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("USER_POSTGRES")
 # USER_POSTGRES = "postgres://ieigwssk:outuHJVlCsEGUWhlqQc4NDwm3bwouT8X@salt.db.elephantsql.com:5432/ieigwssk"
 
-import os
-dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
-
-
 def intialize_firebase():
     config = {
-        "apiKey": os.getenv("MSFT_FB_API_KEY"),
-        "authDomain": os.getenv("MSFT_FB_AUTH_DOMAIN"),
-        "databaseURL": os.getenv("MSFT_FB_DB_URL"),
-        "projectId": os.getenv("MSFT_FB_PROJECT_ID"),
-        "storageBucket": os.getenv("MSFT_FB_STORAGE_BUCKET"),
-        "messagingSenderId": os.getenv("MSFT_FB_SENDER_ID"),
-        "appId": os.getenv("MSFT_FB_APP_ID")
+        "apiKey": os.getenv("FIREBASE_API_KEY"),
+        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
+        "databaseURL": os.getenv("FIREBASE_DB_URL"),
+        "projectId": os.getenv("FIREBASE_PROJECT_ID"),
+        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET"),
+        "messagingSenderId": os.getenv("FIREBASE_MSG_SENDER_ID"),
+        "appId": os.getenv("FIREBASE_APP_ID")
     }
 
     firebase = pyrebase.initialize_app(config)

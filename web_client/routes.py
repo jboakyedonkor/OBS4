@@ -9,14 +9,16 @@ from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
 import jwt
+import pyrebase
 
+fire_db = intialize_firebase().database()
 
 
 @app.route("/")
 @app.route("/home")
 @login_required
 def home():
-    return render_template('home.html')
+    return redirect(url_for('dashboard'))
 
 
 @app.route("/about")
@@ -80,35 +82,62 @@ def logout():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    # req = request.get_json()
-    # token = generate_token(current_user.username)
-    print(str(current_user.username) + "dashboard username")
-
-
-    # aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
-    # print(aapl_shares)
-    # print(req)
+    token = generate_token(current_user.username)
+    aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
     aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-    # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+    fb_price = requests.get('http://localhost:5002/fb/share_price').json()["Price"]
     # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
     # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+    return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares, fb_price=fb_price)
 
 
-
-    return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price,  accountNum = getUserAccounts(str(current_user.username)),
-                           user_funds=getPrevFunds(str(current_user.username), returnAccount()),
-                           goog_share_num=getShareNum(str(current_user.username), returnAccount(), "googl"),
-                           aapl_share_num=getShareNum(str(current_user.username), returnAccount(), "aapl"),
-                           fb_share_num=getShareNum(str(current_user.username), returnAccount(), "fb"),
-                           msft_share_num=getShareNum(str(current_user.username), returnAccount(), "msft")
-                           )
-
-
-@app.route("/transactions")
+@app.route("/logs")
 @login_required
 def transactions():
-    return render_template('transactions.html', title='Transactions')
+    all_transactions = requests.get('http://localhost:5000/transaction_parse').json()
+    all_auth_log = requests.get('http://localhost:5000/auth_parse').json()
+    return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log)
 
+@app.route('/auth_parse', methods=["GET", "POST"])
+def parse_auth():
+    auth_log = requests.get('http://localhost:5000/api/auth/admin').json()
+    present_auth = []
+
+    for user_value in auth_log.values():
+        for trans in user_value.values():
+            present_auth.append(trans)
+    
+    return jsonify(sorted(present_auth, key=lambda i: i["time"], reverse=True))
+
+@app.route('/api/auth/admin', methods=["GET"])
+def get_auth_log():
+    auth_log = fire_db.child('AUTH').get().val()
+    return jsonify(auth_log)
+
+@app.route('/api/transactions/admin', methods=['GET', 'POST'])
+def get_transactions():
+    all_transactions = fire_db.child('transactions').get()
+    return jsonify(all_transactions.val())
+
+@app.route('/transaction_parse', methods=["GET", "POST"])
+def parse_trans():
+    all_transactions = requests.get('http://localhost:5000/api/transactions/admin').json()
+    present_trans = []
+
+    for user_value in all_transactions.values():
+        try:
+            for trans_value in user_value["bought"].values():
+                present_trans.append(trans_value)
+        except:
+            continue
+        
+        try:
+            for trans_value in user_value["sold"].values():
+                present_trans.append(trans_value)
+        except:
+            continue
+
+    return jsonify(sorted(present_trans, key=lambda i: i["created_at"], reverse=True))
 
 
 def generate_token(username, seconds=0, minutes=30, hours=0):
@@ -260,3 +289,45 @@ def sellShares():
     return res
 
 
+    return res
+
+@app.route('/createAccount', methods=["POST"])
+def create_account():
+    username = request.json["username"]
+    balance = request.json["funds"]
+    account_name = request.json["acc_name"]
+
+    try:
+        check_account_length = fire_db.child("accounts").child(username).get().val()
+        check_account_length = list(check_account_length.items())
+    except BaseException:
+        check_account_length = []
+
+    accounts_length = len(check_account_length)
+
+    if accounts_length >= 3:
+        return jsonify(status=400, description="User cannot have more than 3 accounts.")
+
+    new_account = {
+        "username": username,
+        "balance": balance,
+        "account_name": account_name
+    }
+    
+    fire_db.child("accounts").child(username).child(account_name).set(new_account)
+
+    return jsonify(new_account)
+
+@app.route('/getAccounts', methods=["GET"])
+def get_account():
+    username = request.json["username"]
+
+    accounts = fire_db.child("accounts").child(username).get().val()
+
+    listing = []
+
+    for value in accounts.values():
+        for inner_value in value.values():
+            listing.append(inner_value)
+
+    return jsonify(listing)

@@ -155,7 +155,7 @@ def get_price():
     response = {
         'symbol': api_response['symbol'],
         'name': api_response['description'],
-        'share_price': api_response['last'],
+        'Price': api_response['last'],
     }
 
     return jsonify(response)
@@ -165,4 +165,5 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         microsoft_api.run(debug=True)
     else:
-        microsoft_api.run(host='0.0.0.0')
+        # microsoft_api.run(host='0.0.0.0')
+        microsoft_api.run(port=5003)

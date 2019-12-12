@@ -129,7 +129,7 @@ def sell_shares(current_user):
     
     if(val >= 0):
         data2={"shares_bought": val }
-        dbfire.child('transactions').child(current_user).child('sell').push(data)
+        dbfire.child('transactions').child(current_user).child('sold').push(data)
         dbfire.child('transactions').child(current_user).child('amount').child('aapl_shares').update(data2)
         return data
     else:

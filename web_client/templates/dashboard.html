@@ -1,5 +1,15 @@
 {% extends "layout.html" %} {% block content %}
 <h1 class="text-center">Dashboard</h1>
+<<<<<<< HEAD
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+    aria-haspopup="true" aria-expanded="false">
+    {{ current_user.username }}
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#"></a>
+  </div>
+=======
         <select id = "userInfo"name=accountNum method="GET" action="/" onchange="dropFunction()">
             {% for acc in accountNum %}
             <option value="{{acc}}" SELECTED>{{ acc }}</option>
@@ -76,11 +86,32 @@
             </div>
         </div>
     </div>
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
 </div>
 <br/>
 
 
 <div class="row">
+<<<<<<< HEAD
+  <div class="col-sm-12">
+    <div class="card text-center">
+      <div class="card-body">
+        <h5 class="card-title">Funds</h5>
+        <p class="card-text">Net Worth:</p>
+        <p class="card-text">Cash:</p>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+          Add Funds
+        </button>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Funds</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+=======
     <div class="col-sm-3">
         <div class="card">
             <div class="card-body">
@@ -193,11 +224,34 @@
                         aria-label="Close"
                 >
                     <span aria-hidden="true">&times;</span>
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
                 </button>
             </div>
             <div class="modal-body">
                 <form method="POST" action="">
 
+<<<<<<< HEAD
+                  <fieldset class="form-group">
+
+                    <div class="mb-3">
+                      <div class="form-group">
+                        <label>Name</label>
+                        <input type="number" class="form-control" id="fundAmount" placeholder="Add Amount">
+                      </div>
+
+
+
+                      <button class="btn btn-success" id="submit" onclick="submit_funds();">Confirm</button>
+                    </div>
+
+                  </fieldset>
+
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                  Close
+=======
                     <fieldset class="form-group">
 
                         <div class="mb-3">
@@ -220,14 +274,90 @@
                         data-dismiss="modal"
                 >
                     Close
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
                 </button>
             </div>
         </div>
+<<<<<<< HEAD
+      </div>
+    </div>
+  </div>
+</div>
+<br />
+<div class="row">
+  <div class="col-sm-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">GOOGL</h5>
+        <p class="card-text">Shares:</p>
+        <p class="card-text">Current Price:</p>
+        <form>
+          <div class="form-group">
+            <input type="number" class="form-control" id="googlShareAmount" placeholder="Amount" />
+          </div>
+        </form>
+        <button class="btn btn-primary" onclick="submit_purchase('googl');">Buy</button>
+        <a href="#" class="btn btn-danger" onclick="submit_sell('googl')">Sell</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">AAPL</h5>
+        <p class="card-text">Shares: {{aapl_shares}}</p>
+        <p class="card-text" id="aapl-price">Current Price: {{aapl_price}}</p>
+        <form>
+          <div class="form-group">
+            <input type="number" class="form-control" id="aaplShareAmount" placeholder="Amount" />
+          </div>
+        </form>
+        <button class="btn btn-primary" onclick="submit_purchase('aapl')">Buy</button>
+        <a href="#" class="btn btn-danger" onclick="submit_sell('aapl')">Sell</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">FB</h5>
+        <p class="card-text">Shares:</p>
+        <p class="card-text">Current Price: {{fb_price}}</p>
+        <form>
+          <div class="form-group">
+            <input type="number" class="form-control" id="fbShareAmount" placeholder="Amount" />
+          </div>
+        </form>
+        <button class="btn btn-primary" onclick="submit_purchase('fb')">Buy</button>
+        <a href="#" class="btn btn-danger" onclick="submit_sell('fb')">Sell</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-3">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Msft</h5>
+        <p class="card-text">Shares:</p>
+        <p class="card-text">Current Price:</p>
+        <form>
+          <div class="form-group">
+            <input type="number" class="form-control" id="msftShareAmount" placeholder="Amount" />
+          </div>
+        </form>
+        <button class="btn btn-primary" onclick="submit_purchase('msft')">Buy</button>
+        <a href="#" class="btn btn-danger" onclick="submit_sell('msft')">Sell</a>
+      </div>
+=======
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
     </div>
 </div>
 
 
 {% block script %}
+<<<<<<< HEAD
+<script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
+{% endblock %} {% endblock content %}
+=======
 
 
 <script
@@ -235,3 +365,4 @@
         src="{{url_for('static', filename='script.js')}}"
 ></script>
 {% endblock %} {% endblock content %}
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
