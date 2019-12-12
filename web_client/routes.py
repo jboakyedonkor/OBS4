@@ -12,10 +12,10 @@ import jwt
 
 
 #put apis here, or uncomment from the dashboard function
-aapl_price = 270
-fb_price = 202
-msft_price = 151
-goog_price = 1300
+aapl_price = 270.0
+fb_price = 202.0
+msft_price = 151.0
+goog_price = 1300.0
 
 
 @app.route("/")
@@ -92,12 +92,13 @@ def dashboard():
     # print(str(current_user.username) + "dashboard username")
 
     # aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
-    # print(aapl_shares)
-    # print(req)
-    # aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+
+    #aapl_price2 = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+    print("yeet")
+    #print(aapl_price2)
     # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
     # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-    # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+    #goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
 
     return render_template('dashboard.html', title='Dashboard',
                            user_networth=str(getUserNetworth(str(current_user.username), aapl_price,
@@ -144,9 +145,6 @@ def getUser():
 
     signOutUsers()
     time.sleep(2)
-    print("STARTGETUSER")
-    print(savedUser + "   " + str(req))
-    print("ENDGETUSER")
     updateSignIn("Y", savedUser, str(req))
     res = make_response(jsonify({"message": "OK"}), 200)
     return res
@@ -194,11 +192,10 @@ def buyShares():
     data = {'amount': buyAmount}
     finalFund = (getPrevFunds(str(current_user.username), returnAccount()))
     cash = (float)(finalFund)
-    print(cash)
 
     # retrieve cash in account if symbol is AAPL and buyAmount *appl_shares < cash then store
     if (symPass == 'aapl'):
-        # aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+        #aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
         tot = buyAmount * aapl_price
         if (tot < cash):
             updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
@@ -270,7 +267,7 @@ def sellShares():
     tot_shares = (getShareNum(str(current_user.username), returnAccount(), symPass))
 
     if (symPass == 'aapl'):
-        # aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+        #aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
 
         tot = sellAmount * aapl_price
         # add tot to cash val
@@ -280,7 +277,7 @@ def sellShares():
             updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
 
             res = make_response(jsonify({"message": "OK"}), 200)
-            print(tot)
+
             return res
         else:
             res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
@@ -298,7 +295,6 @@ def sellShares():
             updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
 
             res = make_response(jsonify({"message": "OK"}), 200)
-            print(tot)
             return res
         else:
             res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
@@ -316,7 +312,7 @@ def sellShares():
             updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
 
             res = make_response(jsonify({"message": "OK"}), 200)
-            print(tot)
+
             return res
         else:
             res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
@@ -334,11 +330,9 @@ def sellShares():
             updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
 
             res = make_response(jsonify({"message": "OK"}), 200)
-            print(tot)
             return res
         else:
             res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
-            # print(tot)
             return res
 
 
