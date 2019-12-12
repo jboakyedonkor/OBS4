@@ -1,18 +1,15 @@
-  
 {% extends "layout.html" %}
 {% block content %}
 <h1>Home</h1>
 {% if request.args.get('token') != None  %}
 <script>
-let params = (new URL(document.location)).searchParams;
-let name = params.get("token");
-localStorage.setItem('token',name);
-var token = JSON.parse(localStorage.getItem('token'));
+    let params = (new URL(document.location)).searchParams;
+    let name = params.get("token");
+    localStorage.setItem('token', name);
+    var token = JSON.parse(localStorage.getItem('token'));
 // console.log("Yo soy a " +token["token"])
 
 </script>
-
-{{ request.args.get('token') }}  
 
 {% endif %}
 {% endblock content %}

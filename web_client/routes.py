@@ -1,22 +1,24 @@
-from flask import render_template, url_for, flash, redirect, request, session, jsonify,make_response
-from web_client import db,app,bcrypt,intialize_firebase
+from flask import render_template, url_for, flash, redirect, request, session, jsonify, make_response
+from web_client import db, app, bcrypt, intialize_firebase
 from web_client.forms import RegistrationForm, LoginForm
 from web_client.models import User
+from web_client.username_table import *
+import time
 import json
 from flask_login import login_user, current_user, logout_user, login_required
 import requests
 from datetime import datetime, timedelta
 import jwt
+import pyrebase
 
-
-
+fire_db = intialize_firebase().database()
 
 
 @app.route("/")
 @app.route("/home")
 @login_required
 def home():
-    return render_template('home.html')
+    return redirect(url_for('dashboard'))
 
 
 @app.route("/about")
@@ -36,8 +38,11 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=hashed_password)
-        
-       
+        signOutUsers()
+        savedUser = str(form.username.data)
+        time.sleep(2)
+        insert_user_table(savedUser, savedUser, "0", "Y", "0", "0", "0", "0")
+
 
         db.session.add(user)
         db.session.commit()
@@ -57,10 +62,10 @@ def login():
                 user.password, form.password.data):
             login_user(user, remember=form.remember.data)
 
+
             token = generate_token(user.username)
             return redirect(url_for('home', token=json.dumps(
                 {'token': token.decode('UTF-8')})))
-
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -68,6 +73,8 @@ def login():
 
 @app.route("/logout")
 def logout():
+    signOutUsers()
+    time.sleep(2)
     logout_user()
     return redirect(url_for('login'))
 
@@ -75,68 +82,252 @@ def logout():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-        # req = request.get_json()
-        token = generate_token(current_user.username)
-        aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
-        # print(aapl_shares)
-        # print(req)
-        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-        # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
-        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-        # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
-        return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares  )
-
-    
-    
-    # print(aapl_shares)
+    token = generate_token(current_user.username)
+    aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
+    aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+    fb_price = requests.get('http://localhost:5002/fb/share_price').json()["Price"]
+    # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+    # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+    return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares, fb_price=fb_price)
 
 
-@app.route("/transactions")
+@app.route("/logs")
 @login_required
 def transactions():
-    return render_template('transactions.html', title='Transactions')
-# Generates token
+    all_transactions = requests.get('http://localhost:5000/transaction_parse').json()
+    all_auth_log = requests.get('http://localhost:5000/auth_parse').json()
+    return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log)
+
+@app.route('/auth_parse', methods=["GET", "POST"])
+def parse_auth():
+    auth_log = requests.get('http://localhost:5000/api/auth/admin').json()
+    present_auth = []
+
+    for user_value in auth_log.values():
+        for trans in user_value.values():
+            present_auth.append(trans)
+    
+    return jsonify(sorted(present_auth, key=lambda i: i["time"], reverse=True))
+
+@app.route('/api/auth/admin', methods=["GET"])
+def get_auth_log():
+    auth_log = fire_db.child('AUTH').get().val()
+    return jsonify(auth_log)
+
+@app.route('/api/transactions/admin', methods=['GET', 'POST'])
+def get_transactions():
+    all_transactions = fire_db.child('transactions').get()
+    return jsonify(all_transactions.val())
+
+@app.route('/transaction_parse', methods=["GET", "POST"])
+def parse_trans():
+    all_transactions = requests.get('http://localhost:5000/api/transactions/admin').json()
+    present_trans = []
+
+    for user_value in all_transactions.values():
+        try:
+            for trans_value in user_value["bought"].values():
+                present_trans.append(trans_value)
+        except:
+            continue
+        
+        try:
+            for trans_value in user_value["sold"].values():
+                present_trans.append(trans_value)
+        except:
+            continue
+
+    return jsonify(sorted(present_trans, key=lambda i: i["created_at"], reverse=True))
 
 
 def generate_token(username, seconds=0, minutes=30, hours=0):
-
     exp_time = datetime.utcnow() + \
-        timedelta(seconds=seconds, minutes=minutes, hours=hours)
+               timedelta(seconds=seconds, minutes=minutes, hours=hours)
 
     payload = {'username': username,
                'exp': exp_time
                }
-
     token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
     return token
+
+
+def returnAccount():
+
+    return getAccUser("Y")
+
+@app.route("/getUser", methods=["POST"])
+def getUser():
+    req = request.get_json()
+
+    savedUser = str(current_user.username)
+
+    signOutUsers()
+    time.sleep(2)
+    updateSignIn("Y", savedUser, str(req))
+    res = make_response(jsonify({"message": "OK"}), 200)
+    return res
+
 
 @app.route("/addFunds", methods=["POST"])
 def addFunds():
     # Retrieve amount and its in JSON form
     req = request.get_json()
 
-    print ( str(current_user) + str(req))
+
+    insertFunds(str(current_user.username), returnAccount(), str(req["fundAmount"]))
+
 
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res
+
+
+
+@app.route("/addAccount", methods=["POST"])
+def addAccount():
+    req = request.get_json()
+
+    savedUser = str(current_user.username)
+    savedAcc = str(req['newAccount'])
+    print("saved user is " +savedUser )
+    accCount = (accNum(savedUser))
+
+    if (accCount <=2 and accCount > 0):
+        signOutUsers()
+        insert_user_table(savedUser, savedAcc, "0", "Y", "0", "0", "0", "0")
+        res = make_response(jsonify({"message": "OK"}), 200)
+    else:
+        res = make_response(jsonify({"message": "Err - no more than 3 accounts"}), 200)
+    return res
+
+
 @app.route("/buy", methods=["POST"])
 def buyShares():
-     # Retrieve amount and its in JSON form
+    # Retrieve amount and its in JSON form
     req = request.get_json()
+    # token=generate_token(current_user.username)
+    # headers = {'token': token}
+    
+    buyAmount = (float) (req["buyAmount"]) #probably want float but dont know how your sql works
+    symPass = str(req["Symbol"])
+    data={'amount':buyAmount}
+    #retrieve cash in account if symbol is AAPL and buyAmount *appl_shares < cash then store
+    # if(symPass =='aapl'):
+    #     aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+    #     tot = buyAmount * aapl_price
+    #     cash = 200000 
+    #     if(tot < cash):
+    #         updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount)
+    #         aapl_price = requests.get('http://localhost:5001/aapl/buy/',headers=headers,params=data)
+    #         print(aapl_price)
+    #         res = make_response(jsonify({"message": "OK"}), 200)
+    #         print(tot)
+    #         return res
+    #     else:
+    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+    #         print(tot)
+    #         return res
+       
+    # if(symPass =='msft'):
+    #     msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+    #     tot = buyAmount * msft_price
+    #     print(tot)
+    # if(symPass =='fb'):
+    #     fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+    #     tot = buyAmount * fb_price
+    #     print(tot)
+    # if(symPass =='googl'):
+    #     googl_price = requests.get('http://localhost:5001/googl/share_price').json()["Price"]
+    #     tot = buyAmount * googl_price
+    #     print(tot)
+        
 
-    print ( str(current_user) + str(req))
+    updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount)
 
+    print(str(current_user) + str(req))
     res = make_response(jsonify({"message": "OK"}), 200)
 
     return res
+
+
 @app.route("/sell", methods=["POST"])
 def sellShares():
-     # Retrieve amount and its in JSON form
+    # Retrieve amount and its in JSON form
     req = request.get_json()
+    token=generate_token(current_user.username)
+    headers = {'token': token}
 
-    print ( str(current_user) + str(req))
+    sellAmount = (float) (req["sellAmount"])
+   
+    symPass = str(req["Symbol"])
+    # data={'amount':sellAmount}
+    # if(symPass =='aapl'):
+    #     aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+    #     tot = sellAmount * aapl_price
+    #     # add tot to cash val
+    #     # subtract from appl shares
+    #     # get current amount of appl shares and check if you are trying to sell less then the one you have
+    #     tot_shares = 200000 
+    #     if(tot < tot_shares):
+    #         updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount)
+    #         aapl_price = requests.get('http://localhost:5001/aapl/sell/',headers=headers,params=data)
+    #         print(aapl_price)
+    #         res = make_response(jsonify({"message": "OK"}), 200)
+    #         print(tot)
+    #         return res
+    #     else:
+    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+    #         print(tot)
+    #         return res
+    updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount)
 
+
+
+
+    print(str(current_user.username) + str(req))
     res = make_response(jsonify({"message": "OK"}), 200)
+    return res
+
 
     return res
+
+@app.route('/createAccount', methods=["POST"])
+def create_account():
+    username = request.json["username"]
+    balance = request.json["funds"]
+    account_name = request.json["acc_name"]
+
+    try:
+        check_account_length = fire_db.child("accounts").child(username).get().val()
+        check_account_length = list(check_account_length.items())
+    except BaseException:
+        check_account_length = []
+
+    accounts_length = len(check_account_length)
+
+    if accounts_length >= 3:
+        return jsonify(status=400, description="User cannot have more than 3 accounts.")
+
+    new_account = {
+        "username": username,
+        "balance": balance,
+        "account_name": account_name
+    }
+    
+    fire_db.child("accounts").child(username).child(account_name).set(new_account)
+
+    return jsonify(new_account)
+
+@app.route('/getAccounts', methods=["GET"])
+def get_account():
+    username = request.json["username"]
+
+    accounts = fire_db.child("accounts").child(username).get().val()
+
+    listing = []
+
+    for value in accounts.values():
+        for inner_value in value.values():
+            listing.append(inner_value)
+
+    return jsonify(listing)

@@ -1,90 +1,284 @@
 {% extends "layout.html" %} {% block content %}
 <h1 class="text-center">Dashboard</h1>
+<<<<<<< HEAD
 <div class="dropdown">
-  <button
-    class="btn btn-secondary dropdown-toggle"
-    type="button"
-    id="dropdownMenuButton"
-    data-toggle="dropdown"
-    aria-haspopup="true"
-    aria-expanded="false"
-  >
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+    aria-haspopup="true" aria-expanded="false">
     {{ current_user.username }}
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
     <a class="dropdown-item" href="#"></a>
   </div>
-</div>
-<br />
+=======
+        <select id = "userInfo"name=accountNum method="GET" action="/" onchange="dropFunction()">
+            {% for acc in accountNum %}
+            <option value="{{acc}}" SELECTED>{{ acc }}</option>
+            {% endfor %}
+        </select>
+
+<br/>
 <div class="row">
+    <div class="col-sm-12">
+        <div class="card text-center">
+            <div class="card-body">
+                <h5 class="card-title">Funds</h5>
+                <p class="card-text">Net Worth: </p>
+                <p class="card-text" id="cashAmount">Cash:{{user_funds}} </p>
+                <button type="button" class="btn btn-primary" data-toggle="modal" id="addFundsButton" data-target="#exampleModal">
+                    Add Funds
+                </button>
+                <!-- Modal -->
+                <div
+                        class="modal fade"
+                        id="exampleModal"
+                        tabindex="-1"
+                        role="dialog"
+                        aria-labelledby="exampleModalLabel"
+                        aria-hidden="true"
+                >
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="label">Add Funds</h5>
+                                <button
+                                        type="button"
+                                        class="close"
+                                        data-dismiss="modal"
+                                        aria-label="Close"
+                                >
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="">
+
+                                    <fieldset class="form-group">
+
+                                        <div class="mb-3">
+                                            <div class="form-group">
+                                                <label>Amount</label>
+                                                <input type="number" class="form-control" id="fundAmount"
+                                                       placeholder="Add Amount">
+                                            </div>
+
+
+                                            <button class="btn btn-success" id="submitFunds" onclick="submit_funds();">
+                                                Confirm
+                                            </button>
+                                        </div>
+
+                                    </fieldset>
+
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        data-dismiss="modal"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
+</div>
+<br/>
+
+
+<div class="row">
+<<<<<<< HEAD
   <div class="col-sm-12">
     <div class="card text-center">
       <div class="card-body">
         <h5 class="card-title">Funds</h5>
         <p class="card-text">Net Worth:</p>
         <p class="card-text">Cash:</p>
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-toggle="modal"
-          data-target="#exampleModal"
-        >
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
           Add Funds
         </button>
         <!-- Modal -->
-        <div
-          class="modal fade"
-          id="exampleModal"
-          tabindex="-1"
-          role="dialog"
-          aria-labelledby="exampleModalLabel"
-          aria-hidden="true"
-        >
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+          aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Add Funds</h5>
-                <button
-                  type="button"
-                  class="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
+=======
+    <div class="col-sm-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">GOOGL</h5>
+                <p class="card-text">Shares: {{goog_share_num}}</p>
+                <p class="card-text">Current Price:</p>
+                <form>
+                    <div class="form-group">
+                        <input
+                                type="number"
+                                class="form-control"
+                                id="googlShareAmount"
+                                placeholder="Amount"
+                        />
+                    </div>
+                </form>
+                <button class="btn btn-primary" id="googlBuyButton" onclick="submit_purchase('googl')">Buy</button>
+
+                <a href="#" class="btn btn-danger"  id="googlSellButton" onclick="submit_sell('googl')">Sell</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">AAPL</h5>
+                <p class="card-text" id="totAAPLShares">Shares: {{aapl_share_num}}</p>
+                <p class="card-text" id="aapl-price">Current Price: {{aapl_price}}</p>
+                <form>
+                    <div class="form-group">
+                        <input
+                                type="number"
+                                class="form-control"
+                                id="aaplShareAmount"
+                                placeholder="Amount"
+                        />
+                    </div>
+                </form>
+                <button class="btn btn-primary"  id="aaplBuyButton" onclick="submit_purchase('aapl')">Buy</button>
+                <a href="#" class="btn btn-danger"  id="aaplSellButton" onclick="submit_sell('aapl')">Sell</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">FB</h5>
+                <p class="card-text">Shares:{{fb_share_num}}</p>
+                <p class="card-text">Current Price:</p>
+                <form>
+                    <div class="form-group">
+                        <input
+                                type="number"
+                                class="form-control"
+                                id="fbShareAmount"
+                                placeholder="Amount"
+                        />
+                    </div>
+                </form>
+                <button class="btn btn-primary" id="fbBuyButton" onclick="submit_purchase('fb');passSymbol('fb');">Buy</button>
+                <a href="#" class="btn btn-danger"  id="fbSellButton" onclick="submit_sell('fb');passSymbol('fb');">Sell</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Msft</h5>
+                <p class="card-text">Shares: {{msft_share_num}}</p>
+                <p class="card-text">Current Price:</p>
+                <form>
+                    <div class="form-group">
+                        <input
+                                type="number"
+                                class="form-control"
+                                id="msftShareAmount"
+                                placeholder="Amount"
+                        />
+                    </div>
+                </form>
+                <button class="btn btn-primary" id="msftBuyButton" onclick="submit_purchase('msft');passSymbol('msft');">Buy</button>
+                <a href="#" class="btn btn-danger"  id="msftSellButton" onclick="submit_sell('msft')">Sell</a>
+            </div>
+        </div>
+    </div>
+</div>
+<br/>
+
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2">Create Account</button>
+
+
+<!-- Modal -->
+<div
+        class="modal fade"
+        id="exampleModal2"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="exampleModalLabel2"
+        aria-hidden="true"
+>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel2">Add Account</h5>
+                <button
+                        type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Close"
+                >
+                    <span aria-hidden="true">&times;</span>
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
                 </button>
-              </div>
-              <div class="modal-body">
+            </div>
+            <div class="modal-body">
                 <form method="POST" action="">
-                 
+
+<<<<<<< HEAD
                   <fieldset class="form-group">
-                  
+
                     <div class="mb-3">
                       <div class="form-group">
                         <label>Name</label>
                         <input type="number" class="form-control" id="fundAmount" placeholder="Add Amount">
                       </div>
-              
-                   
-              
+
+
+
                       <button class="btn btn-success" id="submit" onclick="submit_funds();">Confirm</button>
                     </div>
-              
+
                   </fieldset>
-                
+
                 </form>
               </div>
               <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-dismiss="modal"
-                >
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
                   Close
-                </button>
-              </div>
+=======
+                    <fieldset class="form-group">
+
+                        <div class="mb-3">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control" id="newAccount" placeholder="Add Account">
+                            </div>
+                            <button class="btn btn-success" id="submit_acc" onclick="submit_account();">Confirm
+                            </button>
+                        </div>
+
+                    </fieldset>
+
+                </form>
             </div>
-          </div>
+            <div class="modal-footer">
+                <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal"
+                >
+                    Close
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
+                </button>
+            </div>
         </div>
+<<<<<<< HEAD
       </div>
     </div>
   </div>
@@ -96,18 +290,13 @@
       <div class="card-body">
         <h5 class="card-title">GOOGL</h5>
         <p class="card-text">Shares:</p>
-        <p class="card-text" >Current Price:</p>
+        <p class="card-text">Current Price:</p>
         <form>
           <div class="form-group">
-            <input
-              type="number"
-              class="form-control"
-              id="googlShareAmount"
-              placeholder="Amount"
-            />
+            <input type="number" class="form-control" id="googlShareAmount" placeholder="Amount" />
           </div>
         </form>
-        <button class="btn btn-primary"  onclick="submit_purchase('googl');">Buy</button>
+        <button class="btn btn-primary" onclick="submit_purchase('googl');">Buy</button>
         <a href="#" class="btn btn-danger" onclick="submit_sell('googl')">Sell</a>
       </div>
     </div>
@@ -120,15 +309,10 @@
         <p class="card-text" id="aapl-price">Current Price: {{aapl_price}}</p>
         <form>
           <div class="form-group">
-            <input
-              type="number"
-              class="form-control"
-              id="aaplShareAmount"
-              placeholder="Amount"
-            />
+            <input type="number" class="form-control" id="aaplShareAmount" placeholder="Amount" />
           </div>
         </form>
-        <button class="btn btn-primary"  onclick="submit_purchase('aapl')">Buy</button>
+        <button class="btn btn-primary" onclick="submit_purchase('aapl')">Buy</button>
         <a href="#" class="btn btn-danger" onclick="submit_sell('aapl')">Sell</a>
       </div>
     </div>
@@ -138,18 +322,13 @@
       <div class="card-body">
         <h5 class="card-title">FB</h5>
         <p class="card-text">Shares:</p>
-        <p class="card-text">Current Price:</p>
+        <p class="card-text">Current Price: {{fb_price}}</p>
         <form>
           <div class="form-group">
-            <input
-              type="number"
-              class="form-control"
-              id="fbShareAmount"
-              placeholder="Amount"
-            />
+            <input type="number" class="form-control" id="fbShareAmount" placeholder="Amount" />
           </div>
         </form>
-        <button class="btn btn-primary"  onclick="submit_purchase('fb')">Buy</button>
+        <button class="btn btn-primary" onclick="submit_purchase('fb')">Buy</button>
         <a href="#" class="btn btn-danger" onclick="submit_sell('fb')">Sell</a>
       </div>
     </div>
@@ -162,25 +341,28 @@
         <p class="card-text">Current Price:</p>
         <form>
           <div class="form-group">
-            <input
-              type="number"
-              class="form-control"
-              id="msftShareAmount"
-              placeholder="Amount"
-            />
+            <input type="number" class="form-control" id="msftShareAmount" placeholder="Amount" />
           </div>
         </form>
-        <button class="btn btn-primary"  onclick="submit_purchase('msft')">Buy</button>
+        <button class="btn btn-primary" onclick="submit_purchase('msft')">Buy</button>
         <a href="#" class="btn btn-danger" onclick="submit_sell('msft')">Sell</a>
       </div>
+=======
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
     </div>
-  </div>
 </div>
-<br />
-<button type="button" class="btn btn-primary">Create Account</button>
+
+
 {% block script %}
+<<<<<<< HEAD
+<script type="text/javascript" src="{{url_for('static', filename='script.js')}}"></script>
+{% endblock %} {% endblock content %}
+=======
+
+
 <script
-  type="text/javascript"
-  src="{{url_for('static', filename='script.js')}}"
+        type="text/javascript"
+        src="{{url_for('static', filename='script.js')}}"
 ></script>
 {% endblock %} {% endblock content %}
+>>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
