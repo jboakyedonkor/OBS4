@@ -166,6 +166,9 @@ def tot_shares(current_user):
             output.append(user.val())
             print(output)
         val = ((float)(output[0]))
+
+    if val is None:
+        val = 0
     
     return jsonify({"total_shares": val})
 
@@ -182,5 +185,5 @@ def aapl_price():
 
 
 if __name__ == "__main__":
-    aapl_api.run(port=5001)
+    aapl_api.run(port=5001, debug=True)
 
