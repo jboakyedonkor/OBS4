@@ -61,7 +61,7 @@ def get_price():
     return jsonify(
         symbol=fb_quote['symbol'],
         name=fb_quote['description'],
-        share_price=fb_quote['last'])
+        Price=fb_quote['last'])
 
 
 @app.route('/api/transactions/FB', methods=['POST'])
@@ -99,7 +99,7 @@ def buy_share():
     num_owned = request.json["amount"]
     username = request.json["username"]
     price = requests.get(
-        'http://localhost:5000/fb/share_price').json()['share_price']
+        'http://localhost:5000/fb/share_price').json()['Price']
     trans_type = "BUY"
     pl = 0
     pl_added = num_owned * price
@@ -211,7 +211,7 @@ def sell_share():
     num_owned = request.json["amount"]
     username = request.json["username"]
     price = requests.get(
-        'http://localhost:5000/fb/share_price').json()['share_price']
+        'http://localhost:5000/fb/share_price').json()['Price']
     trans_type = "SELL"
     pl = 0
     pl_added = num_owned * price
