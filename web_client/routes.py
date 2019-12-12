@@ -208,7 +208,7 @@ def buyShares():
             return res
 
     if (symPass == 'msft'):
-        # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+        msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
         tot = buyAmount * msft_price
         if (tot < cash):
             updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
@@ -224,7 +224,7 @@ def buyShares():
             return res
 
     if (symPass == 'fb'):
-        # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+        fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
         tot = buyAmount * fb_price
         if (tot < cash):
             updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
@@ -240,7 +240,7 @@ def buyShares():
             return res
 
     if (symPass == 'googl'):
-        # goog_price = requests.get('http://localhost:5001/goog/share_price').json()["Price"]
+        goog_price = requests.get('http://localhost:5001/goog/share_price').json()["Price"]
         tot = buyAmount * goog_price
         if (tot < cash):
             updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
