@@ -115,6 +115,7 @@ def dashboard():
 @app.route("/transactions")
 @login_required
 def transactions():
+    fire_db
     return render_template('transactions.html', title='Transactions')
 
 
