@@ -74,7 +74,10 @@ RUN rm  -v *.json
 RUN rm  -rvf venv
 RUN rm -rvf dockerfiles
 RUN rm -rvf Milestone-1
+RUN rm -rvf Milestone-2
 RUN rm  -v README.md
 RUN apk --no-cache add build-base  libffi-dev
+RUN apk --no-cache add nodejs  npm
 RUN apk update && apk --no-cache add postgresql-dev
 RUN pip3 install --no-cache-dir  -r requirements.txt
+RUN npm install
