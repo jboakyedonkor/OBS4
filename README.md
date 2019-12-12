@@ -9,7 +9,7 @@ export(Mac) or set(Windows) SECRET_KEY= "Choose a Key here" <br/>
 Either set FLASK_APP or python3 main.py <br/>
 On a seperate terminal python3 apis/"api name"
 
-# Links  <br/> 
+# Document  <br/> 
 Repo Link: https://github.com/kwaku97/OBS4  <br/> 
 Styling Format PeP8: https://www.python.org/dev/peps/pep-0008/  <br/> 
 Swagger Hub Documentation: In Milestone2 folder openapi.yaml  <br/> 
