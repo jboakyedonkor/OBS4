@@ -16,7 +16,7 @@ fire_db = intialize_firebase().database()
 @app.route("/home")
 @login_required
 def home():
-    return render_template('home.html')
+    return redirect(url_for('dashboard'))
 
 
 @app.route("/about")
@@ -82,15 +82,37 @@ def dashboard():
     return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares, fb_price=fb_price)
 
 
-@app.route("/transactions")
+@app.route("/logs")
 @login_required
 def transactions():
-    all_transactions = requests.get('http://localhost:5000/tests/transaction_parse').json()
-    return render_template('transactions.html', title='Transactions', all_transactions=all_transactions)
+    all_transactions = requests.get('http://localhost:5000/transaction_parse').json()
+    all_auth_log = requests.get('http://localhost:5000/auth_parse').json()
+    return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log)
 
-@app.route('/tests/transaction_parse', methods=["GET", "POST"])
+@app.route('/auth_parse', methods=["GET", "POST"])
+def parse_auth():
+    auth_log = requests.get('http://localhost:5000/api/auth/admin').json()
+    present_auth = []
+
+    for user_value in auth_log.values():
+        for trans in user_value.values():
+            present_auth.append(trans)
+    
+    return jsonify(sorted(present_auth, key=lambda i: i["time"], reverse=True))
+
+@app.route('/api/auth/admin', methods=["GET"])
+def get_auth_log():
+    auth_log = fire_db.child('AUTH').get().val()
+    return jsonify(auth_log)
+
+@app.route('/api/transactions/admin', methods=['GET', 'POST'])
+def get_transactions():
+    all_transactions = fire_db.child('transactions').get()
+    return jsonify(all_transactions.val())
+
+@app.route('/transaction_parse', methods=["GET", "POST"])
 def parse_trans():
-    all_transactions = requests.get('http://localhost:5002/api/transactions/admin').json()
+    all_transactions = requests.get('http://localhost:5000/api/transactions/admin').json()
     present_trans = []
 
     for user_value in all_transactions.values():
