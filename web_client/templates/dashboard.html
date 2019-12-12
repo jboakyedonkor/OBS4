@@ -12,9 +12,9 @@
         <div class="card text-center">
             <div class="card-body">
                 <h5 class="card-title">Funds</h5>
-                <p class="card-text">Net Worth: </p>
-                <p class="card-text" id="cashAmount">Cash:{{user_funds}} </p>
-                <button type="button" class="btn btn-primary" data-toggle="modal" id="addFundsButton" data-target="#exampleModal">
+                <p class="card-text">Net Worth:  {{user_networth}}</p>
+                <p class="card-text">Cash:{{user_funds}} </p>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                     Add Funds
                 </button>
                 <!-- Modal -->
@@ -29,7 +29,7 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="label">Add Funds</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">Add Funds</h5>
                                 <button
                                         type="button"
                                         class="close"
@@ -52,7 +52,7 @@
                                             </div>
 
 
-                                            <button class="btn btn-success" id="submitFunds" onclick="submit_funds();">
+                                            <button class="btn btn-success" id="submit" onclick="submit_funds();">
                                                 Confirm
                                             </button>
                                         </div>
@@ -86,7 +86,7 @@
             <div class="card-body">
                 <h5 class="card-title">GOOGL</h5>
                 <p class="card-text">Shares: {{goog_share_num}}</p>
-                <p class="card-text">Current Price:</p>
+                <p class="card-text">Current Price: {{goog_price}}</p>
                 <form>
                     <div class="form-group">
                         <input
@@ -97,9 +97,9 @@
                         />
                     </div>
                 </form>
-                <button class="btn btn-primary" id="googlBuyButton" onclick="submit_purchase('googl')">Buy</button>
+                <button class="btn btn-primary" onclick="submit_purchase('googl')">Buy</button>
 
-                <a href="#" class="btn btn-danger"  id="googlSellButton" onclick="submit_sell('googl')">Sell</a>
+                <a href="#" class="btn btn-danger" onclick="submit_sell('googl')">Sell</a>
             </div>
         </div>
     </div>
@@ -107,7 +107,7 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">AAPL</h5>
-                <p class="card-text" id="totAAPLShares">Shares: {{aapl_share_num}}</p>
+                <p class="card-text">Shares: {{aapl_share_num}}</p>
                 <p class="card-text" id="aapl-price">Current Price: {{aapl_price}}</p>
                 <form>
                     <div class="form-group">
@@ -119,8 +119,8 @@
                         />
                     </div>
                 </form>
-                <button class="btn btn-primary"  id="aaplBuyButton" onclick="submit_purchase('aapl')">Buy</button>
-                <a href="#" class="btn btn-danger"  id="aaplSellButton" onclick="submit_sell('aapl')">Sell</a>
+                <button class="btn btn-primary" onclick="submit_purchase('aapl')">Buy</button>
+                <a href="#" class="btn btn-danger" onclick="submit_sell('aapl')">Sell</a>
             </div>
         </div>
     </div>
@@ -129,7 +129,7 @@
             <div class="card-body">
                 <h5 class="card-title">FB</h5>
                 <p class="card-text">Shares:{{fb_share_num}}</p>
-                <p class="card-text">Current Price:</p>
+                <p class="card-text">Current Price: {{fb_price}}</p>
                 <form>
                     <div class="form-group">
                         <input
@@ -140,8 +140,8 @@
                         />
                     </div>
                 </form>
-                <button class="btn btn-primary" id="fbBuyButton" onclick="submit_purchase('fb');passSymbol('fb');">Buy</button>
-                <a href="#" class="btn btn-danger"  id="fbSellButton" onclick="submit_sell('fb');passSymbol('fb');">Sell</a>
+                <button class="btn btn-primary" onclick="submit_purchase('fb');passSymbol('fb');">Buy</button>
+                <a href="#" class="btn btn-danger" onclick="submit_sell('fb');passSymbol('fb');">Sell</a>
             </div>
         </div>
     </div>
@@ -150,7 +150,7 @@
             <div class="card-body">
                 <h5 class="card-title">Msft</h5>
                 <p class="card-text">Shares: {{msft_share_num}}</p>
-                <p class="card-text">Current Price:</p>
+                <p class="card-text">Current Price: {{msft_price}}</p>
                 <form>
                     <div class="form-group">
                         <input
@@ -161,8 +161,8 @@
                         />
                     </div>
                 </form>
-                <button class="btn btn-primary" id="msftBuyButton" onclick="submit_purchase('msft');passSymbol('msft');">Buy</button>
-                <a href="#" class="btn btn-danger"  id="msftSellButton" onclick="submit_sell('msft')">Sell</a>
+                <button class="btn btn-primary" onclick="submit_purchase('msft');passSymbol('msft');">Buy</button>
+                <a href="#" class="btn btn-danger" onclick="submit_sell('msft')">Sell</a>
             </div>
         </div>
     </div>
