@@ -155,7 +155,7 @@ def get_price():
     response = {
         'symbol': api_response['symbol'],
         'name': api_response['description'],
-        'share_price': api_response['last'],
+        'Price': api_response['last'],
     }
 
     return jsonify(response)
