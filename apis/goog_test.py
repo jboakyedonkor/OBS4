@@ -7,33 +7,28 @@ import unittest
 import os
 import sys
 import jwt
-from models.goog_table import updateMethods, insertMethods, checkMethods, create_bank_table
+#from models.goog_table import updateMethods, insertMethods, checkMethods, create_bank_table
 from goog_api import app, generate_token, get_price, token_check, buy_shares, sell_shares, showToken, get_quote
 
 
 class TestGoogApi(unittest.TestCase):
     def test_check_share_price_route(self):
         c = app.test_client()
-        response = c.get('/goog/share_price')
+        response = c.get('/share_price')
         self.assertEqual(response.status_code, 200)
 
     def test_check_buy_route(self):
         c = app.test_client()
-        response = c.get('/goog/buy/')
+        response = c.get('/buy')
         self.assertEqual(response.status_code, 200)
 
     def test_check_sell_route(self):
         c = app.test_client()
-        response = c.get('/goog/sell/')
-        self.assertEqual(response.status_code, 200)
-
-    def test_check_shares_route(self):
-        c = app.test_client()
-        response = c.get('/goog/shares')
+        response = c.get('/sell')
         self.assertEqual(response.status_code, 200)
 
     def test_generate_token(self):
-        secret_key = os.getenv('welp')
+        secret_key = os.getenv('SECRET_KEY')
         current_time = datetime.utcnow()
 
         test_toke1 = generate_token("TestUser")
@@ -75,12 +70,6 @@ class TestGoogApi(unittest.TestCase):
 
         self.assertEqual(test_response1['last'], test_response2['last'],
                          "get prices match")
-
-    def test_database_connection(self):
-        testConn = psycopg2.connect(
-            'postgres://bdhcskpn:aN7RtxPZgnKxxjWBhOGzaSi5uVigON4l@salt.db.elephantsql.com:5432/bdhcskpn')
-        if (testConn):
-            pass
 
 
 if __name__ == "__main__":
