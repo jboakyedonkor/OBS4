@@ -72,7 +72,8 @@ def buy_shares(current_user):
     price = aapl_price()['quotes']['quote']['last']
     buy = round(float(amount) * price, 2)
     data = {
-        'user': current_user, 'symbol': 'AAPL', 
+        'user': current_user, 
+        'symbol': 'AAPL', 
         "share_price": price,
         "shares_bought": amount,
         "created_at": datetime.datetime.utcnow().strftime(
@@ -111,7 +112,8 @@ def sell_shares(current_user):
         "share_price": price,
         "shares_sold": amount,
         "created_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-        "payment": sell}
+        "payment": sell
+        }
     
     output = []
     # Gets initial amount of the apple shares
