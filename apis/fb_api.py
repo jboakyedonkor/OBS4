@@ -15,36 +15,50 @@ dotenv.load_dotenv(dotenv_path='.\\config\\.env')
 app = Flask(__name__)
 
 config = {
-    "apiKey": os.getenv('FB_FIREBASE_API_KEY'),
-    "authDomain": os.getenv('FB_FIREBASE_AUTH_DOMAIN'),
-    "databaseURL": os.getenv('FB_FIREBASE_DB_URL'),
-    "projectId": os.getenv('FB_FIREBASE_PROJECT_ID'),
-    "storageBucket": os.getenv('FB_FIREBASE_STORAGE_BUCKET'),
-    "messagingSenderId": os.getenv('FB_FIREBASE_MSG_SENDER_ID'),
-    "appId": os.getenv('FB_FIREBASE_APP_ID'),
-    "measurementId": os.getenv('FB_FIREBASE_MEASUREMENT_ID')
+    "apiKey": os.getenv('FIREBASE_API_KEY'),
+    "authDomain": os.getenv('FIREBASE_AUTH_DOMAIN'),
+    "databaseURL": os.getenv('FIREBASE_DB_URL'),
+    "projectId": os.getenv('FIREBASE_PROJECT_ID'),
+    "storageBucket": os.getenv('FIREBASE_STORAGE_BUCKET'),
+    "messagingSenderId": os.getenv('FIREBASE_MSG_SENDER_ID'),
+    "appId": os.getenv('FIREBASE_APP_ID'),
 }
 
 fire_db = pyrebase.initialize_app(config).database()
 
+def get_token(headers):
+    if 'token' not in headers or not headers['token']:
+        return None
+
+    token = headers['token']
+    return token
+
+
+def token_verification(token):
+    try:
+        decoded = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms='HS256')
+        return True, decoded
+    except jwt.ExpiredSignatureError:
+        return False, None
+    except jwt.InvalidSignatureError:
+        return False, None
+
 
 @app.route('/api/user/verify', methods=['GET', 'POST'])
 def verify_user():
-    token = request.headers.get('token')
+    token = get_token(request.headers)
+    if not token:
+        return jsonify(status=400, description='Token not received.', authenticated=False)
 
-    if token is None:
+    authenticated, decoded = token_verification(token)
+    if authenticated:
         return jsonify(
-            status=400,
-            description='Authentication token not sent.',
-            authenticated=False)
-
-    decoded = jwt.decode(token, os.getenv('SECRET_KEY'), algorithm='HS256')
-
-    return jsonify(
-        status=200,
-        description='User is authenticated.',
-        authenticated=True,
-        user=decoded['username'])
+            status=200,
+            description='User is authenticated.',
+            authenticated=True,
+            user=decoded['username'])
+    else:
+        return jsonify(status=400, description='User not authenticated', authenticated=False, user=None)
 
 
 @app.route('/fb/share_price', methods=['GET'])
@@ -67,27 +81,28 @@ def get_price():
 @app.route('/api/transactions/FB', methods=['POST'])
 def create_transaction():
     new_transaction = {
-        "timestamp": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-        "trans_type": request.json['trans_type'],
-        "amount": request.json['amount'],
-        "price": request.json['price'],
+        "created_at": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        "payment": request.json['payment'],
+        "share_price": request.json['price'],
+        "symbol": "FB",
         "username": request.json['username']
     }
 
-    fire_db.child('transactions').push(new_transaction)
+    if (request.json['trans_type'] == 'BUY'):
+        new_transaction['shares_bought'] = request.json['amount']
+        fire_db.child('transactions').child(request.json['username']).child('bought').push(new_transaction)
+    elif (request.json['trans_type'] == 'SELL'):
+        new_transaction['shares_sold'] = request.json['amount']
+        fire_db.child('transactions').child(request.json['username']).child('sold').push(new_transaction)
+    else:
+        fire_db.child('transactions').child(request.json['username']).child('test').push(new_transaction)
 
     return jsonify(new_transaction)
 
 
-@app.route('/api/transactions/admin/FB', methods=['GET', 'POST'])
-def get_FB_transactions():
-    all_transactions = fire_db.child('transactions').get()
-    return jsonify(all_transactions.val())
-
-
 @app.route('/fb/buy', methods=['POST'])
 def buy_share():
-    verify = requests.get('http://localhost:5000/api/user/verify',
+    verify = requests.get('http://localhost:5002/api/user/verify',
                           headers={'token': request.headers.get('token')})
 
     try:
@@ -97,109 +112,33 @@ def buy_share():
 
     symbol = "FB"
     num_owned = request.json["amount"]
-    username = request.json["username"]
+    username = verify.json()['user']
     price = requests.get(
         'http://localhost:5000/fb/share_price').json()['Price']
     trans_type = "BUY"
-    pl = 0
     pl_added = num_owned * price
-
-    try:
-        user_asset = fire_db.child('assets').order_by_child(
-            'username').equal_to(username).get().val()
-        user_asset_info = list(user_asset.items())[0][1]
-        user_asset_key = list(user_asset.items())[0][0]
-    except BaseException:
-        user_asset = None
-
-    try:
-        bank_asset = fire_db.child('assets').order_by_child(
-            'username').equal_to('obs@04.ssgj').get().val()
-    except BaseException:
-        bank_asset = None
-
-    if bank_asset is None:
-        bank_pl = 5000 * price * -1
-        new_bank = {
-            "symbol": "FB",
-            "pl": bank_pl,
-            "num_owned": 5000,
-            "username": "obs@04.ssgj"}
-        fire_db.child('assets').push(new_bank)
-        requests.post(
-            'http://localhost:5000/api/transactions/FB',
-            json={
-                'trans_type': 'BUY',
-                'amount': 5000,
-                'username': "obs@04.ssgj",
-                'price': price})
-        bank_asset = fire_db.child('assets').order_by_child(
-            'username').equal_to('obs@04.ssgj').get().val()
-
-    bank_asset_key = list(bank_asset.items())[0][0]
-    bank_asset_info = list(bank_asset.items())[0][1]
-
-    if bank_asset_info['num_owned'] < num_owned:
-        asset_diff = num_owned - bank_asset_info['num_owned']
-        bank_asset_info['num_owned'] += asset_diff + 5000
-        bank_asset_info['pl'] += (asset_diff + 5000) * price * -1
-        fire_db.child('assets').child(bank_asset_key).update(bank_asset_info)
-        requests.post(
-            'http://localhost:5000/api/transactions/FB',
-            json={
-                'trans_type': 'BUY',
-                'amount': asset_diff + 5000,
-                'username': "obs@04.ssgj",
-                'price': price})
-
-    bank_asset_info["num_owned"] -= num_owned
-    bank_asset_info["pl"] += num_owned * price
-    fire_db.child('assets').child(bank_asset_key).update(bank_asset_info)
-
-    if user_asset is not None:
-        user_asset_info["num_owned"] += num_owned
-        user_asset_info["pl"] -= num_owned * price
-        fire_db.child('assets').child(user_asset_key).update(user_asset_info)
-        requests.post(
-            'http://localhost:5000/api/transactions/FB',
-            json={
-                'trans_type': 'BUY',
-                'amount': num_owned,
-                'username': username,
-                'price': price})
-        return jsonify(
-            user=username,
-            symbol='FB',
-            share_price=price,
-            shares_bought=num_owned,
-            created_at=datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-            payment=pl_added)
-    else:
-        new_asset = {
-            "symbol": symbol,
-            "pl": num_owned * price * -1,
-            "num_owned": num_owned,
-            "username": username}
-        fire_db.child('assets').push(new_asset)
-        requests.post(
-            'http://localhost:5000/api/transactions/FB',
-            json={
-                'trans_type': 'BUY',
-                'amount': num_owned,
-                'username': username,
-                'price': price})
-        return jsonify(
-            user=username,
-            symbol='FB',
-            share_price=price,
-            shares_bought=num_owned,
-            created_at=datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-            payment=pl_added)
+        
+    requests.post(
+        'http://localhost:5002/api/transactions/FB',
+        json={
+            'payment': -1 * price * num_owned, 
+            'trans_type': 'BUY',
+            'amount': num_owned,
+            'username': username,
+            'price': price})
+        
+    return jsonify(
+        user=username,
+        symbol='FB',
+        share_price=price,
+        shares_bought=num_owned,
+        created_at=datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        payment=pl_added)
 
 
 @app.route('/fb/sell', methods=['POST'])
 def sell_share():
-    verify = requests.get('http://localhost:5000/api/user/verify',
+    verify = requests.get('http://localhost:5002/api/user/verify',
                           headers={'token': request.headers.get('token')})
 
     try:
@@ -209,77 +148,30 @@ def sell_share():
 
     symbol = "FB"
     num_owned = request.json["amount"]
-    username = request.json["username"]
+    username = verify.json()['user']
     price = requests.get(
         'http://localhost:5000/fb/share_price').json()['Price']
     trans_type = "SELL"
-    pl = 0
     pl_added = num_owned * price
 
-    try:
-        user_asset = fire_db.child('assets').order_by_child(
-            'username').equal_to(username).get().val()
-        user_asset_info = list(user_asset.items())[0][1]
-        user_asset_key = list(user_asset.items())[0][0]
-    except BaseException:
-        user_asset = None
+    requests.post(
+        'http://localhost:5002/api/transactions/FB',
+        json={
+            'payment': num_owned * price,
+            'trans_type': 'SELL',
+            'amount': num_owned,
+            'username': username,
+            'price': price})
 
-    try:
-        bank_asset = fire_db.child('assets').order_by_child(
-            'username').equal_to('obs@04.ssgj').get().val()
-    except BaseException:
-        bank_asset = None
-
-    if bank_asset is None:
-        bank_pl = 5000 * price * -1
-        new_bank = {
-            "symbol": "FB",
-            "pl": bank_pl,
-            "num_owned": 5000,
-            "username": "obs@04.ssgj"}
-        fire_db.child('assets').push(new_bank)
-        requests.post(
-            'http://localhost:5000/api/transactions/FB',
-            json={
-                'trans_type': 'BUY',
-                'amount': 5000,
-                'username': "obs@04.ssgj",
-                'price': price})
-        bank_asset = fire_db.child('assets').order_by_child(
-            'username').equal_to('obs@04.ssgj').get().val()
-
-    bank_asset_key = list(bank_asset.items())[0][0]
-    bank_asset_info = list(bank_asset.items())[0][1]
-
-    bank_asset_info["num_owned"] += num_owned
-    bank_asset_info["pl"] -= num_owned * price
-    fire_db.child('assets').child(bank_asset_key).update(bank_asset_info)
-
-    if user_asset is not None:
-        if user_asset_info["num_owned"] < num_owned:
-            return jsonify(
-                status=400,
-                error='User does not have enough assets to sell.')
-        user_asset_info["num_owned"] -= num_owned
-        user_asset_info["pl"] += num_owned * price
-        fire_db.child('assets').child(user_asset_key).update(user_asset_info)
-        requests.post(
-            'http://localhost:5000/api/transactions/FB',
-            json={
-                'trans_type': 'SELL',
-                'amount': num_owned,
-                'username': username,
-                'price': price})
-        return jsonify(
-            user=username,
-            symbol='FB',
-            share_price=price,
-            shares_sold=num_owned,
-            created_at=datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-            payment=pl_added)
-    else:
-        return jsonify(error='User does not exist.')
+    return jsonify(
+        user=username,
+        symbol='FB',
+        share_price=price,
+        shares_sold=num_owned,
+        created_at=datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
+        payment=pl_added)
 
 
 if __name__ == "__main__":
-    app.run('0.0.0.0', 5000, debug=True)
+    # app.run('0.0.0.0', 5000, debug=True)
+    app.run(port=5002, debug=True)
