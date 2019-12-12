@@ -234,8 +234,6 @@ class FBRoutesTestCase(unittest.TestCase):
     def tearDown(self):
         fire_db.child('transactions').child('fake_user').remove()
 
-    
-
 
 if __name__ == '__main__':
     # server = Process(target=app.run)
