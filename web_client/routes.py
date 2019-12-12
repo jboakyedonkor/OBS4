@@ -76,7 +76,7 @@ def dashboard():
     token = generate_token(current_user.username)
     aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
     aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-    fb_price = requests.get('http://localhost:5002/fb/share_price').json()["share_price"]
+    fb_price = requests.get('http://localhost:5002/fb/share_price').json()["Price"]
     # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
     # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
     return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares, fb_price=fb_price)
