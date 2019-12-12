@@ -1,5 +1,5 @@
 /// <reference types="Cypress" />
-
+// acceptance
 context('OBS',() =>{
     const username = "assign2"
     const email = "assign2@gmail.com"
