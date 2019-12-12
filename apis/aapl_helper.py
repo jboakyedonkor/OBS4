@@ -2,6 +2,7 @@ import pyrebase
 import dotenv
 import os
 import jwt
+import pyrebase
 from datetime import datetime, timedelta
 dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 

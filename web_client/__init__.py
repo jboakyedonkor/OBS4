@@ -5,6 +5,7 @@ from datetime import timedelta
 from flask_login import LoginManager
 import os
 import dotenv
+import pyrebase
 import psycopg2
 import pyrebase
 dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
@@ -12,6 +13,7 @@ dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("USER_POSTGRES")
+# USER_POSTGRES = "postgres://ieigwssk:outuHJVlCsEGUWhlqQc4NDwm3bwouT8X@salt.db.elephantsql.com:5432/ieigwssk"
 
 def intialize_firebase():
     config = {

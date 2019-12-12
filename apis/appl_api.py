@@ -40,8 +40,8 @@ def token_required(f):
     def decorated(*args, **kwargs):
         token = None
 
-        if 'aapl_token' in request.headers:
-            token = request.headers['aapl_token']
+        if 'token' in request.headers:
+            token = request.headers['token']
         if not token:
             return jsonify({'message': 'Token Missing'}), 401
         try:
@@ -68,14 +68,17 @@ def get_price():
 @token_required
 def buy_shares(current_user):
     amount = request.args.get('amount')
+   
     price = aapl_price()['quotes']['quote']['last']
     buy = round(float(amount) * price, 2)
     data = {
-        'user': current_user, 'symbol': 'AAPL', "share_price": price,
+        'user': current_user, 
+        'symbol': 'AAPL', 
+        "share_price": price,
         "shares_bought": amount,
         "created_at": datetime.datetime.utcnow().strftime(
             '%Y-%m-%dT%H:%M:%S.%f%z'),
-        "payment": price}
+        "payment": buy}
     
     output = []
     # Gets initial amount of the apple shares
@@ -109,7 +112,8 @@ def sell_shares(current_user):
         "share_price": price,
         "shares_sold": amount,
         "created_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%f%z'),
-        "payment": sell}
+        "payment": sell
+        }
     
     output = []
     # Gets initial amount of the apple shares
