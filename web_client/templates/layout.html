@@ -20,21 +20,6 @@
 </head>
 
 <body>
-<<<<<<< HEAD
-  <header class="site-header">
-    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
-      <div class="container">
-        <a class="navbar-brand mr-4" href="/">OBS</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
-          aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarToggle">
-          <div class="navbar-nav mr-auto">
-            <a class="nav-item nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
-            <a class="nav-item nav-link" href="{{ url_for('transactions') }}">Logs</a>
-
-=======
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
@@ -63,23 +48,13 @@
                 <a class="nav-item nav-link" id="register" href="{{ url_for('register') }}">Register</a>
               {% endif %}
             </div>
->>>>>>> ba4ad1a382c4a92cc7df1fd53b77b14d05d55aed
           </div>
 
 
 
 
-          <!-- Navbar Right Side -->
-          <div class="navbar-nav">
-            {% if current_user.is_authenticated %}
-
-            <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
-            {% else %}
-            <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-            <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
-            {% endif %}
-          </div>
-        </div>
+         
+       
       </div>
     </nav>
   </header>

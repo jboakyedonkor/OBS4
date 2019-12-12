@@ -18,7 +18,7 @@ fire_db = intialize_firebase().database()
 @app.route("/home")
 @login_required
 def home():
-    return redirect(url_for('dashboard'))
+    return render_template('home.html')
 
 
 @app.route("/about")
@@ -61,12 +61,24 @@ def login():
         if user and bcrypt.check_password_hash(
                 user.password, form.password.data):
             login_user(user)
-
+            data ={
+            "email": form.email.data,
+            "status": "Success",
+            "time": str(datetime.utcnow())
+            }
+            fire_db.child('AUTH').child(str(user.username)).push(data)
 
             token = generate_token(user.username)
             return redirect(url_for('home', token=json.dumps(
                 {'token': token.decode('UTF-8')})))
         else:
+            data ={
+            "email": form.email.data,
+            "status": "Failure",
+            "time": str(datetime.utcnow())
+            }
+            email = str(user.username)
+            fire_db.child('AUTH').child(email).push(data)
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
@@ -75,6 +87,14 @@ def login():
 def logout():
     signOutUsers()
     time.sleep(2)
+    username = str(current_user.username)
+    data ={
+            "user":username,
+            "status": "Logout",
+            "time": str(datetime.utcnow())
+            }
+    
+    fire_db.child('AUTH').child(username).push(data)
     logout_user()
     return redirect(url_for('login'))
 
@@ -83,12 +103,12 @@ def logout():
 @login_required
 def dashboard():
     token = generate_token(current_user.username)
-    aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'aapl_token': token}).json()["total_shares"]
+    # aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'token': token}).json()["total_shares"]
     aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
     fb_price = requests.get('http://localhost:5002/fb/share_price').json()["Price"]
     # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
     # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
-    return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, aapl_shares=aapl_shares, fb_price=fb_price)
+    return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, fb_price=fb_price)
 
 
 @app.route("/logs")
@@ -270,8 +290,8 @@ def sellShares():
     #     tot_shares = 200000 
     #     if(tot < tot_shares):
     #         updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount)
-    #         aapl_price = requests.get('http://localhost:5001/aapl/sell/',headers=headers,params=data)
-    #         print(aapl_price)
+    #         aapl_transaction = requests.get('http://localhost:5001/aapl/sell/',headers=headers,params=data)
+    #         print(aapl_transaction)
     #         res = make_response(jsonify({"message": "OK"}), 200)
     #         print(tot)
     #         return res
