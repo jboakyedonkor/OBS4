@@ -183,13 +183,23 @@ class FBRoutesTestCase(unittest.TestCase):
         encoded = jwt.encode(payload, secret, algorithm='HS256')
 
         res = requests.post(
-            'http://localhost:5002/fb/sell',
+            'http://localhost:5002/fb/buy',
             headers={
                 'Content-Type': 'application/json',
                 'token': encoded},
             json={
                 'amount': 400}).json()
 
+        expected_res = {
+            'user': username,
+            'symbol': 'FB',
+            'share_price': res['share_price'],
+            'shares_bought': 400,
+            'created_at': res['created_at'],
+            'payment': 400 * res['share_price']
+        }
+
+        self.assertEqual(res, expected_res, 'Did not return bought transaction properly.')
         self.assertIsNotNone(res, 'Route did not return anything.')
         self.assertIsInstance(res, dict, 'Did not return valid json.')
 
@@ -208,6 +218,16 @@ class FBRoutesTestCase(unittest.TestCase):
             json={
                 'amount': 400}).json()
 
+        expected_res = {
+            'user': username,
+            'symbol': 'FB',
+            'share_price': res['share_price'],
+            'shares_sold': 400,
+            'created_at': res['created_at'],
+            'payment': 400 * res['share_price']
+        }
+
+        self.assertEqual(res, expected_res, 'Did not return sold transaction correctly.')
         self.assertIsNotNone(res, 'Route did not return anything.')
         self.assertIsInstance(res, dict, 'Did not return valid json.')
 
