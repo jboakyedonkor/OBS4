@@ -151,13 +151,10 @@ def parse_obs():
     present_obs = []
 
     for user_value in obs_log.values():
-        try:
-            for obs in user_value.values():
-                present_obs.append(obs)
-        except:
-            continue
+        for obs in user_value.values():
+            present_obs.append(obs)
 
-    return jsonify(sorted(obs_log, key=lambda i: i["time"], reverse=True))
+    return jsonify(sorted(present_obs, key=lambda i: i["time"], reverse=True))
 
 @app.route('/api/auth/admin', methods=["GET"])
 def get_auth_log():

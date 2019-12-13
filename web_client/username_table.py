@@ -1,8 +1,7 @@
 import psycopg2
 import math
 import decimal
-conn = psycopg2.connect("postgres://wxgvhaks:idl6hSvxU3pAFzs4Q7s8SQT30xyKPaiE@rajje.db.elephantsql.com:5432/wxgvhaks")
-
+conn = psycopg2.connect("postgres://kltrpniy:NkxN5nNSePdu6WIDt-UhStBqTomk7l88@rajje.db.elephantsql.com:5432/kltrpniy") 
 
 def execute_sql(command):
     cur = conn.cursor()
