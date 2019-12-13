@@ -323,7 +323,7 @@ class MsftRoutesTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    server = Process(target=microsoft_api.run)
+    server = Process(target=microsoft_api.run,args=(None,5003))
     server.start()
 
     time.sleep(4)
