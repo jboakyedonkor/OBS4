@@ -145,7 +145,7 @@ class MsftHelperTestCase (unittest.TestCase):
 class MsftRoutesTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.msft_url = "http://localhost:5003"
+        self.msft_url = "http://localhost:5000"
         self.price_route = "/share_price"
         self.buy_route = "/buy"
         self.sell_route = "/sell"
