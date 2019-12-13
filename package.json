@@ -1,23 +1,24 @@
 {
-  "name": "obs4",
+  "name": "cypress",
   "version": "1.0.0",
-  "description": "obs4",
-  "main": "index.js",
+  "description": "End to End test",
+  "main": "sample.spec.js",
+  "dependencies": {
+    "cypress": "^3.6.1"
+  },
+  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "e2e": "cypress open",
+    "cy:run": "cypress run"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kwaku97/OBS4.git"
   },
-  "author": "Team 4",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/kwaku97/OBS4/issues"
   },
-  "homepage": "https://github.com/kwaku97/OBS4#readme",
-  "dependencies": {},
-  "devDependencies": {
-    "cyprus": "^1.0.0"
-  }
+  "homepage": "https://github.com/kwaku97/OBS4#readme"
 }
