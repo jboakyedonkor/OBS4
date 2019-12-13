@@ -14,17 +14,17 @@ from goog_api import app, generate_token, get_price, token_check, buy_shares, se
 class TestGoogApi(unittest.TestCase):
     def test_check_share_price_route(self):
         c = app.test_client()
-        response = c.get('/share_price')
+        response = c.get('/goog/share_price')
         self.assertEqual(response.status_code, 200)
 
     def test_check_buy_route(self):
         c = app.test_client()
-        response = c.get('/buy')
+        response = c.get('/goog/buy')
         self.assertEqual(response.status_code, 200)
 
     def test_check_sell_route(self):
         c = app.test_client()
-        response = c.get('/sell')
+        response = c.get('/goog/sell')
         self.assertEqual(response.status_code, 200)
 
     def test_generate_token(self):
