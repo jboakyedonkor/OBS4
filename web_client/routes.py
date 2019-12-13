@@ -151,8 +151,11 @@ def parse_obs():
     present_obs = []
 
     for user_value in obs_log.values():
-        for obs in user_value.values():
-            present_obs.append(obs)
+        try:
+            for obs in user_value.values():
+                present_obs.append(obs)
+        except:
+            continue
 
     return jsonify(sorted(obs_log, key=lambda i: i["time"], reverse=True))
 
