@@ -12,7 +12,7 @@ dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 
 
 class TestAPI(unittest.TestCase):
-
+    #Unit
     def test_share_price(self):
         api_url = "https://sandbox.tradier.com/v1/markets/quotes"
 
@@ -28,7 +28,7 @@ class TestAPI(unittest.TestCase):
         test_val = response.json()
         correctValue = round(test_val['quotes']['quote']['last'], 2)
         self.assertEqual(round(price, 2), correctValue)
-
+    #Unit
     def test_aapl_buy(self):
         self.aapl_url = "http://localhost:5001"
         self.aapl_buy = "/aapl/buy/"
@@ -45,7 +45,7 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(r['symbol'], "AAPL")
         self.assertEqual(r['shares_bought'], '200')
         self.assertEqual(r['user'], 'test')
-
+    #Unit
     def test_aapl_sell(self):
         self.aapl_url = "http://localhost:5001"
         self.aapl_sell = "/aapl/sell/"

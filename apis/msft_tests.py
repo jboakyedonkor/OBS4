@@ -17,7 +17,7 @@ class MsftHelperTestCase (unittest.TestCase):
                 os.sep, os.sep))
         self.secret_key = os.getenv('SECRET_KEY')
         self.api_key = os.getenv('MSFT_TRADIER_API_KEY')
-
+    #Unit
     def test_get_quote(self):
         api_url = "https://sandbox.tradier.com/v1/markets/quotes"
 
@@ -41,7 +41,7 @@ class MsftHelperTestCase (unittest.TestCase):
             api_response['description'],
             test_json['quotes']['quote']['description'],
             "not the same company")
-
+    #Unit
     def test_get_token(self):
         test_header = {'token': 'check'}
         test_header2 = {'Authorizationd': 'check'}
@@ -58,7 +58,7 @@ class MsftHelperTestCase (unittest.TestCase):
             token2,
             None,
             'The was not authorization header or an empty header')
-
+    #Unit
     def test_generate_token(self):
 
         token = generate_token("test", self.secret_key, seconds=10, minutes=0)
@@ -88,7 +88,7 @@ class MsftHelperTestCase (unittest.TestCase):
             decoded_test_token['exp'],
             decoded_token['exp'],
             "Not a close enough expiration time")
-
+    #Unit
     def test_verify_token(self):
 
         exp_time = datetime.utcnow() + timedelta(seconds=10)
@@ -155,7 +155,7 @@ class MsftRoutesTestCase(unittest.TestCase):
                 os.sep, os.sep))
         self.secret_key = os.getenv('SECRET_KEY')
         self.api_key = os.getenv('MSFT_TRADIER_API_KEY')
-
+    #Unit
     def test_get_price(self):
         token = generate_token('testuser', self.secret_key)
         headers = {'token': token.decode()}
@@ -195,7 +195,7 @@ class MsftRoutesTestCase(unittest.TestCase):
             api_response2['error'],
             "token expired",
             "incorrect error response")
-
+    #Unit
     def test_post_buy(self):
 
         token = generate_token('testuser', self.secret_key)
@@ -258,7 +258,7 @@ class MsftRoutesTestCase(unittest.TestCase):
             api_response2['error'],
             "token expired",
             "incorrect error response")
-
+    #Unit
     def test_post_sell(self):
         token = generate_token('testuser', self.secret_key)
 

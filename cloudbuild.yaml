@@ -1,6 +1,6 @@
 steps:
 
-  # build
+  # =====build=====
 - name: 'gcr.io/cloud-builders/docker'
   id: ' BUILD BASE IMAGE'
   args: 
@@ -62,15 +62,16 @@ steps:
   - '--build-arg'
   - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
   - '--build-arg'
-  - 'FB_URI_G=temp_uri'
+  - 'FB_URI_G=https://fb-api-kt5lmc6w4q-ue.a.run.app'
   - '--build-arg'
-  - 'AAPL_URI_G=temp_uri'
+  - 'AAPL_URI_G=https://aapl-api-kt5lmc6w4q-ue.a.run.app'
   - '--build-arg'
-  - 'GOOG_URI_G=temp_uri'
+  - 'GOOG_URI_G=https://goog-api-kt5lmc6w4q-ue.a.run.app'
   - '--build-arg'
-  - 'MSFT_URI_G=temp_uri'
+  - 'MSFT_URI_G=https://msft-api-kt5lmc6w4q-ue.a.run.app'
   - '.'
   
+# =====test=====
 #msft tests
 - name: 'gcr.io/$PROJECT_ID/obs4'
   id: 'RUN MSFT API TESTS'
@@ -99,12 +100,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/obs4'
   id: 'RUN LOGIN TESTS'
   entrypoint: 'python'
-  args: ['web_client/login_tests.py']
-
-#cypress tests
-- name: 'gcr.io/cloud-builders/docker'
-  id: 'RUN CYPRESS TESTS'
-  args: ['run','gcr.io/$PROJECT_ID/obs4', '/bin/bash', '-c', '"cd OSB4; python main.py &;node_modules/bin/cypress run cypress/cypress/integration/sample.spec.js;exit"']
+  args: ['login_tests.py']
 
 # build  microsoft container
 - name: 'gcr.io/cloud-builders/docker'
@@ -162,7 +158,7 @@ steps:
   id  : 'STORE WEB API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_web']
 
-#deploy
+# =====deploy=====
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'DEPLOY MSFT API SERVICE'
   args:
@@ -224,19 +220,19 @@ steps:
   - '--allow-unauthenticated'
 
 
-# - name: 'gcr.io/cloud-builders/gcloud'
-#   id: 'DEPLOY OBS4 WEB SERVICE'
-#   args:
-#   - 'beta'
-#   - 'run'
-#   - 'deploy'
-#   - 'fb-api'
-#   - '--image'
-#   - 'gcr.io/$PROJECT_ID/obs4_web'
-#   - '--region'
-#   - 'us-east1'
-#   - '--platform'
-#   - 'managed'
-#   - '--allow-unauthenticated'
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY OBS4 WEB SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'web-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_web'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
 
   
