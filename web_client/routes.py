@@ -146,32 +146,37 @@ def dashboard():
 @app.route("/logs")
 @login_required
 def transactions():
-    all_transactions = requests.get('https://0.0.0.0:8080/transaction_parse').json()
-    all_auth_log = requests.get('https://0.0.0.0:8080/auth_parse').json()
-    all_obs_log = requests.get('https://0.0.0.0:8080/obs_parse').json()
+#     all_transactions = requests.get('https://0.0.0.0:8080/transaction_parse').json()
+#     all_auth_log = requests.get('https://0.0.0.0:8080/auth_parse').json()
+#     all_obs_log = requests.get('https://0.0.0.0:8080/obs_parse').json()
+
+    all_transactions = parse_trans()
+    all_auth_log = parse_auth()
+    all_obs_log = parse_obs()
     return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log, obs_log=all_obs_log)
 
-@app.route('/auth_parse', methods=["GET", "POST"])
+#@app.route('/auth_parse', methods=["GET", "POST"])
 def parse_auth():
-    auth_log = requests.get('https://0.0.0.0:8080/api/auth/admin').json()
+    auth_log = fire_db.child('AUTH').get().val()
+    #auth_log = requests.get('https://0.0.0.0:8080/api/auth/admin').json()
     present_auth = []
 
     for user_value in auth_log.values():
         for trans in user_value.values():
             present_auth.append(trans)
     
-    return jsonify(sorted(present_auth, key=lambda i: i["time"], reverse=True))
+    return sorted(present_auth, key=lambda i: i["time"], reverse=True)
 
-@app.route('/obs_parse', methods=['GET', 'POST'])
+#@app.route('/obs_parse', methods=['GET', 'POST'])
 def parse_obs():
-    obs_log = requests.get('https://0.0.0.0:8080/api/obs/admin').json()
+    obs_log = fire_db.child('OBS').get().val()
+    #obs_log = requests.get('https://0.0.0.0:8080/api/obs/admin').json()
     present_obs = []
 
     for user_value in obs_log.values():
         for obs in user_value.values():
             present_obs.append(obs)
-
-    return jsonify(sorted(present_obs, key=lambda i: i["time"], reverse=True))
+    return sorted(present_obs, key=lambda i: i["time"], reverse=True)
 
 @app.route('/api/auth/admin', methods=["GET"])
 def get_auth_log():
@@ -188,9 +193,11 @@ def get_transactions():
     all_transactions = fire_db.child('transactions').get()
     return jsonify(all_transactions.val())
 
-@app.route('/transaction_parse', methods=["GET", "POST"])
+#@app.route('/transaction_parse', methods=["GET", "POST"])
 def parse_trans():
-    all_transactions = requests.get('https://0.0.0.0:8080/api/transactions/admin').json()
+    all_transactions = fire_db.child('transactions').get()
+    all_transactions = all_transactions.val()
+    #all_transactions = requests.get('https://0.0.0.0:8080/api/transactions/admin').json()
     present_trans = []
 
     for user_value in all_transactions.values():
@@ -206,7 +213,7 @@ def parse_trans():
         except:
             continue
 
-    return jsonify(sorted(present_trans, key=lambda i: i["created_at"], reverse=True))
+    return sorted(present_trans, key=lambda i: i["created_at"], reverse=True)
 
 
 def generate_token(username, seconds=0, minutes=30, hours=0):
@@ -324,7 +331,7 @@ def buyShares():
         tot = buyAmount * msft_price
         if (tot < cash):
             updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
-            msft_buy = requests.post(msft_uri+'/localhost:5003/msft/buy/', headers=headers, json={'shares':buyAmount})
+            msft_buy = requests.post(msft_uri+'/msft/buy/', headers=headers, json={'shares':buyAmount})
             print(msft_buy)
 
             res = make_response(jsonify({"message": "OK"}), 200)
