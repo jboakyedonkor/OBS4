@@ -131,7 +131,8 @@ def dashboard():
 def transactions():
     all_transactions = requests.get('http://localhost:5000/transaction_parse').json()
     all_auth_log = requests.get('http://localhost:5000/auth_parse').json()
-    return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log)
+    all_obs_log = requests.get('http://localhost:5000/obs_parse').json()
+    return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log, obs_log=all_obs_log)
 
 @app.route('/auth_parse', methods=["GET", "POST"])
 def parse_auth():
