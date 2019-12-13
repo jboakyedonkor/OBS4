@@ -10,11 +10,23 @@ import requests
 from datetime import datetime, timedelta
 import jwt
 import pyrebase
+import os
+import dotenv
+
+env_file = ".{}config{}.env".format(os.sep, os.sep)
+dotenv.load_dotenv(dotenv_path=env_file)
+
 
 fire_db = intialize_firebase().database()
 fb_price = 202.0
 msft_price = 151.0
 goog_price = 1300.0
+
+msft_uri = os.getenv("MSFT_URI")
+aapl_uri = os.getenv("AAPL_URI")
+fb_uri = os.getenv("FB_URI")
+goog_uri = os.getenv("GOOG_URI")
+
 @app.route("/")
 @app.route("/home")
 @login_required
@@ -105,10 +117,15 @@ def logout():
 def dashboard():
     token = generate_token(current_user.username)
     # aapl_shares = requests.get('http://localhost:5001/aapl/share_amount',headers={'token': token}).json()["total_shares"]
-    aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
-    # fb_price = requests.get('http://localhost:5002/fb/share_price').json()["Price"]
-    # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-    # goog_price = requests.get('http://localhost:5001/goog/price').json()["Price"]
+    aapl_price = requests.get(aapl_uri+'/aapl/share_price').json()["Price"]
+    fb_price = requests.get(fb_uri+'/fb/share_price',headers={"token":token}).json()
+    fb_price = fb_price["Price"]
+    msft_price = requests.get(msft_uri+'/msft/share_price',headers={"token":token}).json()
+    print(msft_price)
+    msft_price = msft_price["Price"]
+    print(msft_price)
+    goog_price = requests.get(goog_uri+'/goog/share_price').json()
+    goog_price = goog_price["Price"]
     # return render_template('dashboard.html', title='Dashboard', aapl_price=aapl_price, fb_price=fb_price)
     return render_template('dashboard.html', title='Dashboard',
                            user_networth=str(getUserNetworth(str(current_user.username), aapl_price,
@@ -288,11 +305,11 @@ def buyShares():
 
     # retrieve cash in account if symbol is AAPL and buyAmount *appl_shares < cash then store
     if (symPass == 'aapl'):
-        aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+        aapl_price = requests.get(aapl_uri+'/aapl/share_price').json()["Price"]
         tot = buyAmount * aapl_price
         if (tot < cash):
             updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
-            aapl_buy = requests.get('http://localhost:5001/aapl/buy/', headers=headers, params=data)
+            aapl_buy = requests.get(aapl_uri+'/aapl/buy/', headers=headers, params=data)
             print(aapl_buy)
 
             res = make_response(jsonify({"message": "OK"}), 200)
@@ -302,51 +319,51 @@ def buyShares():
             # print(tot)
             return res
 
-    # if (symPass == 'msft'):
-    #     msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
-    #     tot = buyAmount * msft_price
-    #     if (tot < cash):
-    #         updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
-    #         msft_buy = requests.get('http://localhost:5001/msft/buy/', headers=headers, params=data)
-    #         print(msft_buy)
+    if (symPass == 'msft'):
+        msft_price = requests.get(msft_uri+'/msft/share_price',headers=headers).json()["Price"]
+        tot = buyAmount * msft_price
+        if (tot < cash):
+            updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
+            msft_buy = requests.post(msft_uri+'/localhost:5003/msft/buy/', headers=headers, json={'shares':buyAmount})
+            print(msft_buy)
 
-    #         res = make_response(jsonify({"message": "OK"}), 200)
-    #         # print(tot)
-    #         return res
-    #     else:
-    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
-    #         # print(tot)
-    #         return res
+            res = make_response(jsonify({"message": "OK"}), 200)
+            # print(tot)
+            return res
+        else:
+            res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+            # print(tot)
+            return res
 
-    # if (symPass == 'fb'):
-    #     fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
-    #     tot = buyAmount * fb_price
-    #     if (tot < cash):
-    #         updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
+    if (symPass == 'fb'):
+        fb_price = requests.get(fb_uri+'/fb/share_price').json()["Price"]
+        tot = buyAmount * fb_price
+        if (tot < cash):
+            updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
 
-    #         fb_buy = requests.get('http://localhost:5001/fb/buy/', headers=headers, params=data)
-    #         print(fb_buy)
-    #         res = make_response(jsonify({"message": "OK"}), 200)
-    #         # print(tot)
-    #         return res
-    #     else:
-    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
-    #         # print(tot)
-    #         return res
+            fb_buy = requests.post(fb_uri+'/fb/buy/', headers=headers, json={'shares':buyAmount})
+            print(fb_buy)
+            res = make_response(jsonify({"message": "OK"}), 200)
+            # print(tot)
+            return res
+        else:
+            res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+            # print(tot)
+            return res
 
-    # if (symPass == 'googl'):
-    #     goog_price = requests.get('http://localhost:5001/goog/share_price').json()["Price"]
-    #     tot = buyAmount * goog_price
-    #     if (tot < cash):
-    #         updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
-    #         goog_buy = requests.get('http://localhost:5001/goog/buy/', headers=headers, params=data)
-    #         print(goog_buy)
-    #         res = make_response(jsonify({"message": "OK"}), 200)
-    #         return res
-    #     else:
-    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
-    #         # print(tot)
-    #         return res
+    if (symPass == 'googl'):
+        goog_price = requests.get(goog_uri+'/goog/share_price').json()["Price"]
+        tot = buyAmount * goog_price
+        if (tot < cash):
+            updateShares(str(current_user.username), returnAccount(), symPass, True, buyAmount, tot)
+            goog_buy = requests.get(goog_uri+'/goog/buy/', headers=headers, params=data)
+            print(goog_buy)
+            res = make_response(jsonify({"message": "OK"}), 200)
+            return res
+        else:
+            res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+            # print(tot)
+            return res
 
     res = make_response(jsonify({"message": "OK"}), 200)
 
@@ -374,7 +391,7 @@ def sellShares():
     tot_shares = (getShareNum(str(current_user.username), returnAccount(), symPass))
 
     if (symPass == 'aapl'):
-        #aapl_price = requests.get('http://localhost:5001/aapl/share_price').json()["Price"]
+        aapl_price = requests.get(aapl_uri+'/aapl/share_price').json()["Price"]
 
         tot = sellAmount * aapl_price
         # add tot to cash val
@@ -382,7 +399,7 @@ def sellShares():
         # get current amount of appl shares and check if you are trying to sell less then the one you have
         if (sellAmount <= tot_shares):
             updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
-
+            aapl_sell = requests.get(aapl_uri+'/aapl/sell/', headers=headers, params=data)
             res = make_response(jsonify({"message": "OK"}), 200)
 
             return res
@@ -391,56 +408,56 @@ def sellShares():
             # print(tot)
             return res
 
-    # if (symPass == 'msft'):
-    #     # msft_price = requests.get('http://localhost:5001/msft/share_price').json()["Price"]
+    if (symPass == 'msft'):
+        msft_price = requests.get(msft_uri+'/msft/share_price',headers=headers).json()["Price"]
+        
+        tot = sellAmount * msft_price
+        # add tot to cash val
+        # subtract from appl shares
+        # get current amount of appl shares and check if you are trying to sell less then the one you have
+        if (sellAmount <= tot_shares):
+            updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
+            msft_sell = requests.post(msft_uri+'/msft/sell/', headers=headers, json={'shares':sellAmount})
+            res = make_response(jsonify({"message": "OK"}), 200)
+            return res
+        else:
+            res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+            # print(tot)
+            return res
 
-    #     tot = sellAmount * msft_price
-    #     # add tot to cash val
-    #     # subtract from appl shares
-    #     # get current amount of appl shares and check if you are trying to sell less then the one you have
-    #     if (sellAmount <= tot_shares):
-    #         updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
+    if (symPass == 'fb'):
+        fb_price = requests.get(fb_uri+'/fb/share_price').json()["Price"]
+        
+        tot = sellAmount * fb_price
+        # add tot to cash val
+        # subtract from appl shares
+        # get current amount of appl shares and check if you are trying to sell less then the one you have
+        if (sellAmount <= tot_shares):
+            updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
+            fb_sell = requests.post(fb_uri+'/fb/sell/', headers=headers, json={'amount':sellAmount})
+            res = make_response(jsonify({"message": "OK"}), 200)
 
-    #         res = make_response(jsonify({"message": "OK"}), 200)
-    #         return res
-    #     else:
-    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
-    #         # print(tot)
-    #         return res
+            return res
+        else:
+            res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+            # print(tot)
+            return res
 
-    # if (symPass == 'fb'):
-    #     # fb_price = requests.get('http://localhost:5001/fb/share_price').json()["Price"]
+    if (symPass == 'googl'):
+        goog_price = requests.get(goog_uri+'/goog/share_price').json()["Price"]
 
-    #     tot = sellAmount * fb_price
-    #     # add tot to cash val
-    #     # subtract from appl shares
-    #     # get current amount of appl shares and check if you are trying to sell less then the one you have
-    #     if (sellAmount <= tot_shares):
-    #         updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
-
-    #         res = make_response(jsonify({"message": "OK"}), 200)
-
-    #         return res
-    #     else:
-    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
-    #         # print(tot)
-    #         return res
-
-    # if (symPass == 'googl'):
-    #     # goog_price = requests.get('http://localhost:5001/goog/share_price').json()["Price"]
-
-    #     tot = sellAmount * goog_price
-    #     # add tot to cash val
-    #     # subtract from appl shares
-    #     # get current amount of appl shares and check if you are trying to sell less then the one you have
-    #     if (sellAmount <= tot_shares):
-    #         updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
-
-    #         res = make_response(jsonify({"message": "OK"}), 200)
-    #         return res
-    #     else:
-    #         res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
-    #         return res
+        tot = sellAmount * goog_price
+        # add tot to cash val
+        # subtract from appl shares
+        # get current amount of appl shares and check if you are trying to sell less then the one you have
+        if (sellAmount <= tot_shares):
+            updateShares(str(current_user.username), returnAccount(), symPass, False, sellAmount, tot)
+            googl_sell = requests.get(goog_uri+'/goog/sell/', headers=headers, params=data)
+            res = make_response(jsonify({"message": "OK"}), 200)
+            return res
+        else:
+            res = make_response(jsonify({"Error": "Not Enough Funds"}), 409)
+            return res
 
 
     res = make_response(jsonify({"message": "OK"}), 200)
