@@ -100,12 +100,12 @@ class FBRoutesTestCase(unittest.TestCase):
         self.assertEqual(res['symbol'], 'FB', 'Incorrect symbol.')
         self.assertEqual(res['name'], 'Facebook Inc', 'Incorrect description.')
         self.assertIsInstance(
-            res['share_price'],
+            res['Price'],
             float,
             'Incorrect data type. Should be float. Is ' +
             str(
                 type(
-                    res['share_price'])))
+                    res['Price'])))
 
     def test_create_transaction(self):
         trans_type = "TEST"

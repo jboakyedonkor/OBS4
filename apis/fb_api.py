@@ -160,7 +160,7 @@ def sell_share():
             'payment': num_owned * price,
             'trans_type': 'SELL',
             'amount': num_owned,
-            'user': username,
+            'username': username,
             'price': price})
 
     return jsonify(
