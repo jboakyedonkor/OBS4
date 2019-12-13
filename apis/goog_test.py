@@ -12,21 +12,22 @@ from goog_api import app, generate_token, get_price, token_check, buy_shares, se
 
 
 class TestGoogApi(unittest.TestCase):
+    #Unit
     def test_check_share_price_route(self):
         c = app.test_client()
         response = c.get('/goog/share_price')
         self.assertEqual(response.status_code, 200)
-
+    #Unit
     def test_check_buy_route(self):
         c = app.test_client()
         response = c.get('/goog/buy')
         self.assertEqual(response.status_code, 200)
-
+    #Unit
     def test_check_sell_route(self):
         c = app.test_client()
         response = c.get('/goog/sell')
         self.assertEqual(response.status_code, 200)
-
+    #Unit
     def test_generate_token(self):
         secret_key = os.getenv('SECRET_KEY')
         current_time = datetime.utcnow()
@@ -56,7 +57,7 @@ class TestGoogApi(unittest.TestCase):
 
         self.assertEqual(decode_toke1['username'], decode_toke2['username'],
                          "Token username match")
-
+    #Unit
     def test_get_price(self):
         test_api_url = "https://sandbox.tradier.com/v1/markets/quotes"
         test_api_key = "Jo5Qmiac0PqN8dG360REQq8oGbNY"

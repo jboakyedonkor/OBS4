@@ -15,7 +15,7 @@ class FBRoutesTestCase(unittest.TestCase):
     def setUp(self):
         dotenv.load_dotenv(dotenv_path=r'.\\config\.env')
         self.secret_key = os.getenv('SECRET_KEY')
-
+    #Unit
     def test_get_token(self):
         test_correct_token_header = {'token': '123'}
         test_incorrect_token_header = {'towkinz': '456'}
@@ -25,7 +25,7 @@ class FBRoutesTestCase(unittest.TestCase):
 
         self.assertEqual(correct_token, '123', 'Token not retrieved correctly')
         self.assertEqual(incorrect_token, None, 'Token did not send. Should not have returned token.')
-
+    #Unit
     def test_token_verify(self):
         exp_time = datetime.utcnow() + timedelta(seconds=10)
 
@@ -55,7 +55,7 @@ class FBRoutesTestCase(unittest.TestCase):
         self.assertEqual(verify, True, 'Token verification should return True.')
         self.assertEqual(verify_2, False, 'Token should have expired.')
         self.assertEqual(verify_4, False, 'Token should return invalid due to invalid signature.')
-
+    #Unit
     def test_verify_user(self):
         payload = {'username': 'test_user',
                    'exp': datetime.utcnow() + timedelta(minutes=30)}
@@ -94,7 +94,7 @@ class FBRoutesTestCase(unittest.TestCase):
         self.assertEqual(res_invalid_token['description'], 'User not authenticated', 'Did not respond with correct server description.')
         self.assertEqual(res_invalid_token['authenticated'], False, 'Did not authenticate properly.')
         self.assertEqual(res_invalid_token['user'], None, 'Did not respond with no user.')
-
+    #Unit
     def test_get_price(self):
         res = requests.get('http://localhost:5002/fb/share_price').json()
         self.assertEqual(res['symbol'], 'FB', 'Incorrect symbol.')
@@ -106,7 +106,7 @@ class FBRoutesTestCase(unittest.TestCase):
             str(
                 type(
                     res['Price'])))
-
+    #Unit
     def test_create_transaction(self):
         trans_type = "TEST"
         payment = 2020
@@ -174,7 +174,7 @@ class FBRoutesTestCase(unittest.TestCase):
         self.assertEqual(res_test, test_transaction, 'Route did not return transaction properly.')
         self.assertEqual(res_bought, bought_transaction, 'Route did not return transaction properly.')
         self.assertEqual(res_sold, sold_transaction, 'Route did not return transaction properly.')
-
+    #Unit
     def test_buy_share(self):
         username = 'fake_user'
         secret = self.secret_key
@@ -202,7 +202,7 @@ class FBRoutesTestCase(unittest.TestCase):
         self.assertEqual(res, expected_res, 'Did not return bought transaction properly.')
         self.assertIsNotNone(res, 'Route did not return anything.')
         self.assertIsInstance(res, dict, 'Did not return valid json.')
-
+    #Unit
     def test_sell_share(self):
         username = 'fake_user'
         secret = self.secret_key
