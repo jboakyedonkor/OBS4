@@ -11,13 +11,13 @@ def create_firebase_app():
     env_file = ".{}config{}.env".format(os.sep, os.sep)
     dotenv.load_dotenv(dotenv_path=env_file)
     config = {
-        "apiKey": os.getenv("MSFT_FB_API_KEY"),
-        "authDomain": os.getenv("MSFT_FB_AUTH_DOMAIN"),
-        "databaseURL": os.getenv("MSFT_FB_DB_URL"),
-        "projectId": os.getenv("MSFT_FB_PROJECT_ID"),
-        "storageBucket": os.getenv("MSFT_FB_STORAGE_BUCKET"),
-        "messagingSenderId": os.getenv("MSFT_FB_SENDER_ID"),
-        "appId": os.getenv("MSFT_FB_APP_ID")
+        "apiKey": os.getenv("MSFT_FIREBASE_API_KEY"),
+        "authDomain": os.getenv("MSFT_FIREBASE_AUTH_DOMAIN"),
+        "databaseURL": os.getenv("MSFT_FIREBASE_DB_URL"),
+        "projectId": os.getenv("MSFT_FIREBASE_PROJECT_ID"),
+        "storageBucket": os.getenv("MSFT_FIREBASE_STORAGE_BUCKET"),
+        "messagingSenderId": os.getenv("MSFT_FIREBASE_SENDER_ID"),
+        "appId": os.getenv("MSFT_FIREBASE_APP_ID")
     }
    # print(config)
     if config["apiKey"]:
