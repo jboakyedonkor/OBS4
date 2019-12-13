@@ -62,13 +62,13 @@ steps:
   - '--build-arg'
   - 'FB_FIREBASE_STORAGE_BUCKET_G=${_FB_FIREBASE_STORAGE_BUCKET}'
   - '--build-arg'
-  - 'FB_URI_G=temp_uri'
+  - 'FB_URI_G=https://fb-api-kt5lmc6w4q-ue.a.run.app'
   - '--build-arg'
-  - 'AAPL_URI_G=temp_uri'
+  - 'AAPL_URI_G=https://aapl-api-kt5lmc6w4q-ue.a.run.app'
   - '--build-arg'
-  - 'GOOG_URI_G=temp_uri'
+  - 'GOOG_URI_G=https://goog-api-kt5lmc6w4q-ue.a.run.app'
   - '--build-arg'
-  - 'MSFT_URI_G=temp_uri'
+  - 'MSFT_URI_G=https://msft-api-kt5lmc6w4q-ue.a.run.app'
   - '.'
   
 # =====test=====
@@ -220,19 +220,19 @@ steps:
   - '--allow-unauthenticated'
 
 
-# - name: 'gcr.io/cloud-builders/gcloud'
-#   id: 'DEPLOY OBS4 WEB SERVICE'
-#   args:
-#   - 'beta'
-#   - 'run'
-#   - 'deploy'
-#   - 'fb-api'
-#   - '--image'
-#   - 'gcr.io/$PROJECT_ID/obs4_web'
-#   - '--region'
-#   - 'us-east1'
-#   - '--platform'
-#   - 'managed'
-#   - '--allow-unauthenticated'
+- name: 'gcr.io/cloud-builders/gcloud'
+  id: 'DEPLOY OBS4 WEB SERVICE'
+  args:
+  - 'beta'
+  - 'run'
+  - 'deploy'
+  - 'web-api'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/obs4_web'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
 
   
