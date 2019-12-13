@@ -227,3 +227,4 @@ def getCashAcc(account, username):
 def drop_user_table():
     command = """ DROP TABLE user_table """
     execute_sql(command)
+create_user_table()

@@ -145,7 +145,7 @@ class MsftHelperTestCase (unittest.TestCase):
 class MsftRoutesTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.msft_url = "http://localhost:5000"
+        self.msft_url = "http://localhost:5003"
         self.price_route = "/msft/share_price"
         self.buy_route = "/msft/buy"
         self.sell_route = "/msft/sell"
@@ -323,7 +323,7 @@ class MsftRoutesTestCase(unittest.TestCase):
 
 if __name__ == "__main__":
 
-    server = Process(target=microsoft_api.run)
+    server = Process(target=microsoft_api.run,args=(None,5003))
     server.start()
 
     time.sleep(4)

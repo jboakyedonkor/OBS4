@@ -100,12 +100,12 @@ class FBRoutesTestCase(unittest.TestCase):
         self.assertEqual(res['symbol'], 'FB', 'Incorrect symbol.')
         self.assertEqual(res['name'], 'Facebook Inc', 'Incorrect description.')
         self.assertIsInstance(
-            res['share_price'],
+            res['Price'],
             float,
             'Incorrect data type. Should be float. Is ' +
             str(
                 type(
-                    res['share_price'])))
+                    res['Price'])))
 
     def test_create_transaction(self):
         trans_type = "TEST"
@@ -236,9 +236,9 @@ class FBRoutesTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # server = Process(target=app.run)
-    # server.start()
-    # time.sleep(2)
+    server = Process(target=app.run, args=(None,5002))
+    server.start()
+    time.sleep(2)
     unittest.main(exit=False)
-    # server.terminate()
-    # server.join()
+    server.terminate()
+    server.join()
