@@ -1,6 +1,6 @@
 steps:
 
-  # build
+  # =====build=====
 - name: 'gcr.io/cloud-builders/docker'
   id: ' BUILD BASE IMAGE'
   args: 
@@ -71,6 +71,7 @@ steps:
   - 'MSFT_URI_G=temp_uri'
   - '.'
   
+# =====test=====
 #msft tests
 - name: 'gcr.io/$PROJECT_ID/obs4'
   id: 'RUN MSFT API TESTS'
@@ -162,7 +163,7 @@ steps:
   id  : 'STORE WEB API CONTAINER IMAGE'
   args: ['push','gcr.io/$PROJECT_ID/obs4_web']
 
-#deploy
+# =====deploy=====
 - name: 'gcr.io/cloud-builders/gcloud'
   id: 'DEPLOY MSFT API SERVICE'
   args:
