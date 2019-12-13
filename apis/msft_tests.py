@@ -43,7 +43,7 @@ class MsftHelperTestCase (unittest.TestCase):
             "not the same company")
 
     def test_get_token(self):
-        test_header = {'Authorization': 'check'}
+        test_header = {'token': 'check'}
         test_header2 = {'Authorizationd': 'check'}
 
         token = get_token(test_header)
@@ -67,7 +67,6 @@ class MsftHelperTestCase (unittest.TestCase):
         test_payload = {
 
             'username': "test",
-            'iss': 'Microsoft_API',
             'exp': exp_time
         }
 
@@ -86,11 +85,6 @@ class MsftHelperTestCase (unittest.TestCase):
             "username is not the same")
 
         self.assertEqual(
-            decoded_test_token['iss'],
-            decoded_token['iss'],
-            "invalid issuer")
-
-        self.assertEqual(
             decoded_test_token['exp'],
             decoded_token['exp'],
             "Not a close enough expiration time")
@@ -101,7 +95,6 @@ class MsftHelperTestCase (unittest.TestCase):
         test_payload = {
 
             'username': "test",
-            'iss': 'Microsoft_API',
             'exp': exp_time
         }
 
@@ -120,7 +113,6 @@ class MsftHelperTestCase (unittest.TestCase):
         test_payload2 = {
 
             'username': "testuser",
-            'iss': 'Micrsosoft_API',
             'exp': exp_time
         }
 
@@ -145,9 +137,6 @@ class MsftHelperTestCase (unittest.TestCase):
         self.assertEqual(output2, (False, "token expired"),
                          " token show have expired")
 
-        # checks invalid issuer
-        self.assertEqual(output3, (False, 'invalid iss'),
-                         "token should have been rejected as invalid issuer")
         # checks for invalid signature
         self.assertEqual(output4, (False, "invalid signature"),
                          "should have been rejected as an invalid signature")
@@ -169,7 +158,7 @@ class MsftRoutesTestCase(unittest.TestCase):
 
     def test_get_price(self):
         token = generate_token('testuser', self.secret_key)
-        headers = {'Authorization': token.decode()}
+        headers = {'token': token.decode()}
         api_response = requests.get(
             self.msft_url + self.price_route,
             headers=headers).json()
@@ -180,7 +169,7 @@ class MsftRoutesTestCase(unittest.TestCase):
             seconds=1,
             minutes=0)
         time.sleep(2)
-        headers = {'Authorization': token2.decode()}
+        headers = {'token': token2.decode()}
         api_response2 = requests.get(
             self.msft_url + self.price_route,
             headers=headers).json()
@@ -211,7 +200,7 @@ class MsftRoutesTestCase(unittest.TestCase):
 
         token = generate_token('testuser', self.secret_key)
 
-        headers = {'Authorization': token.decode()}
+        headers = {'token': token.decode()}
         json_data = {'shares': 45}
 
         api_response = requests.post(
@@ -227,7 +216,7 @@ class MsftRoutesTestCase(unittest.TestCase):
 
         time.sleep(2)
 
-        headers = {'Authorization': token2.decode()}
+        headers = {'token': token2.decode()}
 
         api_response2 = requests.post(
             self.msft_url + self.buy_route,
@@ -273,7 +262,7 @@ class MsftRoutesTestCase(unittest.TestCase):
     def test_post_sell(self):
         token = generate_token('testuser', self.secret_key)
 
-        headers = {'Authorization': token.decode()}
+        headers = {'token': token.decode()}
         json_data = {'shares': 45}
 
         api_response = requests.post(
@@ -302,7 +291,7 @@ class MsftRoutesTestCase(unittest.TestCase):
         api_response4 = requests.post(
             self.msft_url + self.sell_route,
             headers={
-                'Authorization': '223443dd'}).json()
+                'token': '223443dd'}).json()
 
         self.assertEqual(
             ('error' in api_response4.keys()),
