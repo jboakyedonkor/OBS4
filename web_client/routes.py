@@ -206,6 +206,13 @@ def getUser():
 @app.route("/addFunds", methods=["POST"])
 def addFunds():
     # Retrieve amount and its in JSON form
+    new_record = {
+        'email': current_user.username, 
+        'action': 'Added funds.', 
+        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+    }
+    fire_db.child('OBS').child(current_user.username).push(new_record)
+
     req = request.get_json()
 
 
@@ -220,6 +227,12 @@ def addFunds():
 
 @app.route("/addAccount", methods=["POST"])
 def addAccount():
+    new_record = {
+        'email': current_user.username, 
+        'action': 'Added account.', 
+        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+    }
+    fire_db.child('OBS').child(current_user.username).push(new_record)
     req = request.get_json()
 
     savedUser = str(current_user.username)
@@ -239,6 +252,13 @@ def addAccount():
 @app.route("/buy", methods=["POST"])
 def buyShares():
     # Retrieve amount and its in JSON form
+    new_record = {
+        'email': current_user.username, 
+        'action': 'Bought shares.', 
+        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+    }
+    fire_db.child('OBS').child(current_user.username).push(new_record)
+
     req = request.get_json()
     token=generate_token(current_user.username)
     headers = {'token': token}
@@ -318,6 +338,13 @@ def buyShares():
 
 @app.route("/sell", methods=["POST"])
 def sellShares():
+    new_record = {
+        'email': current_user.username, 
+        'action': 'Sold shares.', 
+        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+    }
+    fire_db.child('OBS').child(current_user.username).push(new_record)
+
     # Retrieve amount and its in JSON form
     req = request.get_json()
     token = generate_token(current_user.username)
@@ -402,43 +429,3 @@ def sellShares():
     res = make_response(jsonify({"message": "OK"}), 200)
     return res
 
-@app.route('/createAccount', methods=["POST"])
-def create_account():
-    username = request.json["username"]
-    balance = request.json["funds"]
-    account_name = request.json["acc_name"]
-
-    try:
-        check_account_length = fire_db.child("accounts").child(username).get().val()
-        check_account_length = list(check_account_length.items())
-    except BaseException:
-        check_account_length = []
-
-    accounts_length = len(check_account_length)
-
-    if accounts_length >= 3:
-        return jsonify(status=400, description="User cannot have more than 3 accounts.")
-
-    new_account = {
-        "username": username,
-        "balance": balance,
-        "account_name": account_name
-    }
-    
-    fire_db.child("accounts").child(username).child(account_name).set(new_account)
-
-    return jsonify(new_account)
-
-@app.route('/getAccounts', methods=["GET"])
-def get_account():
-    username = request.json["username"]
-
-    accounts = fire_db.child("accounts").child(username).get().val()
-
-    listing = []
-
-    for value in accounts.values():
-        for inner_value in value.values():
-            listing.append(inner_value)
-
-    return jsonify(listing)
