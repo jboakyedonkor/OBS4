@@ -10,19 +10,19 @@ import jwt
 from flask import Flask, request, jsonify
 import requests
 sys.path.append(os.getcwd())
-dotenv.load_dotenv(dotenv_path='.\\config\\.env')
-
+# dotenv.load_dotenv(dotenv_path='.\\config\\.env')
+dotenv.load_dotenv(dotenv_path=".{}config{}.env".format(os.sep, os.sep))
 app = Flask(__name__)
 
 config = {
-    "apiKey": os.getenv('MSFT_FB_API_KEY'),
-    "authDomain": os.getenv('MSFT_FB_AUTH_DOMAIN'),
-    "databaseURL": os.getenv('MSFT_FB_DB_URL'),
-    "projectId": os.getenv('MSFT_FB_PROJECT_ID'),
-    "storageBucket": os.getenv('MSFT_FB_STORAGE_BUCKET'),
-    "messagingSenderId": os.getenv('MSFT_FB_SENDER_ID'),
-    "appId": os.getenv('MSFT_FB_APP_ID'),
-}
+        "apiKey": os.getenv("MSFT_FB_API_KEY"),
+        "authDomain": os.getenv("MSFT_FB_AUTH_DOMAIN"),
+        "databaseURL": os.getenv("MSFT_FB_DB_URL"),
+        "projectId": os.getenv("MSFT_FB_PROJECT_ID"),
+        "storageBucket": os.getenv("MSFT_FB_STORAGE_BUCKET"),
+        "messagingSenderId": os.getenv("MSFT_FB_SENDER_ID"),
+        "appId": os.getenv("MSFT_FB_APP_ID")
+    }
 
 fire_db = pyrebase.initialize_app(config).database()
 
