@@ -102,11 +102,6 @@ steps:
   entrypoint: 'python'
   args: ['login_tests.py']
 
-#cypress tests
-#- name: 'gcr.io/cloud-builders/docker'
-#  id: 'RUN CYPRESS TESTS'
-#  args: ['run','gcr.io/$PROJECT_ID/obs4', '/bin/bash', '-c', '"cd OSB4; python main.py &;node_modules/bin/cypress run cypress/cypress/integration/sample.spec.js;exit"']
-
 # build  microsoft container
 - name: 'gcr.io/cloud-builders/docker'
   id: 'BUILD MSFT API CONTAINER'
