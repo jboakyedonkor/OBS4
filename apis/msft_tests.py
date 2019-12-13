@@ -146,9 +146,9 @@ class MsftRoutesTestCase(unittest.TestCase):
 
     def setUp(self):
         self.msft_url = "http://localhost:5003"
-        self.price_route = "/msft/share_price"
-        self.buy_route = "/msft/buy"
-        self.sell_route = "/msft/sell"
+        self.price_route = "/share_price"
+        self.buy_route = "/buy"
+        self.sell_route = "/sell"
 
         dotenv.load_dotenv(
             dotenv_path=".{}config{}.env".format(
