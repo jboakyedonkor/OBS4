@@ -34,12 +34,14 @@ class TestAPI(unittest.TestCase):
         self.aapl_buy = "/aapl/buy/"
         token = generate_token("test")
         payload = {'amount': 200}
-        headers = {"aapl_token": token}
+        headers = {"token": token}
         r = requests.get(
             self.aapl_url +
             self.aapl_buy,
             params=payload,
-            headers=headers).json()
+            headers=headers)
+        r=r.json()
+        # print(r)
         self.assertEqual(r['symbol'], "AAPL")
         self.assertEqual(r['shares_bought'], '200')
         self.assertEqual(r['user'], 'test')
@@ -49,7 +51,7 @@ class TestAPI(unittest.TestCase):
         self.aapl_sell = "/aapl/sell/"
         token = generate_token("test")
         payload = {'amount': 200}
-        headers = {"aapl_token": token}
+        headers = {"token": token}
         r = requests.get(
             self.aapl_url +
             self.aapl_sell,
