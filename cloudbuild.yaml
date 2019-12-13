@@ -99,7 +99,7 @@ steps:
 - name: 'gcr.io/$PROJECT_ID/obs4'
   id: 'RUN LOGIN TESTS'
   entrypoint: 'python'
-  args: ['web_client/login_tests.py']
+  args: ['login_tests.py']
 
 #cypress tests
 - name: 'gcr.io/cloud-builders/docker'

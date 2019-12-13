@@ -80,4 +80,4 @@ RUN apk --no-cache add build-base  libffi-dev
 RUN apk --no-cache add nodejs  npm
 RUN apk update && apk --no-cache add postgresql-dev
 RUN pip3 install --no-cache-dir  -r requirements.txt
-RUN npm install
+RUN npm install cypress
