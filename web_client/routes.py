@@ -146,14 +146,14 @@ def dashboard():
 @app.route("/logs")
 @login_required
 def transactions():
-    all_transactions = requests.get('http://localhost:5000/transaction_parse').json()
-    all_auth_log = requests.get('http://localhost:5000/auth_parse').json()
-    all_obs_log = requests.get('http://localhost:5000/obs_parse').json()
+    all_transactions = requests.get('https://0.0.0.0:8080/transaction_parse').json()
+    all_auth_log = requests.get('https://0.0.0.0:8080/auth_parse').json()
+    all_obs_log = requests.get('https://0.0.0.0:8080/obs_parse').json()
     return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log, obs_log=all_obs_log)
 
 @app.route('/auth_parse', methods=["GET", "POST"])
 def parse_auth():
-    auth_log = requests.get('http://localhost:5000/api/auth/admin').json()
+    auth_log = requests.get('https://0.0.0.0:8080/api/auth/admin').json()
     present_auth = []
 
     for user_value in auth_log.values():
@@ -164,7 +164,7 @@ def parse_auth():
 
 @app.route('/obs_parse', methods=['GET', 'POST'])
 def parse_obs():
-    obs_log = requests.get('http://localhost:5000/api/obs/admin').json()
+    obs_log = requests.get('https://0.0.0.0:8080/api/obs/admin').json()
     present_obs = []
 
     for user_value in obs_log.values():
@@ -190,7 +190,7 @@ def get_transactions():
 
 @app.route('/transaction_parse', methods=["GET", "POST"])
 def parse_trans():
-    all_transactions = requests.get('http://localhost:5000/api/transactions/admin').json()
+    all_transactions = requests.get('https://0.0.0.0:8080/api/transactions/admin').json()
     present_trans = []
 
     for user_value in all_transactions.values():
