@@ -131,7 +131,8 @@ def dashboard():
 def transactions():
     all_transactions = requests.get('http://localhost:5000/transaction_parse').json()
     all_auth_log = requests.get('http://localhost:5000/auth_parse').json()
-    return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log)
+    all_obs_log = requests.get('http://localhost:5000/obs_parse').json()
+    return render_template('transactions.html', title='Logs', all_transactions=all_transactions, auth_log=all_auth_log, obs_log=all_obs_log)
 
 @app.route('/auth_parse', methods=["GET", "POST"])
 def parse_auth():
@@ -144,10 +145,26 @@ def parse_auth():
     
     return jsonify(sorted(present_auth, key=lambda i: i["time"], reverse=True))
 
+@app.route('/obs_parse', methods=['GET', 'POST'])
+def parse_obs():
+    obs_log = requests.get('http://localhost:5000/api/obs/admin').json()
+    present_obs = []
+
+    for user_value in obs_log.values():
+        for obs in user_value.values():
+            present_obs.append(obs)
+
+    return jsonify(sorted(obs_log, key=lambda i: i["time"], reverse=True))
+
 @app.route('/api/auth/admin', methods=["GET"])
 def get_auth_log():
     auth_log = fire_db.child('AUTH').get().val()
     return jsonify(auth_log)
+
+@app.route('/api/obs/admin', methods=['GET'])
+def get_obs_log():
+    obs_log = fire_db.child('OBS').get().val()
+    return jsonify(obs_log)
 
 @app.route('/api/transactions/admin', methods=['GET', 'POST'])
 def get_transactions():
