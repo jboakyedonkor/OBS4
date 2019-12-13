@@ -249,16 +249,27 @@ function dropFunction() {
       "content-type": "application/json"
     })
   })
+
+
+   .then(function(response) {
+    if (response.status !== 200) {
+      console.log(`Looks like there was a problem. Status code: ${response.status}`);
+      return;
+    }
+    response.json().then(function(data) {
+      console.log(data);
+
+            var delayInMilliseconds = 50;
+
+    setTimeout(function() {
+          location.reload(true);
+          parent.window.location.reload(true);
+          window.location.reload(true);
+
+    }, delayInMilliseconds);
+    });
+  })
+  .catch(function(error) {
+    console.log("Fetch error: " + error);
+});
 }
-
-// window.onload = function(){ 
-// //  console.log("Loaded")
-// const url = 'http://localhost:5000/dashboard';
-
-// var token = JSON.parse(localStorage.getItem('token'))
-// console.log(`Authorization=Bearer ${token.token}`)
-// var xhr = new XMLHttpRequest();
-// xhr.open("POST", url, true);
-// xhr.setRequestHeader('Content-Type', 'application/json');
-// xhr.send(JSON.stringify({ 'token': token.token}));
-// }

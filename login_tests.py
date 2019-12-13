@@ -9,8 +9,8 @@ import jwt
 class TestUserModel(unittest.TestCase):
   
     def test_user(self):
-        username ='test4'
-        email='test4@test.com'
+        username ='welll'
+        email='welll@test.com'
         password='test'
         user = User(
             username =username,
@@ -34,13 +34,13 @@ class TestUserModel(unittest.TestCase):
         self.assertTrue(isinstance(auth_token, bytes))
         
     def test_auth(self):
-        username ='test4'
-        email='test4@test.com'
+        username ='welll'
+        email='welll@test.com'
         password='test'
         auth_token = generate_token(username);
         decoded = jwt.decode(auth_token, app.config['SECRET_KEY'], algorithms='HS256')
         print(decoded)
-        self.assertTrue(decoded['username'] == 'test4')
+        self.assertTrue(decoded['username'] == 'welll')
         
 
 if __name__ == "__main__":
