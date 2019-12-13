@@ -226,7 +226,7 @@ def addFunds():
     new_record = {
         'email': current_user.username, 
         'action': 'Added funds.', 
-        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+        'time': str(datetime.utcnow())
     }
     fire_db.child('OBS').child(current_user.username).push(new_record)
 
@@ -247,7 +247,7 @@ def addAccount():
     new_record = {
         'email': current_user.username, 
         'action': 'Added account.', 
-        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+        'time': str(datetime.utcnow())
     }
     fire_db.child('OBS').child(current_user.username).push(new_record)
     req = request.get_json()
@@ -272,7 +272,7 @@ def buyShares():
     new_record = {
         'email': current_user.username, 
         'action': 'Bought shares.', 
-        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+        'time': str(datetime.utcnow())
     }
     fire_db.child('OBS').child(current_user.username).push(new_record)
 
@@ -358,7 +358,7 @@ def sellShares():
     new_record = {
         'email': current_user.username, 
         'action': 'Sold shares.', 
-        'time': datetime.utcnow().strptime('%Y-%m-%dT%H:%M:%S.%f%z')
+        'time': str(datetime.utcnow())
     }
     fire_db.child('OBS').child(current_user.username).push(new_record)
 
